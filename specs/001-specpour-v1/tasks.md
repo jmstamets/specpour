@@ -70,12 +70,12 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - [X] T023 [P] Implement notifications thin slice: InboxMessage + ChannelPreference entities, typed notification events consumer, IEmailChannelAdapter port with per-port contract-test suite (real adapter lands in T146; push delivery deferred to Phase 2 per FR-040a), GET /api/v1/inbox in backend/src/Modules/Notifications/
 - [X] T024 [P] Implement measurements module: ConventionTable versioned reference data, canonical-ml conversion service (oz/ml/cl + dash/barspoon), method dilution constants in backend/src/Modules/Measurements/
 - [X] T025 Implement Seeder tool: convention tables, curated launch-content ingestion pipeline (recipes/ingredients/equipment/glossary from content files), first-Super-Admin bootstrap from environment config writing inaugural audit entry in backend/src/Tools/Seeder/
-- [ ] T026 Set up Reqnroll + Testcontainers acceptance harness (composed host, real PostgreSQL, clock test hook) in backend/tests/Acceptance/Support/
-- [ ] T027 [P] Set up OpenAPI contract-test harness validating running API against backend/contracts/openapi/ in backend/tests/Contract/Support/
-- [ ] T028 Scaffold Flutter core: go_router navigation, Riverpod DI, WCAG AA theming + bar-mode theme tokens, entitlement-manifest gate, api_client wiring in frontend/app/lib/core/
-- [ ] T029 Set up Drift local store skeleton (schema v1, migrator, FTS5 enablement) and repository layer pattern in frontend/app/lib/data/
-- [ ] T144 [P] Flutter compliance/age-gate feature: DOB-entry UI (form entry, not checkbox); fetch jurisdiction threshold from /compliance/age-gate; strictest-rule fallback when the jurisdiction call fails or the device is offline; persist affirmed flag locally only, in frontend/app/lib/features/compliance/
-- [ ] T145 [P] Failing-first age-gate integration tests: (1) intercept all network traffic during the gate flow and assert the DOB value appears in no request payload, (2) assert nothing DOB-derived exists outside local storage, (3) offline/lookup-failure → strictest-rule local default, in frontend/app/integration_test/age_gate_test.dart
+- [X] T026 Set up Reqnroll + Testcontainers acceptance harness (composed host, real PostgreSQL, clock test hook) in backend/tests/Acceptance/Support/
+- [X] T027 [P] Set up OpenAPI contract-test harness validating running API against backend/contracts/openapi/ in backend/tests/Contract/Support/
+- [X] T028 Scaffold Flutter core: go_router navigation, Riverpod DI, WCAG AA theming + bar-mode theme tokens, entitlement-manifest gate, api_client wiring in frontend/app/lib/core/
+- [X] T029 Set up Drift local store skeleton (schema v1, migrator, FTS5 enablement) and repository layer pattern in frontend/app/lib/data/
+- [X] T144 [P] Flutter compliance/age-gate feature: DOB-entry UI (form entry, not checkbox); fetch jurisdiction threshold from /compliance/age-gate; strictest-rule fallback when the jurisdiction call fails or the device is offline; persist affirmed flag locally only, in frontend/app/lib/features/compliance/
+- [X] T145 [P] Failing-first age-gate integration tests: (1) intercept all network traffic during the gate flow and assert the DOB value appears in no request payload, (2) assert nothing DOB-derived exists outside local storage, (3) offline/lookup-failure → strictest-rule local default, in frontend/app/integration_test/age_gate_test.dart
 
 **Checkpoint**: Foundation ready — user story phases can begin
 

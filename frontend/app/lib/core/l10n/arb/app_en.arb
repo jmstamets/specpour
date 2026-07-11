@@ -3,5 +3,33 @@
   "appTitle": "SpecPour",
   "@appTitle": {
     "description": "The application title, shown on the home screen and as the OS task label."
+  },
+  "ageGateTitle": "Confirm your age",
+  "@ageGateTitle": {
+    "description": "Title of the age-affirmation gate screen (T144)."
+  },
+  "ageGateExplanation": "SpecPour's content is intended for adults of legal drinking age. Please enter your date of birth to continue.",
+  "@ageGateExplanation": {
+    "description": "Body copy explaining why the age gate is shown."
+  },
+  "ageGateDateOfBirthLabel": "Date of birth",
+  "@ageGateDateOfBirthLabel": {
+    "description": "Label for the date-of-birth entry field."
+  },
+  "ageGateDatePickerHint": "Select your date of birth",
+  "@ageGateDatePickerHint": {
+    "description": "Placeholder shown before a date has been selected."
+  },
+  "ageGateConfirmButton": "Confirm",
+  "@ageGateConfirmButton": {
+    "description": "Button that submits the entered date of birth for the local age check."
+  },
+  "ageGateMissingDateOfBirth": "Please select your date of birth.",
+  "@ageGateMissingDateOfBirth": {
+    "description": "Validation message when the user taps confirm without selecting a date."
+  },
+  "ageGateUnderageMessage": "We're sorry, you must be of legal drinking age to use SpecPour.",
+  "@ageGateUnderageMessage": {
+    "description": "Rejection message shown when the entered date of birth is under the legal drinking age threshold."
   }
 }

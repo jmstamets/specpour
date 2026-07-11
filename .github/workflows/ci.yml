@@ -27,7 +27,13 @@ jobs:
   # --- Backend: the four CI merge-gate suites (Principle I), run separately so a
   # failure in one doesn't hide the others. Acceptance/Contract/Integration use
   # Testcontainers against real PostgreSQL — the ubuntu-latest runner's Docker
-  # daemon provides that. ---
+  # daemon provides that. Acceptance/Contract also shell out to the built
+  # MigrationRunner.dll (T026/T027) rather than duplicating its migrator-ordering
+  # list, and Contract shells out to `npx @redocly/cli bundle` (T027) the same way
+  # client-regen-drift-check already does — ubuntu-latest ships Node.js, no explicit
+  # setup-node step needed, matching that job. Each matrix job is a fresh runner (no
+  # shared filesystem with backend-build despite `needs:`), so the whole solution is
+  # built here too, not just the one suite's own project. ---
   backend-tests:
     needs: backend-build
     runs-on: ubuntu-latest
@@ -40,7 +46,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-      - run: dotnet test backend/tests/${{ matrix.suite }} -c Release
+      - run: dotnet build backend/SpecPour.slnx -c Release
+      - run: dotnet test backend/tests/${{ matrix.suite }} -c Release --no-build
 
   # --- Frontend: analyzer + formatting gate (mirrors T006's local commands). ---
   frontend-analyze:

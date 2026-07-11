@@ -5,6 +5,7 @@ using SpecPour.Api.Observability;
 using SpecPour.Api.RateLimiting;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Http;
+using SpecPour.BuildingBlocks.Time;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,9 @@ builder.Services.AddSpecPourHealthChecks(connectionString);
 builder.Services.AddAuthorization();
 builder.Services.AddSpecPourOpenTelemetry(builder.Configuration);
 builder.Services.AddSpecPourOutboxDispatcher(connectionString);
+// T026: acceptance tests override this with a settable TestClock via
+// WebApplicationFactory's ConfigureTestServices — production always gets real time.
+builder.Services.AddSingleton<IClock, SystemClock>();
 
 foreach (var module in ModuleRegistry.All)
 {
@@ -47,6 +51,15 @@ else
 {
     app.UseExceptionHandler();
 }
+
+// Every non-2xx response must be problem+json (T007's global convention,
+// contracts/openapi/openapi.yaml). Without this, ASP.NET Core's authentication
+// challenge (401 on a missing/invalid bearer token) writes only a bare status code
+// and a WWW-Authenticate header with an EMPTY body — UseStatusCodePages wraps the
+// downstream pipeline and, whenever it sees an error status with no body written
+// yet, asks AddProblemDetails() (registered above) to fill one in. Must be
+// registered before UseAuthentication/UseAuthorization so it can see their result.
+app.UseStatusCodePages();
 
 app.UseRateLimiter();
 

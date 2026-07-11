@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'l10n/gen/app_localizations.dart';
-import '../features/home/home_page.dart';
+import 'routing/app_router.dart';
+import 'theme/app_theme.dart';
 
-/// Root widget. Routing (go_router), DI (Riverpod), and full theming
-/// (WCAG AA + bar-mode tokens) land in the Foundational phase (plan.md T028) —
-/// this is the Phase 1 scaffold wiring the app shell and i18n only.
-class SpecPourApp extends StatelessWidget {
+/// Root widget (T028): go_router navigation, WCAG AA light/dark theming. Riverpod DI
+/// wraps this in main.dart (ProviderScope); bar mode's theme is opted into per-screen
+/// by T126, not applied app-wide here.
+class SpecPourApp extends ConsumerWidget {
   const SpecPourApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const HomePage(),
+      theme: SpecPourTheme.light(),
+      darkTheme: SpecPourTheme.dark(),
+      routerConfig: router,
     );
   }
 }

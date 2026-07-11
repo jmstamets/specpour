@@ -99,6 +99,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SpecPour'**
   String get appTitle;
+
+  /// Title of the age-affirmation gate screen (T144).
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your age'**
+  String get ageGateTitle;
+
+  /// Body copy explaining why the age gate is shown.
+  ///
+  /// In en, this message translates to:
+  /// **'SpecPour\'s content is intended for adults of legal drinking age. Please enter your date of birth to continue.'**
+  String get ageGateExplanation;
+
+  /// Label for the date-of-birth entry field.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth'**
+  String get ageGateDateOfBirthLabel;
+
+  /// Placeholder shown before a date has been selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your date of birth'**
+  String get ageGateDatePickerHint;
+
+  /// Button that submits the entered date of birth for the local age check.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get ageGateConfirmButton;
+
+  /// Validation message when the user taps confirm without selecting a date.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select your date of birth.'**
+  String get ageGateMissingDateOfBirth;
+
+  /// Rejection message shown when the entered date of birth is under the legal drinking age threshold.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re sorry, you must be of legal drinking age to use SpecPour.'**
+  String get ageGateUnderageMessage;
 }
 
 class _AppLocalizationsDelegate
