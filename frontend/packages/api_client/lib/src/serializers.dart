@@ -15,13 +15,17 @@ import 'package:api_client/src/date_serializer.dart';
 import 'package:api_client/src/model/date.dart';
 
 import 'package:api_client/src/model/cursor_page.dart';
+import 'package:api_client/src/model/entitlement_manifest.dart';
 import 'package:api_client/src/model/problem_details.dart';
+import 'package:api_client/src/model/role_grant_summary.dart';
 
 part 'serializers.g.dart';
 
 @SerializersFor([
   CursorPage,
+  EntitlementManifest,
   ProblemDetails,
+  RoleGrantSummary,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..add(const OneOfSerializer())

@@ -8,7 +8,16 @@ part of 'serializers.dart';
 
 Serializers _$serializers = (Serializers().toBuilder()
       ..add(CursorPage.serializer)
+      ..add(EntitlementManifest.serializer)
       ..add(ProblemDetails.serializer)
+      ..add(RoleGrantSummary.serializer)
+      ..add(RoleGrantSummaryScopeTypeEnum.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(RoleGrantSummary)]),
+          () => ListBuilder<RoleGrantSummary>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType.nullable(JsonObject)]),

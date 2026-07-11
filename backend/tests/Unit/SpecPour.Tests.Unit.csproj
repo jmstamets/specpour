@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Api\SpecPour.Api.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Identity\Infrastructure\SpecPour.Modules.Identity.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

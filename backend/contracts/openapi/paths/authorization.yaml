@@ -1,0 +1,60 @@
+meEntitlements:
+  get:
+    operationId: getMyEntitlements
+    tags: [authorization]
+    summary: Get the caller's entitlement manifest
+    description: >-
+      Returns the caller's tier, the capabilities that tier grants, and any active
+      platform-scope role grants (constitution Principle VI's three independent axes:
+      tier, role, scope). Works for both anonymous callers (guest pseudo-tier floor,
+      FR-004b) and authenticated users — there is no unauthorized case for this
+      endpoint. The client uses this manifest to shape UI (e.g. show admin routes only
+      when a role grant is present); enforcement itself always happens server-side.
+    security:
+      - {}
+      - bearerAuth: []
+    responses:
+      '200':
+        description: The caller's entitlement manifest.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntitlementManifest'
+
+components:
+  schemas:
+    EntitlementManifest:
+      type: object
+      description: >-
+        Shapes client UI only; every capability/role check is re-enforced server-side
+        on the actual operation.
+      properties:
+        tier:
+          type: string
+          description: Stable tier key (e.g. "guest", "default") — never a display string.
+        capabilities:
+          type: array
+          items:
+            type: string
+          description: Capability keys granted to the caller's tier.
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleGrantSummary'
+          description: Active platform-scope role grants held by the caller (empty for guests).
+      required: [tier, capabilities, roles]
+
+    RoleGrantSummary:
+      type: object
+      properties:
+        roleKey:
+          type: string
+          description: Stable platform role key (e.g. "curator", "super_admin").
+        scopeType:
+          type: string
+          enum: [platform, venue]
+        scopeId:
+          type: [string, "null"]
+          format: uuid
+          description: Null for platform-scope grants (V1 issues platform-scope grants only, FR-063).
+      required: [roleKey, scopeType, scopeId]

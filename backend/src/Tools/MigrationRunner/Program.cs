@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SpecPour.BuildingBlocks.Modules;
+using SpecPour.Modules.Authorization.Infrastructure;
+using SpecPour.Modules.Identity.Infrastructure;
 using SpecPour.Tools.MigrationRunner.Persistence;
 
 // Deploy-time migration job (constitution Principle III / research R3: forward-only,
@@ -37,8 +39,8 @@ Console.WriteLine("Base migration applied.");
 // than an accident of assembly-scan ordering.
 IModuleMigrator[] moduleMigrators =
 [
-    // new IdentityModuleMigrator(),      // T016
-    // new AuthorizationModuleMigrator(), // T018
+    new IdentityModuleMigrator(), // T016
+    new AuthorizationModuleMigrator(), // T018
     // ...
 ];
 

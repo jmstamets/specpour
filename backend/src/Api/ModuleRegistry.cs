@@ -13,8 +13,8 @@ public static class ModuleRegistry
 {
     public static IReadOnlyList<IModule> All { get; } =
     [
-        // new Modules.Identity.Infrastructure.IdentityModule(),           // T016
-        // new Modules.Authorization.Infrastructure.AuthorizationModule(), // T018
+        new Modules.Identity.Infrastructure.IdentityModule(), // T016
+        new Modules.Authorization.Infrastructure.AuthorizationModule(), // T018
         // ...
     ];
 }

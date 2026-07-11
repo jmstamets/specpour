@@ -50,6 +50,16 @@ Please follow the [installation procedure](#installation--usage) and then run th
 ```dart
 import 'package:api_client/api_client.dart';
 
+
+final api = ApiClient().getAuthorizationApi();
+
+try {
+    final response = await api.getMyEntitlements();
+    print(response);
+} on DioException catch (e) {
+    print("Exception when calling AuthorizationApi->getMyEntitlements: $e\n");
+}
+
 ```
 
 ## Documentation for API Endpoints
@@ -58,12 +68,15 @@ All URIs are relative to */api/v1*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*AuthorizationApi*](doc/AuthorizationApi.md) | [**getMyEntitlements**](doc/AuthorizationApi.md#getmyentitlements) | **GET** /me/entitlements | Get the caller&#39;s entitlement manifest
 
 
 ## Documentation For Models
 
  - [CursorPage](doc/CursorPage.md)
+ - [EntitlementManifest](doc/EntitlementManifest.md)
  - [ProblemDetails](doc/ProblemDetails.md)
+ - [RoleGrantSummary](doc/RoleGrantSummary.md)
 
 
 ## Documentation For Authorization
@@ -76,5 +89,6 @@ Authentication schemes defined for the API:
 
 
 ## Author
+
 
 

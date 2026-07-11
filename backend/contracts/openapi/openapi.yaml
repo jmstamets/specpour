@@ -52,7 +52,9 @@ tags:
   - name: sync
   - name: seo
 
-paths: {}
+paths:
+  /me/entitlements:
+    $ref: './paths/authorization.yaml#/meEntitlements'
 # Populated incrementally by per-story tasks via $ref, e.g.:
 #   /recipes:
 #     $ref: './paths/catalog.yaml#/recipes'

@@ -8,14 +8,26 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SPEC="$ROOT/backend/contracts/openapi/openapi.yaml"
 OUT_DIR="$ROOT/frontend/packages/api_client"
+BUNDLE="$(mktemp -t specpour-openapi-bundle-XXXXXX.yaml)"
+trap 'rm -f "$BUNDLE"' EXIT
 
 echo "Generating Dart client: $SPEC -> $OUT_DIR"
+
+# Bundle the multi-file OpenAPI document (root + per-module paths/*.yaml) into one
+# self-contained file first. Feeding openapi-generator-cli the raw multi-file spec
+# directly works, but its cross-file $ref resolution loses named-component identity
+# for schemas defined inside a path file (e.g. authorization.yaml's
+# EntitlementManifest), so it synthesizes ugly operation-derived Dart class names
+# instead. Bundling with Redocly resolves every $ref into one document up front,
+# preserving the authored schema names.
+echo "Bundling multi-file OpenAPI document..."
+npx --yes @redocly/cli bundle "$SPEC" -o "$BUNDLE"
 
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"
 
 npx --yes @openapitools/openapi-generator-cli@2.39.1 generate \
-  -i "$SPEC" \
+  -i "$BUNDLE" \
   -g dart-dio \
   -o "$OUT_DIR" \
   --additional-properties="pubName=api_client,pubAuthor=SpecPour,nullableFields=true,hideGenerationTimestamp=true" \
