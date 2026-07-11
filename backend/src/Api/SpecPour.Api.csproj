@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+    <!-- Pin above Microsoft.AspNetCore.OpenApi's transitive 2.0.0, which carries
+         GHSA-v5pm-xwqc-g5wc (high severity). -->
+    <PackageReference Include="Microsoft.OpenApi" Version="2.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Infrastructure\SpecPour.Modules.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Contracts\SpecPour.Modules.Identity.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Authorization\Infrastructure\SpecPour.Modules.Authorization.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Authorization\Contracts\SpecPour.Modules.Authorization.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Catalog\Infrastructure\SpecPour.Modules.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Catalog\Contracts\SpecPour.Modules.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Ingredients\Infrastructure\SpecPour.Modules.Ingredients.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Ingredients\Contracts\SpecPour.Modules.Ingredients.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Equipment\Infrastructure\SpecPour.Modules.Equipment.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Equipment\Contracts\SpecPour.Modules.Equipment.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Glossary\Infrastructure\SpecPour.Modules.Glossary.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Glossary\Contracts\SpecPour.Modules.Glossary.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Community\Infrastructure\SpecPour.Modules.Community.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Community\Contracts\SpecPour.Modules.Community.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Inventory\Infrastructure\SpecPour.Modules.Inventory.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Inventory\Contracts\SpecPour.Modules.Inventory.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Measurements\Infrastructure\SpecPour.Modules.Measurements.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Measurements\Contracts\SpecPour.Modules.Measurements.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Shopping\Infrastructure\SpecPour.Modules.Shopping.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Shopping\Contracts\SpecPour.Modules.Shopping.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Prep\Infrastructure\SpecPour.Modules.Prep.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Prep\Contracts\SpecPour.Modules.Prep.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Collections\Infrastructure\SpecPour.Modules.Collections.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Collections\Contracts\SpecPour.Modules.Collections.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\TastingLog\Infrastructure\SpecPour.Modules.TastingLog.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\TastingLog\Contracts\SpecPour.Modules.TastingLog.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Search\Infrastructure\SpecPour.Modules.Search.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Search\Contracts\SpecPour.Modules.Search.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Media\Infrastructure\SpecPour.Modules.Media.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Media\Contracts\SpecPour.Modules.Media.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Ai\Infrastructure\SpecPour.Modules.Ai.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Ai\Contracts\SpecPour.Modules.Ai.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Notifications\Infrastructure\SpecPour.Modules.Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Notifications\Contracts\SpecPour.Modules.Notifications.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Compliance\Infrastructure\SpecPour.Modules.Compliance.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Compliance\Contracts\SpecPour.Modules.Compliance.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Venues\Infrastructure\SpecPour.Modules.Venues.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Venues\Contracts\SpecPour.Modules.Venues.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

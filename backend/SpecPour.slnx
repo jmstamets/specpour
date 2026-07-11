@@ -1,0 +1,277 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Api/">
+    <Project Path="src/Api/SpecPour.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/SpecPour.BuildingBlocks.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Ai/" />
+  <Folder Name="/src/Modules/Ai/Application/">
+    <Project Path="src/Modules/Ai/Application/SpecPour.Modules.Ai.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ai/Contracts/">
+    <Project Path="src/Modules/Ai/Contracts/SpecPour.Modules.Ai.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ai/Domain/">
+    <Project Path="src/Modules/Ai/Domain/SpecPour.Modules.Ai.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ai/Infrastructure/">
+    <Project Path="src/Modules/Ai/Infrastructure/SpecPour.Modules.Ai.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Authorization/" />
+  <Folder Name="/src/Modules/Authorization/Application/">
+    <Project Path="src/Modules/Authorization/Application/SpecPour.Modules.Authorization.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Authorization/Contracts/">
+    <Project Path="src/Modules/Authorization/Contracts/SpecPour.Modules.Authorization.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Authorization/Domain/">
+    <Project Path="src/Modules/Authorization/Domain/SpecPour.Modules.Authorization.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Authorization/Infrastructure/">
+    <Project Path="src/Modules/Authorization/Infrastructure/SpecPour.Modules.Authorization.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/" />
+  <Folder Name="/src/Modules/Catalog/Application/">
+    <Project Path="src/Modules/Catalog/Application/SpecPour.Modules.Catalog.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/Contracts/">
+    <Project Path="src/Modules/Catalog/Contracts/SpecPour.Modules.Catalog.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/Domain/">
+    <Project Path="src/Modules/Catalog/Domain/SpecPour.Modules.Catalog.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/Infrastructure/">
+    <Project Path="src/Modules/Catalog/Infrastructure/SpecPour.Modules.Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Collections/" />
+  <Folder Name="/src/Modules/Collections/Application/">
+    <Project Path="src/Modules/Collections/Application/SpecPour.Modules.Collections.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Collections/Contracts/">
+    <Project Path="src/Modules/Collections/Contracts/SpecPour.Modules.Collections.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Collections/Domain/">
+    <Project Path="src/Modules/Collections/Domain/SpecPour.Modules.Collections.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Collections/Infrastructure/">
+    <Project Path="src/Modules/Collections/Infrastructure/SpecPour.Modules.Collections.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Community/" />
+  <Folder Name="/src/Modules/Community/Application/">
+    <Project Path="src/Modules/Community/Application/SpecPour.Modules.Community.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Community/Contracts/">
+    <Project Path="src/Modules/Community/Contracts/SpecPour.Modules.Community.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Community/Domain/">
+    <Project Path="src/Modules/Community/Domain/SpecPour.Modules.Community.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Community/Infrastructure/">
+    <Project Path="src/Modules/Community/Infrastructure/SpecPour.Modules.Community.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Compliance/" />
+  <Folder Name="/src/Modules/Compliance/Application/">
+    <Project Path="src/Modules/Compliance/Application/SpecPour.Modules.Compliance.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Compliance/Contracts/">
+    <Project Path="src/Modules/Compliance/Contracts/SpecPour.Modules.Compliance.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Compliance/Domain/">
+    <Project Path="src/Modules/Compliance/Domain/SpecPour.Modules.Compliance.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Compliance/Infrastructure/">
+    <Project Path="src/Modules/Compliance/Infrastructure/SpecPour.Modules.Compliance.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Equipment/" />
+  <Folder Name="/src/Modules/Equipment/Application/">
+    <Project Path="src/Modules/Equipment/Application/SpecPour.Modules.Equipment.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Equipment/Contracts/">
+    <Project Path="src/Modules/Equipment/Contracts/SpecPour.Modules.Equipment.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Equipment/Domain/">
+    <Project Path="src/Modules/Equipment/Domain/SpecPour.Modules.Equipment.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Equipment/Infrastructure/">
+    <Project Path="src/Modules/Equipment/Infrastructure/SpecPour.Modules.Equipment.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Glossary/" />
+  <Folder Name="/src/Modules/Glossary/Application/">
+    <Project Path="src/Modules/Glossary/Application/SpecPour.Modules.Glossary.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Glossary/Contracts/">
+    <Project Path="src/Modules/Glossary/Contracts/SpecPour.Modules.Glossary.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Glossary/Domain/">
+    <Project Path="src/Modules/Glossary/Domain/SpecPour.Modules.Glossary.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Glossary/Infrastructure/">
+    <Project Path="src/Modules/Glossary/Infrastructure/SpecPour.Modules.Glossary.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/" />
+  <Folder Name="/src/Modules/Identity/Application/">
+    <Project Path="src/Modules/Identity/Application/SpecPour.Modules.Identity.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/Contracts/">
+    <Project Path="src/Modules/Identity/Contracts/SpecPour.Modules.Identity.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/Domain/">
+    <Project Path="src/Modules/Identity/Domain/SpecPour.Modules.Identity.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/Infrastructure/">
+    <Project Path="src/Modules/Identity/Infrastructure/SpecPour.Modules.Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ingredients/" />
+  <Folder Name="/src/Modules/Ingredients/Application/">
+    <Project Path="src/Modules/Ingredients/Application/SpecPour.Modules.Ingredients.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ingredients/Contracts/">
+    <Project Path="src/Modules/Ingredients/Contracts/SpecPour.Modules.Ingredients.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ingredients/Domain/">
+    <Project Path="src/Modules/Ingredients/Domain/SpecPour.Modules.Ingredients.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ingredients/Infrastructure/">
+    <Project Path="src/Modules/Ingredients/Infrastructure/SpecPour.Modules.Ingredients.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Inventory/" />
+  <Folder Name="/src/Modules/Inventory/Application/">
+    <Project Path="src/Modules/Inventory/Application/SpecPour.Modules.Inventory.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Inventory/Contracts/">
+    <Project Path="src/Modules/Inventory/Contracts/SpecPour.Modules.Inventory.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Inventory/Domain/">
+    <Project Path="src/Modules/Inventory/Domain/SpecPour.Modules.Inventory.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Inventory/Infrastructure/">
+    <Project Path="src/Modules/Inventory/Infrastructure/SpecPour.Modules.Inventory.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Measurements/" />
+  <Folder Name="/src/Modules/Measurements/Application/">
+    <Project Path="src/Modules/Measurements/Application/SpecPour.Modules.Measurements.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Measurements/Contracts/">
+    <Project Path="src/Modules/Measurements/Contracts/SpecPour.Modules.Measurements.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Measurements/Domain/">
+    <Project Path="src/Modules/Measurements/Domain/SpecPour.Modules.Measurements.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Measurements/Infrastructure/">
+    <Project Path="src/Modules/Measurements/Infrastructure/SpecPour.Modules.Measurements.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Media/" />
+  <Folder Name="/src/Modules/Media/Application/">
+    <Project Path="src/Modules/Media/Application/SpecPour.Modules.Media.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Media/Contracts/">
+    <Project Path="src/Modules/Media/Contracts/SpecPour.Modules.Media.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Media/Domain/">
+    <Project Path="src/Modules/Media/Domain/SpecPour.Modules.Media.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Media/Infrastructure/">
+    <Project Path="src/Modules/Media/Infrastructure/SpecPour.Modules.Media.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Notifications/" />
+  <Folder Name="/src/Modules/Notifications/Application/">
+    <Project Path="src/Modules/Notifications/Application/SpecPour.Modules.Notifications.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Notifications/Contracts/">
+    <Project Path="src/Modules/Notifications/Contracts/SpecPour.Modules.Notifications.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Notifications/Domain/">
+    <Project Path="src/Modules/Notifications/Domain/SpecPour.Modules.Notifications.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Notifications/Infrastructure/">
+    <Project Path="src/Modules/Notifications/Infrastructure/SpecPour.Modules.Notifications.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Prep/" />
+  <Folder Name="/src/Modules/Prep/Application/">
+    <Project Path="src/Modules/Prep/Application/SpecPour.Modules.Prep.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Prep/Contracts/">
+    <Project Path="src/Modules/Prep/Contracts/SpecPour.Modules.Prep.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Prep/Domain/">
+    <Project Path="src/Modules/Prep/Domain/SpecPour.Modules.Prep.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Prep/Infrastructure/">
+    <Project Path="src/Modules/Prep/Infrastructure/SpecPour.Modules.Prep.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Search/" />
+  <Folder Name="/src/Modules/Search/Application/">
+    <Project Path="src/Modules/Search/Application/SpecPour.Modules.Search.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Search/Contracts/">
+    <Project Path="src/Modules/Search/Contracts/SpecPour.Modules.Search.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Search/Domain/">
+    <Project Path="src/Modules/Search/Domain/SpecPour.Modules.Search.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Search/Infrastructure/">
+    <Project Path="src/Modules/Search/Infrastructure/SpecPour.Modules.Search.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Shopping/" />
+  <Folder Name="/src/Modules/Shopping/Application/">
+    <Project Path="src/Modules/Shopping/Application/SpecPour.Modules.Shopping.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Shopping/Contracts/">
+    <Project Path="src/Modules/Shopping/Contracts/SpecPour.Modules.Shopping.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Shopping/Domain/">
+    <Project Path="src/Modules/Shopping/Domain/SpecPour.Modules.Shopping.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Shopping/Infrastructure/">
+    <Project Path="src/Modules/Shopping/Infrastructure/SpecPour.Modules.Shopping.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/TastingLog/" />
+  <Folder Name="/src/Modules/TastingLog/Application/">
+    <Project Path="src/Modules/TastingLog/Application/SpecPour.Modules.TastingLog.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/TastingLog/Contracts/">
+    <Project Path="src/Modules/TastingLog/Contracts/SpecPour.Modules.TastingLog.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/TastingLog/Domain/">
+    <Project Path="src/Modules/TastingLog/Domain/SpecPour.Modules.TastingLog.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/TastingLog/Infrastructure/">
+    <Project Path="src/Modules/TastingLog/Infrastructure/SpecPour.Modules.TastingLog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Venues/" />
+  <Folder Name="/src/Modules/Venues/Application/">
+    <Project Path="src/Modules/Venues/Application/SpecPour.Modules.Venues.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Venues/Contracts/">
+    <Project Path="src/Modules/Venues/Contracts/SpecPour.Modules.Venues.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Venues/Domain/">
+    <Project Path="src/Modules/Venues/Domain/SpecPour.Modules.Venues.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Venues/Infrastructure/">
+    <Project Path="src/Modules/Venues/Infrastructure/SpecPour.Modules.Venues.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Tools/" />
+  <Folder Name="/src/Tools/MigrationRunner/">
+    <Project Path="src/Tools/MigrationRunner/SpecPour.Tools.MigrationRunner.csproj" />
+  </Folder>
+  <Folder Name="/src/Tools/Seeder/">
+    <Project Path="src/Tools/Seeder/SpecPour.Tools.Seeder.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Acceptance/">
+    <Project Path="tests/Acceptance/SpecPour.Tests.Acceptance.csproj" />
+  </Folder>
+  <Folder Name="/tests/Contract/">
+    <Project Path="tests/Contract/SpecPour.Tests.Contract.csproj" />
+  </Folder>
+  <Folder Name="/tests/Integration/">
+    <Project Path="tests/Integration/SpecPour.Tests.Integration.csproj" />
+  </Folder>
+  <Folder Name="/tests/Unit/">
+    <Project Path="tests/Unit/SpecPour.Tests.Unit.csproj" />
+  </Folder>
+</Solution>

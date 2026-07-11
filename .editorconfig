@@ -1,0 +1,26 @@
+# Repo-wide baseline. Language-specific analyzer rules layer on top:
+# backend/.editorconfig (C#/.NET) and frontend/app/analysis_options.yaml (Dart).
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.cs]
+indent_size = 4
+
+[*.dart]
+indent_size = 2
+
+[Makefile]
+indent_style = tab

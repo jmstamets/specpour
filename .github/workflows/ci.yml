@@ -1,0 +1,154 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  FLUTTER_VERSION: "3.44.6"
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+
+jobs:
+  # --- Backend: build (analyzers + treat-warnings-as-errors are enforced via
+  # backend/Directory.Build.props, so a clean build already gates code style). ---
+  backend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - run: dotnet restore backend/SpecPour.slnx
+      - run: dotnet build backend/SpecPour.slnx --no-restore -c Release
+
+  # --- Backend: the four CI merge-gate suites (Principle I), run separately so a
+  # failure in one doesn't hide the others. Acceptance/Contract/Integration use
+  # Testcontainers against real PostgreSQL — the ubuntu-latest runner's Docker
+  # daemon provides that. ---
+  backend-tests:
+    needs: backend-build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [Acceptance, Contract, Integration, Unit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - run: dotnet test backend/tests/${{ matrix.suite }} -c Release
+
+  # --- Frontend: analyzer + formatting gate (mirrors T006's local commands). ---
+  frontend-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - working-directory: frontend/app
+        run: flutter pub get
+      - working-directory: frontend/app
+        run: flutter analyze
+      - working-directory: frontend/app
+        run: dart format --output=none --set-exit-if-changed .
+
+  # --- Frontend: unit/widget suite (no device required). ---
+  frontend-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - working-directory: frontend/app
+        run: flutter pub get
+      - working-directory: frontend/app
+        run: flutter test
+
+  # --- Frontend: client acceptance flows (quickstart.md: `flutter test
+  # integration_test`). The `integration_test` package doesn't support web or
+  # Linux-desktop devices, so this runs against an Android emulator — Android is
+  # one of the plan's three first-class target platforms. ---
+  frontend-integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - working-directory: frontend/app
+        run: flutter pub get
+      - name: Run integration_test on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          working-directory: frontend/app
+          script: flutter test integration_test
+
+  # --- Generated client must never drift from the authored OpenAPI document
+  # (Principle II hand-edit prohibition — T008). ---
+  client-regen-drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - run: scripts/check-client-drift.sh
+
+  # --- Dependency scanning: fail on known-vulnerable NuGet and pub packages. ---
+  dependency-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: NuGet vulnerable-package scan
+        run: |
+          dotnet restore backend/SpecPour.slnx
+          dotnet list backend/SpecPour.slnx package --vulnerable --include-transitive 2>&1 | tee vulnerable.log
+          if grep -q "has the following vulnerable packages" vulnerable.log; then
+            echo "::error::Vulnerable NuGet packages found (see log above)."
+            exit 1
+          fi
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - name: pub outdated (advisory — informational only)
+        working-directory: frontend/app
+        run: |
+          flutter pub get
+          dart pub outdated || true
+
+  # --- Container scanning: the built API image (docker-compose.yml's api service). ---
+  container-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build API image
+        run: docker build -t specpour-api:ci -f backend/src/Api/Dockerfile backend
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: specpour-api:ci
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: true

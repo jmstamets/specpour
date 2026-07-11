@@ -1,0 +1,81 @@
+# Local development stack for SpecPour: PostgreSQL+PostGIS, MinIO (S3-compatible
+# object storage), an OpenTelemetry collector, and the API host itself.
+# Cloud-agnostic per constitution Technology & Standards — nothing here binds to a
+# specific cloud provider; production swaps compose for the target orchestrator.
+
+services:
+  postgres:
+    image: postgis/postgis:17-3.5
+    container_name: specpour-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: specpour
+      POSTGRES_PASSWORD: specpour_dev_only
+      POSTGRES_DB: specpour
+    ports:
+      - "5432:5432"
+    volumes:
+      - specpour-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U specpour -d specpour"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: specpour-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: specpour
+      MINIO_ROOT_PASSWORD: specpour_dev_only
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Web console
+    volumes:
+      - specpour-minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: specpour-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: src/Api/Dockerfile
+    container_name: specpour-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=specpour;Username=specpour;Password=specpour_dev_only"
+      ObjectStorage__Endpoint: "http://minio:9000"
+      ObjectStorage__AccessKey: specpour
+      ObjectStorage__SecretKey: specpour_dev_only
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+    ports:
+      - "5001:8080"
+
+volumes:
+  specpour-postgres-data:
+  specpour-minio-data:

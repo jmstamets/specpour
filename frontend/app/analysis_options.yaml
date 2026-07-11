@@ -1,0 +1,27 @@
+# Static analysis config (T006). CI runs `flutter analyze` and
+# `dart format --output=none --set-exit-if-changed .` as merge gates (see
+# .github/workflows/ci.yml) — both must be clean, matching the C#
+# treat-warnings-as-errors posture in backend/Directory.Build.props.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "lib/core/l10n/gen/**"          # generated from ARB — see l10n.yaml
+    - "**/*.g.dart"                    # generated (json_serializable, drift, etc.)
+    - "**/*.freezed.dart"
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    prefer_single_quotes: true
+    always_declare_return_types: true
+    avoid_print: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    unnecessary_lambdas: true
+    require_trailing_commas: true
+
+# https://dart.dev/guides/language/analysis-options

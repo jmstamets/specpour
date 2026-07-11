@@ -1,0 +1,149 @@
+openapi: 3.1.0
+info:
+  title: SpecPour API
+  version: "1.0"
+  description: >-
+    Contract-first REST surface for SpecPour (constitution Principle II). This
+    document is the reviewed source of truth: server contract tests validate the
+    running API against it, and the Dart client (frontend/packages/api_client/) is
+    generated from it — never hand-edited (see scripts/generate-client.sh).
+
+
+    Per-module path documents are authored incrementally alongside their
+    implementation tasks and merged here via `$ref` (see contracts/api-v1-surface.md
+    for the full planned surface by module). Breaking changes require a new
+    `/api/v2` document plus a deprecation window, per Principle II.
+
+
+    **Sensitive-PII invariant**: no schema in this document may expose a raw
+    `dateOfBirth` field except the `MeExport` schema returned by `GET /me/export`
+    (the sole raw-DOB surface, FR-002b/SC-017). Every other authenticated or public
+    schema exposes only derived predicates (e.g. `isOfLegalDrinkingAge`) or a
+    verified-status flag. Contract tests enforce this invariant across the whole
+    document — see backend/tests/Contract/.
+
+servers:
+  - url: /api/v1
+    description: Default (versioned path; host varies by environment)
+
+security:
+  - {}
+  - bearerAuth: []
+
+tags:
+  - name: identity
+  - name: authorization
+  - name: catalog
+  - name: ingredients
+  - name: equipment
+  - name: glossary
+  - name: community
+  - name: inventory
+  - name: measurements
+  - name: shopping
+  - name: prep
+  - name: collections
+  - name: ai
+  - name: tasting-log
+  - name: search
+  - name: notifications
+  - name: compliance
+  - name: venues
+  - name: sync
+  - name: seo
+
+paths: {}
+# Populated incrementally by per-story tasks via $ref, e.g.:
+#   /recipes:
+#     $ref: './paths/catalog.yaml#/recipes'
+# See tasks.md T037 onward for the per-module path authoring schedule.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >-
+        OAuth2/OIDC access token issued by the identity module (OpenIddict,
+        authorization code + refresh). Anonymous (guest) access is permitted on
+        public read endpoints, subject to rate limiting (FR-004b).
+
+  parameters:
+    CursorParam:
+      name: cursor
+      in: query
+      required: false
+      description: Opaque pagination cursor from a previous page's `nextCursor`.
+      schema:
+        type: string
+    LimitParam:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of items to return.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  schemas:
+    # --- RFC 9457 problem+json (global error convention) ---
+    ProblemDetails:
+      type: object
+      description: RFC 9457 problem details. Every non-2xx response uses this shape.
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: A URI identifying the problem type. "about:blank" if none is more specific.
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+        status:
+          type: integer
+          description: The HTTP status code.
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+        instance:
+          type: string
+          format: uri-reference
+          description: A URI identifying the specific occurrence of the problem.
+        correlationId:
+          type: string
+          description: Correlation ID propagated from request tracing (OTel), for support/debugging.
+      required: [title, status]
+
+    # --- Cursor pagination envelope (global convention) ---
+    CursorPage:
+      type: object
+      description: >-
+        Generic cursor-paginated envelope. Per-endpoint response schemas compose
+        this with an `items` array of the concrete resource type.
+      properties:
+        items:
+          type: array
+          items: {}
+        nextCursor:
+          type: [string, "null"]
+          description: Pass as `cursor` to fetch the next page; null when no further pages exist.
+      required: [items]
+
+  responses:
+    ProblemResponse:
+      description: An error response in RFC 9457 problem+json format.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    UnauthorizedResponse:
+      description: >-
+        Missing or invalid bearer token. For guest-gated actions, `detail` carries
+        a sign-in prompt payload preserving the caller's original intent so the
+        client can resume the action post-signup.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'

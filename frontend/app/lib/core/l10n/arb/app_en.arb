@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "SpecPour",
+  "@appTitle": {
+    "description": "The application title, shown on the home screen and as the OS task label."
+  }
+}
