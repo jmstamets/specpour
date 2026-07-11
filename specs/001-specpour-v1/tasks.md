@@ -51,12 +51,12 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 
 **Purpose**: Cross-cutting infrastructure every story depends on — no story work before this completes
 
-- [ ] T010 Implement BuildingBlocks: module composition interface (IModule), UUIDv7 generator, problem+json helpers, domain-event envelope in backend/src/BuildingBlocks/
-- [ ] T011 Implement outbox-backed domain-event dispatcher (outbox table pattern, transactional write, background dispatcher) in backend/src/BuildingBlocks/Events/
-- [ ] T012 Implement MigrationRunner tool (per-module forward-only EF Core migrations, ordered apply) in backend/src/Tools/MigrationRunner/
-- [ ] T013 Create base migration: 18 module schemas (identity, authz, catalog, ingredients, equipment, glossary, community, inventory, measurements, shopping, prep, collections, tastinglog, media, notifications, compliance, venues, ai), PostGIS extension, outbox and sync_change tables in backend/src/Tools/MigrationRunner/Migrations/ — Search owns no schema: tsvector/trigram columns live in owning-module schemas, maintained via events (ADR per T141)
-- [ ] T014 Compose Api host: module registration, middleware order (correlation ID, auth, anonymous rate limiter, problem+json), /health/live and /health/ready in backend/src/Api/Program.cs
-- [ ] T015 [P] Wire OpenTelemetry (traces/metrics/logs) + Serilog structured logging with correlation-ID propagation and sensitive-field scrubbing policy (dateOfBirth-shaped fields) in backend/src/Api/Observability/
+- [X] T010 Implement BuildingBlocks: module composition interface (IModule), UUIDv7 generator, problem+json helpers, domain-event envelope in backend/src/BuildingBlocks/
+- [X] T011 Implement outbox-backed domain-event dispatcher (outbox table pattern, transactional write, background dispatcher) in backend/src/BuildingBlocks/Events/
+- [X] T012 Implement MigrationRunner tool (per-module forward-only EF Core migrations, ordered apply) in backend/src/Tools/MigrationRunner/
+- [X] T013 Create base migration: 18 module schemas (identity, authz, catalog, ingredients, equipment, glossary, community, inventory, measurements, shopping, prep, collections, tastinglog, media, notifications, compliance, venues, ai), PostGIS extension, outbox and sync_change tables in backend/src/Tools/MigrationRunner/Migrations/ — Search owns no schema: tsvector/trigram columns live in owning-module schemas, maintained via events (ADR per T141)
+- [X] T014 Compose Api host: module registration, middleware order (correlation ID, auth, anonymous rate limiter, problem+json), /health/live and /health/ready in backend/src/Api/Program.cs
+- [X] T015 [P] Wire OpenTelemetry (traces/metrics/logs) + Serilog structured logging with correlation-ID propagation and sensitive-field scrubbing policy (dateOfBirth-shaped fields) in backend/src/Api/Observability/
 - [ ] T016 Implement identity module core: User entity with application-layer AES-GCM encrypted date_of_birth column (R6a), ASP.NET Core Identity stores, module schema DbContext in backend/src/Modules/Identity/
 - [ ] T017 Implement OpenIddict token issuance (authorization code + refresh) and auth middleware integration in backend/src/Modules/Identity/Infrastructure/OpenIddict/
 - [ ] T018 Implement authorization module: Tier + CapabilityGrant + PlatformRole + RoleGrant entities, capability policy layer, guest pseudo-tier floor, GET /api/v1/me/entitlements in backend/src/Modules/Authorization/

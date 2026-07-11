@@ -52,6 +52,18 @@ services:
       - "4317:4317"   # OTLP gRPC
       - "4318:4318"   # OTLP HTTP
 
+  migration-runner:
+    build:
+      context: ./backend
+      dockerfile: src/Tools/MigrationRunner/Dockerfile
+    container_name: specpour-migration-runner
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=specpour;Username=specpour;Password=specpour_dev_only"
+
   api:
     build:
       context: ./backend
@@ -65,6 +77,8 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
+      migration-runner:
+        condition: service_completed_successfully
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080

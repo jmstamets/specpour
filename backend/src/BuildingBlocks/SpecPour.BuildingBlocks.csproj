@@ -6,4 +6,21 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- ASP.NET Core types (IEndpointRouteBuilder, IApplicationBuilder, ProblemDetails)
+         referenced by the module composition contract and middleware, without pulling
+         in the full Sdk.Web (BuildingBlocks itself hosts nothing). -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- EF Core types needed by the shared outbox mapping helper (OutboxModelBuilderExtensions)
+         and the SavingChanges interceptor. Npgsql is included here (unlike other
+         BuildingBlocks types) because OutboxDbContext is BuildingBlocks-owned
+         cross-cutting infrastructure, not a business module — it needs a real
+         provider to poll the shared outbox table at runtime. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
 </Project>

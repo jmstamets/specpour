@@ -11,6 +11,19 @@
     <!-- Pin above Microsoft.AspNetCore.OpenApi's transitive 2.0.0, which carries
          GHSA-v5pm-xwqc-g5wc (high severity). -->
     <PackageReference Include="Microsoft.OpenApi" Version="2.10.0" />
+
+    <!-- Observability (T015, research R16): Serilog structured logging + OpenTelemetry
+         traces/metrics, both exported to the otel-collector (docker-compose.yml). -->
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.16.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.16.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.16.0" />
+
+    <!-- /health/ready dependency check (T014). -->
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
