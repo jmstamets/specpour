@@ -1,0 +1,11 @@
+[
+  {
+    "key": "daiquiri-concept",
+    "name": "Daiquiri",
+    "description": "The classic rum sour: spirit, citrus, and sweetener, built to endless variation.",
+    "variants": [
+      { "recipeKey": "daiquiri", "differentiatorText": "The original: white rum, lime, and simple syrup." },
+      { "recipeKey": "hemingway-daiquiri", "differentiatorText": "Drier and more tart: adds grapefruit juice and maraschino liqueur in place of syrup." }
+    ]
+  }
+]

@@ -87,17 +87,17 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 
 **Independent Test**: Seed content; search "Mai Tai" anonymously; verify all recipe fields, ABV/standard drinks, allergen roll-up, concept-page variant navigation, content faceted filters, guest gating prompts, responsible-consumption messaging. Note: US1 scenario 5's `rating` and `makeable-from-inventory` facets are staged — their acceptance tests are tagged to run at the US6 (T149) and US4 (T148) checkpoints where the backing projections exist
 
-- [ ] T030 [P] [US1] Acceptance tests (failing first) for US1 scenarios 1–7 (scenario 8 is covered by T150's extension of this feature) in backend/tests/Acceptance/Features/US01_DiscoverRecipes.feature
-- [ ] T031 [P] [US1] Flutter integration test for guest browse/search/recipe view in frontend/app/integration_test/us01_discover_test.dart
-- [ ] T032 [P] [US1] Catalog module: Recipe, RecipeIngredientLine, RecipeRelation, ConceptPage, ConceptVariantLink, Family/Category entities + migration in backend/src/Modules/Catalog/Domain/
-- [ ] T033 [P] [US1] Ingredients module: Ingredient hierarchy, categories, allergen attributes, SubstitutionRule entities + migration in backend/src/Modules/Ingredients/Domain/
-- [ ] T034 [P] [US1] Equipment module: Equipment entity + migration in backend/src/Modules/Equipment/Domain/
-- [ ] T035 [P] [US1] Glossary module: GlossaryTerm (unique term, numbered definitions), Article, LinkOverride entities + migration in backend/src/Modules/Glossary/Domain/
-- [ ] T036 [US1] Derived-data services: ABV + standard-drinks calculator (method dilution conventions) and allergen roll-up in backend/src/Modules/Catalog/Application/DerivedData/
-- [ ] T037 [US1] Read endpoints + OpenAPI paths: GET /recipes (content facets: family, category, tags, flavor profile, glassware, ice, equipment, allergen-exclude, ABV range, source — rating facet lands in T149, makeable facet in T148), GET /recipes/{id}, GET /concepts, GET /concepts/{id}, GET /ingredients, GET /equipment, GET /glossary/* in backend/src/Modules/*/Endpoints/ and backend/contracts/openapi/paths/
-- [ ] T038 [US1] Search endpoint GET /api/v1/search over ISearchPort with content-facet filtering composition (facet set completed by T148/T149) in backend/src/Modules/Search/Endpoints/
-- [ ] T039 [US1] Glossary auto-linking service (first occurrence per page, longest-match, curator overrides honored, return navigation anchors) in backend/src/Modules/Glossary/Application/AutoLink/
-- [ ] T040 [US1] Curated seed content pack: canonical repertoire subset for test/dev (incl. Mai Tai, Daiquiri concept + variants, egg-white flip) in backend/src/Tools/Seeder/Content/
+- [X] T030 [P] [US1] Acceptance tests (failing first) for US1 scenarios 1–7 (scenario 8 is covered by T150's extension of this feature) in backend/tests/Acceptance/Features/US01_DiscoverRecipes.feature
+- [X] T031 [P] [US1] Flutter integration test for guest browse/search/recipe view in frontend/app/integration_test/us01_discover_test.dart
+- [X] T032 [P] [US1] Catalog module: Recipe, RecipeIngredientLine, RecipeRelation, ConceptPage, ConceptVariantLink, Family/Category entities + migration in backend/src/Modules/Catalog/Domain/
+- [X] T033 [P] [US1] Ingredients module: Ingredient hierarchy, categories, allergen attributes, SubstitutionRule entities + migration in backend/src/Modules/Ingredients/Domain/
+- [X] T034 [P] [US1] Equipment module: Equipment entity + migration in backend/src/Modules/Equipment/Domain/
+- [X] T035 [P] [US1] Glossary module: GlossaryTerm (unique term, numbered definitions), Article, LinkOverride entities + migration in backend/src/Modules/Glossary/Domain/
+- [X] T036 [US1] Derived-data services: ABV + standard-drinks calculator (method dilution conventions) and allergen roll-up in backend/src/Modules/Catalog/Application/DerivedData/
+- [X] T037 [US1] Read endpoints + OpenAPI paths: GET /recipes (content facets: family, category, tags, flavor profile, glassware, ice, equipment, allergen-exclude, ABV range, source — rating facet lands in T149, makeable facet in T148), GET /recipes/{id}, GET /concepts, GET /concepts/{id}, GET /ingredients, GET /equipment, GET /glossary/* in backend/src/Modules/*/Endpoints/ and backend/contracts/openapi/paths/
+- [X] T038 [US1] Search endpoint GET /api/v1/search over ISearchPort with content-facet filtering composition (facet set completed by T148/T149) in backend/src/Modules/Search/Endpoints/
+- [X] T039 [US1] Glossary auto-linking service (first occurrence per page, longest-match, curator overrides honored, return navigation anchors) in backend/src/Modules/Glossary/Application/AutoLink/
+- [X] T040 [US1] Curated seed content pack: canonical repertoire subset for test/dev (incl. Mai Tai, Daiquiri concept + variants, egg-white flip) in backend/src/Tools/Seeder/Content/
 - [ ] T041 [US1] Flutter discover feature: home/browse/search screens with facet UI in frontend/app/lib/features/discover/
 - [ ] T042 [US1] Flutter recipe detail + concept page screens (all content fields, derived data, allergen prominence, glossary links with return navigation; FR-022's per-serving cost display is staged — it lights up at the US5 checkpoint where T075/T076 provide pricing data, mirroring the T148/T149 facet pattern) in frontend/app/lib/features/discover/recipe_detail/
 - [ ] T043 [US1] Guest gating UX: account-gated action prompt with post-signup intent completion hook; anonymous rate limiting verified in frontend/app/lib/core/guest_gate/

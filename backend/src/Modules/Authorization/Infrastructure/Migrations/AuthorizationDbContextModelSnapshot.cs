@@ -126,9 +126,9 @@ namespace SpecPour.Modules.Authorization.Infrastructure.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("PermissionSet")
+                    b.Property<string[]>("PermissionSet")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text[]");
 
                     b.Property<string>("RoleKey")
                         .IsRequired()
@@ -146,35 +146,35 @@ namespace SpecPour.Modules.Authorization.Infrastructure.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000010"),
                             Active = true,
-                            PermissionSet = "",
+                            PermissionSet = new string[0],
                             RoleKey = "super_admin"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000011"),
                             Active = true,
-                            PermissionSet = "",
+                            PermissionSet = new string[0],
                             RoleKey = "curator"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000012"),
                             Active = true,
-                            PermissionSet = "",
+                            PermissionSet = new string[0],
                             RoleKey = "moderator"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000013"),
                             Active = true,
-                            PermissionSet = "",
+                            PermissionSet = new string[0],
                             RoleKey = "support"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000014"),
                             Active = false,
-                            PermissionSet = "",
+                            PermissionSet = new string[0],
                             RoleKey = "billing_admin"
                         });
                 });

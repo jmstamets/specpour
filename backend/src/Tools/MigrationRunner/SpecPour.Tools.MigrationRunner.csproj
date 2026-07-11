@@ -15,6 +15,10 @@
     <ProjectReference Include="..\..\Modules\Media\Infrastructure\SpecPour.Modules.Media.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Notifications\Infrastructure\SpecPour.Modules.Notifications.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Measurements\Infrastructure\SpecPour.Modules.Measurements.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Catalog\Infrastructure\SpecPour.Modules.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Ingredients\Infrastructure\SpecPour.Modules.Ingredients.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Equipment\Infrastructure\SpecPour.Modules.Equipment.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Glossary\Infrastructure\SpecPour.Modules.Glossary.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

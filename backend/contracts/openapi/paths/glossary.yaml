@@ -1,0 +1,177 @@
+glossaryTerms:
+  get:
+    operationId: listGlossaryTerms
+    tags: [glossary]
+    summary: Browse glossary terms (FR-025)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of glossary terms.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlossaryTermPage'
+
+glossaryTermById:
+  get:
+    operationId: getGlossaryTerm
+    tags: [glossary]
+    summary: Get a glossary term's ordered, numbered definitions (FR-025)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The term's full detail.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlossaryTermDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+glossaryArticles:
+  get:
+    operationId: listGlossaryArticles
+    tags: [glossary]
+    summary: Browse glossary articles (FR-026)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of articles.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlossaryArticlePage'
+
+glossaryArticleById:
+  get:
+    operationId: getGlossaryArticle
+    tags: [glossary]
+    summary: Get an article's full body (FR-026)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The article's full detail.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlossaryArticleDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+glossaryAutolink:
+  get:
+    operationId: getGlossaryAutolink
+    tags: [glossary]
+    summary: Resolve auto-link matches for a block of content (FR-027)
+    description: >-
+      Best-effort automated matching: first occurrence per term, longest-match-wins
+      on overlapping terms, curator Suppress/Force overrides applied per `context`.
+      Auto-links are computed at render time from the live term list, never stored.
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: context
+        in: query
+        required: true
+        description: Identifies the page/content this text belongs to, so curator link overrides scoped to that page apply.
+        schema: { type: string }
+      - name: content
+        in: query
+        required: true
+        description: The text to resolve auto-links within.
+        schema: { type: string }
+    responses:
+      '200':
+        description: Resolved auto-link matches, ordered by position.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutoLinkResponse'
+
+components:
+  schemas:
+    GlossaryTermSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        term: { type: string }
+      required: [id, term]
+    GlossaryTermPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/GlossaryTermSummary' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    GlossaryTermDetail:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        term: { type: string }
+        definitions:
+          type: array
+          items: { type: string }
+          description: Ordered and numbered — array order IS the numbering.
+      required: [id, term, definitions]
+    GlossaryArticleSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+      required: [id, title]
+    GlossaryArticlePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/GlossaryArticleSummary' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    GlossaryArticleDetail:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        body: { type: string }
+      required: [id, title, body]
+    AutoLinkMatch:
+      type: object
+      properties:
+        start: { type: integer, description: Character offset into the supplied content. }
+        length: { type: integer }
+        termId: { type: string, format: uuid }
+        term: { type: string }
+      required: [start, length, termId, term]
+    AutoLinkResponse:
+      type: object
+      properties:
+        matches:
+          type: array
+          items: { $ref: '#/components/schemas/AutoLinkMatch' }
+      required: [matches]

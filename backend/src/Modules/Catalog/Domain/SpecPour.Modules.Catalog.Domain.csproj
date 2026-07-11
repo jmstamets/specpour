@@ -2,6 +2,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
+    <!-- Cross-module Contracts-only dependency (constitution Principle III): Recipe.Method
+         reuses Measurements' MixMethod enum (T036) rather than duplicating it. -->
+    <ProjectReference Include="..\..\Measurements\Contracts\SpecPour.Modules.Measurements.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

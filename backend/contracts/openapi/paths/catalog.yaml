@@ -1,0 +1,207 @@
+recipes:
+  get:
+    operationId: listRecipes
+    tags: [catalog]
+    summary: Browse/search recipes with content facets (FR-050)
+    description: >-
+      Guest-accessible (FR-004b). Only public/core recipes are returned — private
+      personal-library recipes land with the personal-library story (US3). The
+      rating and makeable-from-inventory facets are staged (T149/T148); ABV-range
+      filtering computes ABV per candidate at request time rather than from a
+      stored column, since ABV is always derived, never persisted (data-model.md).
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: family
+        in: query
+        schema: { type: string }
+        description: Family taxonomy key (e.g. "family.sour").
+      - name: category
+        in: query
+        schema: { type: string }
+      - name: tag
+        in: query
+        schema: { type: string }
+      - name: flavorProfile
+        in: query
+        schema: { type: string }
+      - name: equipment
+        in: query
+        schema: { type: string, format: uuid }
+      - name: glassware
+        in: query
+        schema: { type: string, format: uuid }
+      - name: ice
+        in: query
+        schema: { type: string }
+      - name: allergenExclude
+        in: query
+        schema: { type: string }
+        description: Comma-separated allergen keys to exclude.
+      - name: source
+        in: query
+        schema: { type: string, enum: [core, personal, public] }
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of matching recipes.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipePage'
+
+recipeById:
+  get:
+    operationId: getRecipe
+    tags: [catalog]
+    summary: Get a recipe's full detail, including derived ABV/standard drinks/allergens (FR-022)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The recipe's full detail.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+concepts:
+  get:
+    operationId: listConcepts
+    tags: [catalog]
+    summary: Browse concept pages (FR-021)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of concept pages.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConceptPage'
+
+conceptById:
+  get:
+    operationId: getConcept
+    tags: [catalog]
+    summary: Get a concept page with its approved variant recipes (FR-021)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The concept page and its variants.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConceptDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+components:
+  schemas:
+    RecipeSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        primaryName: { type: string }
+        familyKey: { type: [string, "null"] }
+      required: [id, primaryName]
+    RecipePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/RecipeSummary' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    RecipeIngredientLine:
+      type: object
+      properties:
+        position: { type: integer }
+        ingredientId: { type: string, format: uuid }
+        quantity: { type: number }
+        unit: { type: string }
+        purpose: { type: [string, "null"] }
+        scalingRule: { type: string, enum: [Linear, Stepwise, OmitInBatch, AddFreshAtService] }
+      required: [position, ingredientId, quantity, unit, scalingRule]
+    RecipeDetail:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        primaryName: { type: string }
+        alternateNames: { type: array, items: { type: string } }
+        familyKey: { type: [string, "null"] }
+        categoryKeys: { type: array, items: { type: string } }
+        flavorProfileKeys: { type: array, items: { type: string } }
+        tags: { type: array, items: { type: string } }
+        ingredientLines:
+          type: array
+          items: { $ref: '#/components/schemas/RecipeIngredientLine' }
+        instructions: { type: array, items: { type: string } }
+        garnishes: { type: array, items: { type: string } }
+        iceSpec: { type: string }
+        glasswareIds: { type: array, items: { type: string, format: uuid } }
+        equipmentIds: { type: array, items: { type: string, format: uuid } }
+        creatorAttribution: { type: [string, "null"] }
+        history: { type: [string, "null"] }
+        notes: { type: [string, "null"] }
+        abvPercent:
+          type: number
+          description: Derived — never stored, computed at read time from ingredient composition and method dilution (FR-022).
+        standardDrinks: { type: number }
+        allergens:
+          type: array
+          items: { type: string }
+          description: Rolled up from ingredient allergen attributes, conservative for uncertain (FR-055).
+      required: [id, primaryName, alternateNames, ingredientLines, instructions, iceSpec, abvPercent, standardDrinks, allergens]
+    ConceptSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+      required: [id, name, description]
+    ConceptPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/ConceptSummary' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    ConceptVariant:
+      type: object
+      properties:
+        recipeId: { type: string, format: uuid }
+        differentiatorText: { type: string }
+      required: [recipeId, differentiatorText]
+    ConceptDetail:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        variants:
+          type: array
+          items: { $ref: '#/components/schemas/ConceptVariant' }
+      required: [id, name, description, variants]

@@ -69,19 +69,57 @@ All URIs are relative to */api/v1*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*AuthorizationApi*](doc/AuthorizationApi.md) | [**getMyEntitlements**](doc/AuthorizationApi.md#getmyentitlements) | **GET** /me/entitlements | Get the caller&#39;s entitlement manifest
+[*CatalogApi*](doc/CatalogApi.md) | [**getConcept**](doc/CatalogApi.md#getconcept) | **GET** /concepts/{id} | Get a concept page with its approved variant recipes (FR-021)
+[*CatalogApi*](doc/CatalogApi.md) | [**getRecipe**](doc/CatalogApi.md#getrecipe) | **GET** /recipes/{id} | Get a recipe&#39;s full detail, including derived ABV/standard drinks/allergens (FR-022)
+[*CatalogApi*](doc/CatalogApi.md) | [**listConcepts**](doc/CatalogApi.md#listconcepts) | **GET** /concepts | Browse concept pages (FR-021)
+[*CatalogApi*](doc/CatalogApi.md) | [**listRecipes**](doc/CatalogApi.md#listrecipes) | **GET** /recipes | Browse/search recipes with content facets (FR-050)
 [*ComplianceApi*](doc/ComplianceApi.md) | [**getAgeGate**](doc/ComplianceApi.md#getagegate) | **GET** /compliance/age-gate | Get the per-surface age-gate configuration and jurisdiction rule
+[*EquipmentApi*](doc/EquipmentApi.md) | [**getEquipmentItem**](doc/EquipmentApi.md#getequipmentitem) | **GET** /equipment/{id} | Get an equipment item&#39;s full detail (FR-024)
+[*EquipmentApi*](doc/EquipmentApi.md) | [**listEquipment**](doc/EquipmentApi.md#listequipment) | **GET** /equipment | Browse equipment (FR-024)
+[*GlossaryApi*](doc/GlossaryApi.md) | [**getGlossaryArticle**](doc/GlossaryApi.md#getglossaryarticle) | **GET** /glossary/articles/{id} | Get an article&#39;s full body (FR-026)
+[*GlossaryApi*](doc/GlossaryApi.md) | [**getGlossaryAutolink**](doc/GlossaryApi.md#getglossaryautolink) | **GET** /glossary/autolink | Resolve auto-link matches for a block of content (FR-027)
+[*GlossaryApi*](doc/GlossaryApi.md) | [**getGlossaryTerm**](doc/GlossaryApi.md#getglossaryterm) | **GET** /glossary/terms/{id} | Get a glossary term&#39;s ordered, numbered definitions (FR-025)
+[*GlossaryApi*](doc/GlossaryApi.md) | [**listGlossaryArticles**](doc/GlossaryApi.md#listglossaryarticles) | **GET** /glossary/articles | Browse glossary articles (FR-026)
+[*GlossaryApi*](doc/GlossaryApi.md) | [**listGlossaryTerms**](doc/GlossaryApi.md#listglossaryterms) | **GET** /glossary/terms | Browse glossary terms (FR-025)
+[*IngredientsApi*](doc/IngredientsApi.md) | [**getIngredient**](doc/IngredientsApi.md#getingredient) | **GET** /ingredients/{id} | Get an ingredient&#39;s full detail, including allergen attributes (FR-016)
+[*IngredientsApi*](doc/IngredientsApi.md) | [**listIngredients**](doc/IngredientsApi.md#listingredients) | **GET** /ingredients | Browse ingredients (FR-014)
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getInbox**](doc/NotificationsApi.md#getinbox) | **GET** /inbox | Get the caller&#39;s inbox messages
+[*SearchApi*](doc/SearchApi.md) | [**search**](doc/SearchApi.md#search) | **GET** /search | Full-text search across recipes, ingredients, equipment, glossary terms, and articles (FR-049)
 
 
 ## Documentation For Models
 
  - [AgeGateResponse](doc/AgeGateResponse.md)
+ - [AutoLinkMatch](doc/AutoLinkMatch.md)
+ - [AutoLinkResponse](doc/AutoLinkResponse.md)
+ - [ConceptDetail](doc/ConceptDetail.md)
+ - [ConceptPage](doc/ConceptPage.md)
+ - [ConceptSummary](doc/ConceptSummary.md)
+ - [ConceptVariant](doc/ConceptVariant.md)
  - [CursorPage](doc/CursorPage.md)
  - [EntitlementManifest](doc/EntitlementManifest.md)
+ - [EquipmentDetail](doc/EquipmentDetail.md)
+ - [EquipmentPage](doc/EquipmentPage.md)
+ - [EquipmentSummary](doc/EquipmentSummary.md)
+ - [GlossaryArticleDetail](doc/GlossaryArticleDetail.md)
+ - [GlossaryArticlePage](doc/GlossaryArticlePage.md)
+ - [GlossaryArticleSummary](doc/GlossaryArticleSummary.md)
+ - [GlossaryTermDetail](doc/GlossaryTermDetail.md)
+ - [GlossaryTermPage](doc/GlossaryTermPage.md)
+ - [GlossaryTermSummary](doc/GlossaryTermSummary.md)
  - [InboxMessage](doc/InboxMessage.md)
  - [InboxPage](doc/InboxPage.md)
+ - [IngredientDetail](doc/IngredientDetail.md)
+ - [IngredientPage](doc/IngredientPage.md)
+ - [IngredientSummary](doc/IngredientSummary.md)
  - [ProblemDetails](doc/ProblemDetails.md)
+ - [RecipeDetail](doc/RecipeDetail.md)
+ - [RecipeIngredientLine](doc/RecipeIngredientLine.md)
+ - [RecipePage](doc/RecipePage.md)
+ - [RecipeSummary](doc/RecipeSummary.md)
  - [RoleGrantSummary](doc/RoleGrantSummary.md)
+ - [SearchResult](doc/SearchResult.md)
+ - [SearchResultPage](doc/SearchResultPage.md)
 
 
 ## Documentation For Authorization

@@ -20,6 +20,10 @@ public static class ModuleRegistry
         new Modules.Search.Infrastructure.SearchModule(), // T022
         new Modules.Notifications.Infrastructure.NotificationsModule(), // T023
         new Modules.Measurements.Infrastructure.MeasurementsModule(), // T024
+        new Modules.Catalog.Infrastructure.CatalogModule(), // T032
+        new Modules.Ingredients.Infrastructure.IngredientsModule(), // T033
+        new Modules.Equipment.Infrastructure.EquipmentModule(), // T034
+        new Modules.Glossary.Infrastructure.GlossaryModule(), // T035
         // ...
     ];
 }

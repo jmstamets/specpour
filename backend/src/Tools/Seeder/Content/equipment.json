@@ -1,0 +1,37 @@
+[
+  {
+    "key": "cocktail-shaker",
+    "name": "Cocktail Shaker",
+    "category": "Bar Tool",
+    "description": "A two- or three-piece shaker used to combine and chill ingredients with ice.",
+    "typicalApplications": ["Shaking citrus- or dairy-based cocktails"]
+  },
+  {
+    "key": "double-old-fashioned-glass",
+    "name": "Double Old Fashioned Glass",
+    "category": "Glassware",
+    "description": "A short, wide tumbler suited to drinks served over crushed or large-format ice.",
+    "typicalApplications": ["Tiki drinks", "Drinks served over crushed ice"]
+  },
+  {
+    "key": "coupe-glass",
+    "name": "Coupe Glass",
+    "category": "Glassware",
+    "description": "A stemmed, shallow-bowled glass for cocktails served up (no ice).",
+    "typicalApplications": ["Shaken or stirred cocktails served up"]
+  },
+  {
+    "key": "jigger",
+    "name": "Jigger",
+    "category": "Bar Tool",
+    "description": "A dual-sided measuring tool for accurate cocktail proportions.",
+    "typicalApplications": ["Measuring spirits and modifiers"]
+  },
+  {
+    "key": "fine-strainer",
+    "name": "Fine Strainer",
+    "category": "Bar Tool",
+    "description": "A small mesh strainer used alongside a hawthorne strainer to catch ice chips and pulp.",
+    "typicalApplications": ["Double-straining shaken drinks served up"]
+  }
+]

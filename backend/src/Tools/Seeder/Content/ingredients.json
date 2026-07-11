@@ -1,0 +1,14 @@
+[
+  { "key": "aged-rum", "name": "Aged Rum", "categoryKey": "category.spirit", "abvPercent": 40, "sources": ["Jamaica", "Martinique"], "description": "Pot- or column-still rum aged in oak." },
+  { "key": "white-rum", "name": "White Rum", "categoryKey": "category.spirit", "abvPercent": 40, "sources": ["Puerto Rico", "Cuba"], "description": "Light-bodied, lightly aged or filtered rum." },
+  { "key": "bourbon", "name": "Bourbon", "categoryKey": "category.spirit", "abvPercent": 45, "sources": ["Kentucky"], "description": "American whiskey, at least 51% corn mash." },
+  { "key": "orange-curacao", "name": "Orange Curaçao", "categoryKey": "category.liqueur", "abvPercent": 30, "description": "Orange-peel liqueur." },
+  { "key": "maraschino-liqueur", "name": "Maraschino Liqueur", "categoryKey": "category.liqueur", "abvPercent": 32, "description": "Liqueur distilled from Marasca cherries." },
+  { "key": "lime-juice", "name": "Lime Juice", "categoryKey": "category.juice", "description": "Freshly squeezed lime juice." },
+  { "key": "grapefruit-juice", "name": "Grapefruit Juice", "categoryKey": "category.juice", "description": "Freshly squeezed grapefruit juice." },
+  { "key": "orgeat", "name": "Orgeat", "categoryKey": "category.syrup", "description": "Sweet almond syrup, often with orange-flower water.", "allergenKeys": ["treeNut"] },
+  { "key": "rich-simple-syrup", "name": "Rich Simple Syrup", "categoryKey": "category.syrup", "description": "Sugar syrup at a 2:1 sugar-to-water ratio." },
+  { "key": "simple-syrup", "name": "Simple Syrup", "categoryKey": "category.syrup", "description": "Sugar syrup at a 1:1 sugar-to-water ratio." },
+  { "key": "angostura-bitters", "name": "Angostura Bitters", "categoryKey": "category.bitters", "abvPercent": 44.7, "description": "Aromatic bitters used in dash quantities." },
+  { "key": "whole-egg", "name": "Whole Egg", "categoryKey": "category.dairyAndEgg", "description": "A whole raw egg, used for texture and body.", "allergenKeys": ["egg"] }
+]

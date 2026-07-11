@@ -1,0 +1,95 @@
+[
+  {
+    "key": "mai-tai",
+    "primaryName": "Mai Tai",
+    "alternateNames": ["Trader Vic's Mai Tai"],
+    "familyKey": "family.sour",
+    "method": "Shaken",
+    "instructions": [
+      "Shake all ingredients hard with crushed ice.",
+      "Pour unstrained into a double old fashioned glass.",
+      "Garnish with a spent lime shell and a mint sprig."
+    ],
+    "garnishes": ["Spent lime shell", "Mint sprig"],
+    "iceSpec": "Crushed",
+    "creatorAttribution": "Victor \"Trader Vic\" Bergeron",
+    "history": "Created in 1944 at Trader Vic's in Oakland, California.",
+    "glasswareKeys": ["double-old-fashioned-glass"],
+    "equipmentKeys": ["cocktail-shaker", "jigger"],
+    "ingredientLines": [
+      { "ingredientKey": "aged-rum", "quantity": 1.5, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "lime-juice", "quantity": 0.75, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "orange-curacao", "quantity": 0.5, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "orgeat", "quantity": 0.5, "unit": "oz", "purpose": "Sweetener", "scalingRule": "Linear" },
+      { "ingredientKey": "rich-simple-syrup", "quantity": 0.25, "unit": "oz", "purpose": "Sweetener", "scalingRule": "Linear" }
+    ]
+  },
+  {
+    "key": "daiquiri",
+    "primaryName": "Daiquiri",
+    "alternateNames": [],
+    "familyKey": "family.sour",
+    "method": "Shaken",
+    "instructions": [
+      "Shake all ingredients with ice.",
+      "Strain into a chilled coupe."
+    ],
+    "garnishes": ["Lime wheel"],
+    "iceSpec": "None (served up)",
+    "creatorAttribution": "Jennings Cox",
+    "history": "Named for a village near Santiago de Cuba, circa 1900s.",
+    "glasswareKeys": ["coupe-glass"],
+    "equipmentKeys": ["cocktail-shaker", "jigger", "fine-strainer"],
+    "ingredientLines": [
+      { "ingredientKey": "white-rum", "quantity": 2, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "lime-juice", "quantity": 1, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "simple-syrup", "quantity": 0.75, "unit": "oz", "purpose": "Sweetener", "scalingRule": "Linear" }
+    ]
+  },
+  {
+    "key": "hemingway-daiquiri",
+    "primaryName": "Hemingway Daiquiri",
+    "alternateNames": ["Papa Doble"],
+    "familyKey": "family.sour",
+    "method": "Shaken",
+    "instructions": [
+      "Shake all ingredients with ice.",
+      "Strain into a chilled coupe."
+    ],
+    "garnishes": ["Lime wheel"],
+    "iceSpec": "None (served up)",
+    "creatorAttribution": "Constantino Ribalaigua Vert",
+    "history": "Created at El Floridita in Havana, said to be Ernest Hemingway's preferred variant.",
+    "glasswareKeys": ["coupe-glass"],
+    "equipmentKeys": ["cocktail-shaker", "jigger", "fine-strainer"],
+    "ingredientLines": [
+      { "ingredientKey": "white-rum", "quantity": 2, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "lime-juice", "quantity": 0.75, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "grapefruit-juice", "quantity": 0.5, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "maraschino-liqueur", "quantity": 0.5, "unit": "oz", "purpose": "Sweetener", "scalingRule": "Linear" }
+    ]
+  },
+  {
+    "key": "whiskey-flip",
+    "primaryName": "Whiskey Flip",
+    "alternateNames": [],
+    "familyKey": "family.flip",
+    "method": "Shaken",
+    "instructions": [
+      "Dry shake all ingredients without ice to build texture.",
+      "Add ice and shake again to chill.",
+      "Double strain into a chilled coupe.",
+      "Garnish with fresh grated nutmeg."
+    ],
+    "garnishes": ["Grated nutmeg"],
+    "iceSpec": "None (served up)",
+    "history": "A classic flip built on whole egg for body, rather than just the white.",
+    "glasswareKeys": ["coupe-glass"],
+    "equipmentKeys": ["cocktail-shaker", "jigger", "fine-strainer"],
+    "ingredientLines": [
+      { "ingredientKey": "bourbon", "quantity": 2, "unit": "oz", "scalingRule": "Linear" },
+      { "ingredientKey": "rich-simple-syrup", "quantity": 0.75, "unit": "oz", "purpose": "Sweetener", "scalingRule": "Linear" },
+      { "ingredientKey": "whole-egg", "quantity": 1, "unit": "whole", "purpose": "Texture", "scalingRule": "Linear" }
+    ]
+  }
+]

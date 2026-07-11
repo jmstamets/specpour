@@ -11,9 +11,14 @@ using SpecPour.Modules.Authorization.Contracts.Audit;
 using SpecPour.Modules.Authorization.Domain;
 using SpecPour.Modules.Authorization.Infrastructure;
 using SpecPour.Modules.Authorization.Infrastructure.Audit;
+using SpecPour.Modules.Catalog.Infrastructure;
+using SpecPour.Modules.Equipment.Infrastructure;
+using SpecPour.Modules.Glossary.Infrastructure;
 using SpecPour.Modules.Identity.Application.Ports;
 using SpecPour.Modules.Identity.Infrastructure;
+using SpecPour.Modules.Ingredients.Infrastructure;
 using SpecPour.Tools.Seeder;
+using SpecPour.Tools.Seeder.Content;
 
 // Curated launch-content ingestion pipeline (2nd deliverable) and first-Super-Admin
 // bootstrap (3rd deliverable). Convention-table seeding (1st deliverable) already
@@ -57,6 +62,11 @@ services.AddIdentityCore<ApplicationUser>(options =>
     .AddEntityFrameworkStores<IdentityDbContext>();
 services.AddScoped<IAuditWriter, AuditWriter>();
 services.AddSingleton<IUuidGenerator, UuidV7Generator>();
+services.AddDbContext<CatalogDbContext>(o => o.UseNpgsql(connectionString));
+services.AddDbContext<IngredientsDbContext>(o => o.UseNpgsql(connectionString));
+services.AddDbContext<EquipmentDbContext>(o => o.UseNpgsql(connectionString));
+services.AddDbContext<GlossaryDbContext>(o => o.UseNpgsql(connectionString));
+services.AddScoped<CuratedContentImporter>();
 
 await using var provider = services.BuildServiceProvider();
 await using (var scope = provider.CreateAsyncScope())
@@ -64,13 +74,15 @@ await using (var scope = provider.CreateAsyncScope())
     await BootstrapSuperAdminAsync(scope.ServiceProvider, configuration);
 }
 
-Console.WriteLine("Curated launch-content ingestion: no importers registered yet (T040 adds the first once Catalog/Ingredients/Equipment/Glossary exist).");
-IContentImporter[] contentImporters = [];
 var contentDirectory = Path.Combine(AppContext.BaseDirectory, "Content");
-foreach (var importer in contentImporters)
+await using (var scope = provider.CreateAsyncScope())
 {
-    Console.WriteLine($"Importing {importer.ContentType}...");
-    await importer.ImportAsync(contentDirectory, CancellationToken.None);
+    IContentImporter[] contentImporters = [scope.ServiceProvider.GetRequiredService<CuratedContentImporter>()]; // T040
+    foreach (var importer in contentImporters)
+    {
+        Console.WriteLine($"Importing {importer.ContentType}...");
+        await importer.ImportAsync(contentDirectory, CancellationToken.None);
+    }
 }
 
 Console.WriteLine("Seeder complete.");

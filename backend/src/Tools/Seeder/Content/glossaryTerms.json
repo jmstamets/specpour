@@ -1,0 +1,38 @@
+[
+  {
+    "key": "muddle",
+    "term": "Muddle",
+    "definitions": [
+      "To gently press and twist an ingredient (fruit, herbs, sugar) in the bottom of a mixing glass or shaker to release its flavor and oils, without pulverizing it."
+    ]
+  },
+  {
+    "key": "dash",
+    "term": "Dash",
+    "definitions": [
+      "An informal unit of measure — a single quick shake of a bitters bottle, roughly 0.92 ml.",
+      "By extension, any very small, imprecise addition of an ingredient."
+    ]
+  },
+  {
+    "key": "dry-shake",
+    "term": "Dry Shake",
+    "definitions": [
+      "Shaking a cocktail (typically one containing egg white) without ice first, to build texture and foam, followed by a second shake with ice to chill and dilute."
+    ]
+  },
+  {
+    "key": "orgeat",
+    "term": "Orgeat",
+    "definitions": [
+      "A sweet, cloudy syrup made from almonds, sugar, and often orange-flower water — a foundational ingredient in tiki cocktails such as the Mai Tai."
+    ]
+  },
+  {
+    "key": "curacao",
+    "term": "Curaçao",
+    "definitions": [
+      "An orange-peel-flavored liqueur, historically made from the dried peel of the laraha citrus grown on the island of Curaçao."
+    ]
+  }
+]

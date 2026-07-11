@@ -1,0 +1,8 @@
+[
+  { "key": "category.spirit", "nameKey": "category.spirit", "definition": "Base distilled spirits." },
+  { "key": "category.liqueur", "nameKey": "category.liqueur", "definition": "Sweetened, flavored spirits used as modifiers." },
+  { "key": "category.juice", "nameKey": "category.juice", "definition": "Fresh citrus and fruit juices." },
+  { "key": "category.syrup", "nameKey": "category.syrup", "definition": "Sweeteners, including simple syrups and orgeat." },
+  { "key": "category.bitters", "nameKey": "category.bitters", "definition": "Concentrated aromatic flavoring agents used in dash quantities." },
+  { "key": "category.dairyAndEgg", "nameKey": "category.dairyAndEgg", "definition": "Eggs and dairy products used for texture." }
+]

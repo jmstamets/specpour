@@ -30,6 +30,6 @@ public sealed class SearchModule : IModule
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
-        // GET /api/v1/search lands in T038, once content modules exist to search.
+        SearchEndpoint.Map(endpoints);
     }
 }

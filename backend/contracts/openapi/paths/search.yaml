@@ -1,0 +1,49 @@
+search:
+  get:
+    operationId: search
+    tags: [search]
+    summary: Full-text search across recipes, ingredients, equipment, glossary terms, and articles (FR-049)
+    description: >-
+      Guest-accessible (FR-004b). Search itself owns no schema and has no opinion
+      on content facets (T141 ADR) — this endpoint returns entity references only
+      (`entityType`/`entityId`); fetch the full record from that entity's own
+      GET-by-id endpoint. Content-facet filtering composition lands in T148/T149.
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: q
+        in: query
+        description: Free-text query (websearch_to_tsquery syntax).
+        schema: { type: string }
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of search results, ranked by relevance.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchResultPage'
+
+components:
+  schemas:
+    SearchResult:
+      type: object
+      properties:
+        entityType:
+          type: string
+          enum: [recipe, ingredient, equipment, glossaryTerm, article]
+        entityId: { type: string, format: uuid }
+        title: { type: string }
+        snippet: { type: [string, "null"] }
+        score: { type: number }
+      required: [entityType, entityId, title, score]
+    SearchResultPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/SearchResult' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]

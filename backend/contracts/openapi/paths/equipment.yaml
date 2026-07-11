@@ -1,0 +1,70 @@
+equipment:
+  get:
+    operationId: listEquipment
+    tags: [equipment]
+    summary: Browse equipment (FR-024)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of equipment.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipmentPage'
+
+equipmentById:
+  get:
+    operationId: getEquipmentItem
+    tags: [equipment]
+    summary: Get an equipment item's full detail (FR-024)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The equipment item's full detail.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipmentDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+components:
+  schemas:
+    EquipmentSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        category: { type: string }
+      required: [id, name, category]
+    EquipmentPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/EquipmentSummary' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    EquipmentDetail:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        category: { type: string }
+        cost: { type: [number, "null"] }
+        description: { type: [string, "null"] }
+        usageGuidance: { type: [string, "null"] }
+        typicalApplications: { type: array, items: { type: string } }
+      required: [id, name, category, typicalApplications]

@@ -2,8 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Authorization.Infrastructure;
+using SpecPour.Modules.Catalog.Infrastructure;
 using SpecPour.Modules.Compliance.Infrastructure;
+using SpecPour.Modules.Equipment.Infrastructure;
+using SpecPour.Modules.Glossary.Infrastructure;
 using SpecPour.Modules.Identity.Infrastructure;
+using SpecPour.Modules.Ingredients.Infrastructure;
 using SpecPour.Modules.Media.Infrastructure;
 using SpecPour.Modules.Measurements.Infrastructure;
 using SpecPour.Modules.Notifications.Infrastructure;
@@ -49,6 +53,10 @@ IModuleMigrator[] moduleMigrators =
     new MediaModuleMigrator(), // T021
     new NotificationsModuleMigrator(), // T023
     new MeasurementsModuleMigrator(), // T024
+    new CatalogModuleMigrator(), // T032
+    new IngredientsModuleMigrator(), // T033
+    new EquipmentModuleMigrator(), // T034
+    new GlossaryModuleMigrator(), // T035
     // ...
 ];
 

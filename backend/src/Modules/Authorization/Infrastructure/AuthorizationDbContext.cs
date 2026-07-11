@@ -55,10 +55,13 @@ public sealed class AuthorizationDbContext(DbContextOptions<AuthorizationDbConte
         {
             entity.HasKey(r => r.Id);
             entity.HasIndex(r => r.RoleKey).IsUnique();
+            // Native Postgres text[] (ADR-0001) rather than the delimiter-joined
+            // string this used before: PermissionSet's values are a closed
+            // vocabulary today, but there's no reason to keep two different
+            // list-storage idioms in the codebase, and the array column is simpler
+            // besides.
             entity.Property(r => r.PermissionSet)
-                .HasConversion(
-                    v => string.Join(',', v),
-                    v => v.Length == 0 ? Array.Empty<string>() : v.Split(',', StringSplitOptions.None))
+                .HasConversion(v => v.ToArray(), v => v)
                 .Metadata.SetValueComparer(PermissionSetComparer);
 
             // R18a: the staff role catalog is configuration data present from day one;

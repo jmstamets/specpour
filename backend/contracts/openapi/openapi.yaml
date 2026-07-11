@@ -59,10 +59,36 @@ paths:
     $ref: './paths/compliance.yaml#/ageGate'
   /inbox:
     $ref: './paths/notifications.yaml#/inbox'
-# Populated incrementally by per-story tasks via $ref, e.g.:
-#   /recipes:
-#     $ref: './paths/catalog.yaml#/recipes'
-# See tasks.md T037 onward for the per-module path authoring schedule.
+  /recipes:
+    $ref: './paths/catalog.yaml#/recipes'
+  /recipes/{id}:
+    $ref: './paths/catalog.yaml#/recipeById'
+  /concepts:
+    $ref: './paths/catalog.yaml#/concepts'
+  /concepts/{id}:
+    $ref: './paths/catalog.yaml#/conceptById'
+  /ingredients:
+    $ref: './paths/ingredients.yaml#/ingredients'
+  /ingredients/{id}:
+    $ref: './paths/ingredients.yaml#/ingredientById'
+  /equipment:
+    $ref: './paths/equipment.yaml#/equipment'
+  /equipment/{id}:
+    $ref: './paths/equipment.yaml#/equipmentById'
+  /glossary/terms:
+    $ref: './paths/glossary.yaml#/glossaryTerms'
+  /glossary/terms/{id}:
+    $ref: './paths/glossary.yaml#/glossaryTermById'
+  /glossary/articles:
+    $ref: './paths/glossary.yaml#/glossaryArticles'
+  /glossary/articles/{id}:
+    $ref: './paths/glossary.yaml#/glossaryArticleById'
+  /glossary/autolink:
+    $ref: './paths/glossary.yaml#/glossaryAutolink'
+  /search:
+    $ref: './paths/search.yaml#/search'
+# Populated incrementally by per-story tasks via $ref — see tasks.md for the
+# per-module path authoring schedule.
 
 components:
   securitySchemes:

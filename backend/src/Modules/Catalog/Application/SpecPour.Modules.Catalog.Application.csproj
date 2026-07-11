@@ -4,6 +4,11 @@
     <ProjectReference Include="..\Domain\SpecPour.Modules.Catalog.Domain.csproj" />
     <ProjectReference Include="..\Contracts\SpecPour.Modules.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
+    <!-- Cross-module Contracts-only dependencies (constitution Principle III): the
+         derived-data calculator (T036) needs Measurements' conversion service and
+         Ingredients' lookup port, never those modules' Domain/Infrastructure. -->
+    <ProjectReference Include="..\..\Measurements\Contracts\SpecPour.Modules.Measurements.Contracts.csproj" />
+    <ProjectReference Include="..\..\Ingredients\Contracts\SpecPour.Modules.Ingredients.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

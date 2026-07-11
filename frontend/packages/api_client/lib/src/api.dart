@@ -10,8 +10,13 @@ import 'package:api_client/src/auth/basic_auth.dart';
 import 'package:api_client/src/auth/bearer_auth.dart';
 import 'package:api_client/src/auth/oauth.dart';
 import 'package:api_client/src/api/authorization_api.dart';
+import 'package:api_client/src/api/catalog_api.dart';
 import 'package:api_client/src/api/compliance_api.dart';
+import 'package:api_client/src/api/equipment_api.dart';
+import 'package:api_client/src/api/glossary_api.dart';
+import 'package:api_client/src/api/ingredients_api.dart';
 import 'package:api_client/src/api/notifications_api.dart';
+import 'package:api_client/src/api/search_api.dart';
 
 class ApiClient {
   static const String basePath = r'/api/v1';
@@ -113,15 +118,45 @@ class ApiClient {
     return AuthorizationApi(dio, serializers);
   }
 
+  /// Get CatalogApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  CatalogApi getCatalogApi() {
+    return CatalogApi(dio, serializers);
+  }
+
   /// Get ComplianceApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   ComplianceApi getComplianceApi() {
     return ComplianceApi(dio, serializers);
   }
 
+  /// Get EquipmentApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  EquipmentApi getEquipmentApi() {
+    return EquipmentApi(dio, serializers);
+  }
+
+  /// Get GlossaryApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  GlossaryApi getGlossaryApi() {
+    return GlossaryApi(dio, serializers);
+  }
+
+  /// Get IngredientsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  IngredientsApi getIngredientsApi() {
+    return IngredientsApi(dio, serializers);
+  }
+
   /// Get NotificationsApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   NotificationsApi getNotificationsApi() {
     return NotificationsApi(dio, serializers);
+  }
+
+  /// Get SearchApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  SearchApi getSearchApi() {
+    return SearchApi(dio, serializers);
   }
 }

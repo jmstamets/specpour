@@ -1,0 +1,78 @@
+ingredients:
+  get:
+    operationId: listIngredients
+    tags: [ingredients]
+    summary: Browse ingredients (FR-014)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: category
+        in: query
+        schema: { type: string }
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of matching ingredients.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngredientPage'
+
+ingredientById:
+  get:
+    operationId: getIngredient
+    tags: [ingredients]
+    summary: Get an ingredient's full detail, including allergen attributes (FR-016)
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The ingredient's full detail.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngredientDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+components:
+  schemas:
+    IngredientSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        parentId: { type: [string, "null"], format: uuid }
+      required: [id, name]
+    IngredientPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/IngredientSummary' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    IngredientDetail:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        parentId: { type: [string, "null"], format: uuid }
+        sources: { type: array, items: { type: string } }
+        description: { type: [string, "null"] }
+        abvPercent: { type: [number, "null"] }
+        allergens: { type: array, items: { type: string } }
+        definingRecipeId: { type: [string, "null"], format: uuid }
+        yieldQuantity: { type: [number, "null"] }
+        yieldUnit: { type: [string, "null"] }
+        shelfLife: { type: [string, "null"], description: "ISO 8601 duration, when this is a house-made ingredient." }
+        storageInstructions: { type: [string, "null"] }
+      required: [id, name, sources, allergens]
