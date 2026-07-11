@@ -1,0 +1,178 @@
+inbox:
+  get:
+    operationId: getInbox
+    tags: [notifications]
+    summary: Get the caller's inbox messages
+    description: >-
+      Cursor-paginated in-app inbox (FR-040a) — the always-on notification channel.
+      Email is the V1 opt-in alert channel (also carrying identity transactional
+      mail); push delivery is modeled but deferred to Phase 2.
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of inbox messages, newest first.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboxPage'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+# --- Pre-authored for T151 (2026-07-11 gap review) -------------------------------
+# The two path items below are contract-first authored ahead of implementation but
+# are NOT yet $ref'd from openapi.yaml — the root document only describes the
+# implemented API (contract tests validate the running server against it). T151
+# (Phase 4/US2) wires `/inbox/{id}/read` and `/me/channels` into the root and
+# implements the endpoints over T023's existing storage.
+
+inboxRead:
+  post:
+    operationId: markInboxMessageRead
+    tags: [notifications]
+    summary: Mark an inbox message as read
+    description: >-
+      Sets the message's read timestamp. Idempotent — marking an already-read
+      message again succeeds without changing the original readAt.
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '204':
+        description: The message is marked read.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        description: No such message in the caller's inbox (unowned messages are indistinguishable from nonexistent ones).
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ProblemDetails'
+
+meChannels:
+  get:
+    operationId: getMyChannelPreferences
+    tags: [notifications]
+    summary: Get the caller's notification channel opt-in preferences
+    description: >-
+      Email is the V1 opt-in alert channel (FR-040a); the push preference is modeled
+      here but push delivery is deferred to Phase 2, so opting into push has no
+      delivery effect in V1.
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: The caller's per-channel preferences.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelPreferences'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+  put:
+    operationId: updateMyChannelPreferences
+    tags: [notifications]
+    summary: Update the caller's notification channel opt-in preferences
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ChannelPreferencesUpdate'
+    responses:
+      '200':
+        description: The updated per-channel preferences.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelPreferences'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+components:
+  schemas:
+    InboxPage:
+      type: object
+      description: >-
+        Cursor-paginated inbox page. Mirrors the CursorPage envelope convention
+        (openapi.yaml) with a concrete item type — declared as its own named schema
+        rather than allOf-composing CursorPage, per the envelope's usage note.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InboxMessage'
+        nextCursor:
+          type: [string, "null"]
+          description: Pass as `cursor` to fetch the next page; null when no further pages exist.
+      required: [items, nextCursor]
+
+    ChannelPreferences:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelPreference'
+      required: [channels]
+
+    ChannelPreference:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum: [email, push]
+        optedIn:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+      required: [channel, optedIn, updatedAt]
+
+    ChannelPreferencesUpdate:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            type: object
+            properties:
+              channel:
+                type: string
+                enum: [email, push]
+              optedIn:
+                type: boolean
+            required: [channel, optedIn]
+      required: [channels]
+
+    InboxMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          description: Typed notification key (e.g. "prep_expiry", "account_deactivation_warning").
+        payload:
+          type: object
+          description: Type-specific structured payload.
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+        readAt:
+          type: [string, "null"]
+          format: date-time
+      required: [id, type, payload, createdAt, readAt]

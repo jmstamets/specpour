@@ -86,6 +86,7 @@ services:
       ObjectStorage__Endpoint: "http://minio:9000"
       ObjectStorage__AccessKey: specpour
       ObjectStorage__SecretKey: specpour_dev_only
+      ObjectStorage__BucketName: specpour-media
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
     ports:
       - "5001:8080"

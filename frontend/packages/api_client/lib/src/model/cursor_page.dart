@@ -10,7 +10,7 @@ import 'package:built_value/serializer.dart';
 
 part 'cursor_page.g.dart';
 
-/// Generic cursor-paginated envelope. Per-endpoint response schemas compose this with an `items` array of the concrete resource type.
+/// Generic cursor-paginated envelope documenting the pagination convention. Per-endpoint response schemas MIRROR this shape as their own named schema with a concrete `items` type (e.g. notifications.yaml's InboxPage) rather than allOf-composing this one: the open `items: {}` here maps to built_value JsonObject in the dart-dio generator, and allOf-merging it into a typed page produces synthesized models with missing imports (broken generated code).
 ///
 /// Properties:
 /// * [items] 

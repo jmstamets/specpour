@@ -236,7 +236,7 @@ account — all without any other feature present.
    their personal data — including the stored DOB — is deleted and they can export
    their data beforehand (the export is the only surface where their raw DOB appears).
 6. **Given** a user who requests deletion, **When** the request completes, **Then**
-   their public data, such as reviews or ratings is anonymized.
+   their public data, such as ratings and attribution, is anonymized.
 7. **Given** V1's single default tier, **When** any user is created, **Then** they
    receive the default tier granting all end-user (home and professional) features via
    configuration — and no curation or moderation powers, which require a

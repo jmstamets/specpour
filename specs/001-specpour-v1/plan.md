@@ -1,6 +1,6 @@
 # Implementation Plan: SpecPour V1
 
-**Branch**: `001-specpour-v1` (no git repository initialized yet) | **Date**: 2026-07-10 | **Spec**: [spec.md](spec.md)
+**Branch**: `main` (repo initialized at T001; V1 implementation proceeds directly on trunk — the `001-specpour-v1` name lives on as the spec directory, not a git branch) | **Date**: 2026-07-10 | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `/specs/001-specpour-v1/spec.md`
 

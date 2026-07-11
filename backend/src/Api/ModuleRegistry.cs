@@ -15,6 +15,11 @@ public static class ModuleRegistry
     [
         new Modules.Identity.Infrastructure.IdentityModule(), // T016
         new Modules.Authorization.Infrastructure.AuthorizationModule(), // T018
+        new Modules.Compliance.Infrastructure.ComplianceModule(), // T020
+        new Modules.Media.Infrastructure.MediaModule(), // T021
+        new Modules.Search.Infrastructure.SearchModule(), // T022
+        new Modules.Notifications.Infrastructure.NotificationsModule(), // T023
+        new Modules.Measurements.Infrastructure.MeasurementsModule(), // T024
         // ...
     ];
 }

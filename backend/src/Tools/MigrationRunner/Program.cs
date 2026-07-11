@@ -2,7 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Authorization.Infrastructure;
+using SpecPour.Modules.Compliance.Infrastructure;
 using SpecPour.Modules.Identity.Infrastructure;
+using SpecPour.Modules.Media.Infrastructure;
+using SpecPour.Modules.Measurements.Infrastructure;
+using SpecPour.Modules.Notifications.Infrastructure;
 using SpecPour.Tools.MigrationRunner.Persistence;
 
 // Deploy-time migration job (constitution Principle III / research R3: forward-only,
@@ -41,6 +45,10 @@ IModuleMigrator[] moduleMigrators =
 [
     new IdentityModuleMigrator(), // T016
     new AuthorizationModuleMigrator(), // T018
+    new ComplianceModuleMigrator(), // T020
+    new MediaModuleMigrator(), // T021
+    new NotificationsModuleMigrator(), // T023
+    new MeasurementsModuleMigrator(), // T024
     // ...
 ];
 

@@ -11,6 +11,10 @@
     <ProjectReference Include="..\..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
     <ProjectReference Include="..\..\Modules\Identity\Infrastructure\SpecPour.Modules.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Authorization\Infrastructure\SpecPour.Modules.Authorization.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Compliance\Infrastructure\SpecPour.Modules.Compliance.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Media\Infrastructure\SpecPour.Modules.Media.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Notifications\Infrastructure\SpecPour.Modules.Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Measurements\Infrastructure\SpecPour.Modules.Measurements.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

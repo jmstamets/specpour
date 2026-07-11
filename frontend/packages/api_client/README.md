@@ -69,12 +69,17 @@ All URIs are relative to */api/v1*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*AuthorizationApi*](doc/AuthorizationApi.md) | [**getMyEntitlements**](doc/AuthorizationApi.md#getmyentitlements) | **GET** /me/entitlements | Get the caller&#39;s entitlement manifest
+[*ComplianceApi*](doc/ComplianceApi.md) | [**getAgeGate**](doc/ComplianceApi.md#getagegate) | **GET** /compliance/age-gate | Get the per-surface age-gate configuration and jurisdiction rule
+[*NotificationsApi*](doc/NotificationsApi.md) | [**getInbox**](doc/NotificationsApi.md#getinbox) | **GET** /inbox | Get the caller&#39;s inbox messages
 
 
 ## Documentation For Models
 
+ - [AgeGateResponse](doc/AgeGateResponse.md)
  - [CursorPage](doc/CursorPage.md)
  - [EntitlementManifest](doc/EntitlementManifest.md)
+ - [InboxMessage](doc/InboxMessage.md)
+ - [InboxPage](doc/InboxPage.md)
  - [ProblemDetails](doc/ProblemDetails.md)
  - [RoleGrantSummary](doc/RoleGrantSummary.md)
 

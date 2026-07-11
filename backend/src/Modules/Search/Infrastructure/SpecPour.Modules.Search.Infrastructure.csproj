@@ -1,13 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\Application\SpecPour.Modules.Search.Application.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\SpecPour.Modules.Search.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Plain ADO driver, not the EF Core provider: the FTS adapter composes a
+         dynamic UNION query across whatever tables are registered at runtime, which
+         doesn't fit EF Core's fixed-entity-model DbContext shape. Search owns no
+         schema and therefore no DbContext/migration (T141 ADR). -->
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+  </ItemGroup>
 
 </Project>

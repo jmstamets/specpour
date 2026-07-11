@@ -9,7 +9,7 @@ description: "Task list for SpecPour V1 implementation"
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/api-v1-surface.md, quickstart.md
 
-**Tests**: MANDATORY per Constitution v1.3.0 Principle I (ATDD). Every user story begins
+**Tests**: MANDATORY per Constitution v1.4.0 Principle I (ATDD). Every user story begins
 with Given/When/Then acceptance tests that MUST fail before implementation (red-green).
 CI merge gates: acceptance + unit + integration + contract suites green.
 
@@ -24,8 +24,11 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - **[Story]**: Which user story this task belongs to (US1–US16)
 
 > **Note (post-analysis amendment)**: Tasks T144–T150 were added by the /speckit-analyze
-> remediation pass. Task IDs are stable identifiers; **phase placement defines execution
-> order**, so amended tasks execute within their listed phase, not by ID sequence.
+> remediation pass, and T151 by the 2026-07-11 post-implementation gap review (inbox
+> read / channel-preference endpoints present in contracts/api-v1-surface.md but not
+> previously scheduled). Task IDs are stable identifiers; **phase placement defines
+> execution order**, so amended tasks execute within their listed phase, not by ID
+> sequence.
 
 ---
 
@@ -61,12 +64,12 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - [X] T017 Implement OpenIddict token issuance (authorization code + refresh) and auth middleware integration in backend/src/Modules/Identity/Infrastructure/OpenIddict/
 - [X] T018 Implement authorization module: Tier + CapabilityGrant + PlatformRole + RoleGrant entities, capability policy layer, guest pseudo-tier floor, GET /api/v1/me/entitlements in backend/src/Modules/Authorization/
 - [X] T019 Implement append-only audit log (AuditLogEntry, single audit port IAuditWriter, no UPDATE/DELETE grants in migration) in backend/src/Modules/Authorization/Audit/
-- [ ] T020 [P] Implement compliance module: SurfaceGateConfig + JurisdictionRule entities, IGeoIpPort + adapter, GET /api/v1/compliance/age-gate in backend/src/Modules/Compliance/
-- [ ] T021 [P] Implement media module: IObjectStoragePort + S3-compatible adapter (MinIO), MediaAttachment entity, pre-signed upload flow in backend/src/Modules/Media/
-- [ ] T022 [P] Implement search module: ISearchPort contract + PostgreSQL FTS adapter (tsvector maintenance, websearch_to_tsquery, trigram), port contract-test suite in backend/src/Modules/Search/
-- [ ] T023 [P] Implement notifications thin slice: InboxMessage + ChannelPreference entities, typed notification events consumer, IEmailChannelAdapter port with per-port contract-test suite (real adapter lands in T146; push delivery deferred to Phase 2 per FR-040a), GET /api/v1/inbox in backend/src/Modules/Notifications/
-- [ ] T024 [P] Implement measurements module: ConventionTable versioned reference data, canonical-ml conversion service (oz/ml/cl + dash/barspoon), method dilution constants in backend/src/Modules/Measurements/
-- [ ] T025 Implement Seeder tool: convention tables, curated launch-content ingestion pipeline (recipes/ingredients/equipment/glossary from content files), first-Super-Admin bootstrap from environment config writing inaugural audit entry in backend/src/Tools/Seeder/
+- [X] T020 [P] Implement compliance module: SurfaceGateConfig + JurisdictionRule entities, IGeoIpPort + adapter, GET /api/v1/compliance/age-gate in backend/src/Modules/Compliance/
+- [X] T021 [P] Implement media module: IObjectStoragePort + S3-compatible adapter (MinIO), MediaAttachment entity, pre-signed upload flow in backend/src/Modules/Media/
+- [X] T022 [P] Implement search module: ISearchPort contract + PostgreSQL FTS adapter (tsvector maintenance, websearch_to_tsquery, trigram), port contract-test suite in backend/src/Modules/Search/
+- [X] T023 [P] Implement notifications thin slice: InboxMessage + ChannelPreference entities, typed notification events consumer, IEmailChannelAdapter port with per-port contract-test suite (real adapter lands in T146; push delivery deferred to Phase 2 per FR-040a), GET /api/v1/inbox in backend/src/Modules/Notifications/
+- [X] T024 [P] Implement measurements module: ConventionTable versioned reference data, canonical-ml conversion service (oz/ml/cl + dash/barspoon), method dilution constants in backend/src/Modules/Measurements/
+- [X] T025 Implement Seeder tool: convention tables, curated launch-content ingestion pipeline (recipes/ingredients/equipment/glossary from content files), first-Super-Admin bootstrap from environment config writing inaugural audit entry in backend/src/Tools/Seeder/
 - [ ] T026 Set up Reqnroll + Testcontainers acceptance harness (composed host, real PostgreSQL, clock test hook) in backend/tests/Acceptance/Support/
 - [ ] T027 [P] Set up OpenAPI contract-test harness validating running API against backend/contracts/openapi/ in backend/tests/Contract/Support/
 - [ ] T028 Scaffold Flutter core: go_router navigation, Riverpod DI, WCAG AA theming + bar-mode theme tokens, entitlement-manifest gate, api_client wiring in frontend/app/lib/core/
@@ -84,7 +87,7 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 
 **Independent Test**: Seed content; search "Mai Tai" anonymously; verify all recipe fields, ABV/standard drinks, allergen roll-up, concept-page variant navigation, content faceted filters, guest gating prompts, responsible-consumption messaging. Note: US1 scenario 5's `rating` and `makeable-from-inventory` facets are staged — their acceptance tests are tagged to run at the US6 (T149) and US4 (T148) checkpoints where the backing projections exist
 
-- [ ] T030 [P] [US1] Acceptance tests (failing first) for US1 scenarios 1–7 in backend/tests/Acceptance/Features/US01_DiscoverRecipes.feature
+- [ ] T030 [P] [US1] Acceptance tests (failing first) for US1 scenarios 1–7 (scenario 8 is covered by T150's extension of this feature) in backend/tests/Acceptance/Features/US01_DiscoverRecipes.feature
 - [ ] T031 [P] [US1] Flutter integration test for guest browse/search/recipe view in frontend/app/integration_test/us01_discover_test.dart
 - [ ] T032 [P] [US1] Catalog module: Recipe, RecipeIngredientLine, RecipeRelation, ConceptPage, ConceptVariantLink, Family/Category entities + migration in backend/src/Modules/Catalog/Domain/
 - [ ] T033 [P] [US1] Ingredients module: Ingredient hierarchy, categories, allergen attributes, SubstitutionRule entities + migration in backend/src/Modules/Ingredients/Domain/
@@ -96,7 +99,7 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - [ ] T039 [US1] Glossary auto-linking service (first occurrence per page, longest-match, curator overrides honored, return navigation anchors) in backend/src/Modules/Glossary/Application/AutoLink/
 - [ ] T040 [US1] Curated seed content pack: canonical repertoire subset for test/dev (incl. Mai Tai, Daiquiri concept + variants, egg-white flip) in backend/src/Tools/Seeder/Content/
 - [ ] T041 [US1] Flutter discover feature: home/browse/search screens with facet UI in frontend/app/lib/features/discover/
-- [ ] T042 [US1] Flutter recipe detail + concept page screens (all content fields, derived data, allergen prominence, glossary links with return navigation) in frontend/app/lib/features/discover/recipe_detail/
+- [ ] T042 [US1] Flutter recipe detail + concept page screens (all content fields, derived data, allergen prominence, glossary links with return navigation; FR-022's per-serving cost display is staged — it lights up at the US5 checkpoint where T075/T076 provide pricing data, mirroring the T148/T149 facet pattern) in frontend/app/lib/features/discover/recipe_detail/
 - [ ] T043 [US1] Guest gating UX: account-gated action prompt with post-signup intent completion hook; anonymous rate limiting verified in frontend/app/lib/core/guest_gate/
 - [ ] T044 [US1] SEO HTML projection endpoints GET /pages/recipes/{slug} etc. for public content in backend/src/Api/Seo/
 - [ ] T150 [US1] Responsible-consumption package (FR-067/FR-068/FR-069, US1 scenario 8): jurisdiction-configurable message text + placement served by the compliance module (GET /compliance/messaging, GET /compliance/support-resources); persistent messaging on recipe pages, batch/scaling outputs, and app footer/about; support-resource links reachable from the messaging and settings/about; per-serving ABV/standard-drinks display designated to Principle XIII; extend US1 acceptance feature + widget coverage, in backend/src/Modules/Compliance/Application/Messaging/ and frontend/app/lib/core/responsible_use/
@@ -123,6 +126,7 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - [ ] T053 [US2] Data export (sole raw-DOB surface) and deletion with public-attribution anonymization + rating-event de-identification events in backend/src/Modules/Identity/Application/Export/
 - [ ] T054 [US2] Identity endpoints + OpenAPI paths (/auth/*, /me/*) in backend/src/Modules/Identity/Endpoints/ and backend/contracts/openapi/paths/
 - [ ] T055 [US2] Flutter identity feature: registration (with DOB + underage rejection UX), sign-in, MFA, recovery, session list, preferences, lifecycle screens in frontend/app/lib/features/identity/
+- [ ] T151 [US2] Inbox read + channel-preference endpoints (gap review 2026-07-11: listed in contracts/api-v1-surface.md, previously unscheduled): POST /inbox/{id}/read and GET/PUT /me/channels over T023's existing InboxMessage.ReadAt column and ChannelPreference table; wire the pre-authored path definitions from backend/contracts/openapi/paths/notifications.yaml (inboxRead, meChannels) into openapi.yaml and regenerate the Dart client. Placed here because this is where the endpoints become meaningful: T146's real email adapter + T050's transactional mail give users something to opt into, and T052's deactivation warnings produce the first inbox messages to mark read, in backend/src/Modules/Notifications/Infrastructure/
 
 **Checkpoint**: Both P1 stories complete — guest MVP plus full accounts
 
@@ -372,7 +376,7 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - [ ] T138 [P] Accessibility audit against WCAG 2.1 AA incl. bar mode (automated + manual checklist) in docs/a11y-audit.md
 - [ ] T139 [P] Security hardening pass: OWASP checklist, secrets scan, dependency/container scanning gates verified in .github/workflows/ci.yml
 - [ ] T140 SC sweep with explicit verification methods in backend/tests/Acceptance/SuccessCriteria/: automated (SC-003–SC-007, SC-009–SC-011, SC-013, SC-015–SC-017 via acceptance/contract suite tags; SC-002's search-latency half via T137); client-verified (SC-002's 3-interaction depth via a navigation-depth assertion in the Flutter integration suite; SC-014 via T125's integration test plus an on-device wakelock/voice checklist); semi-automated (SC-008 dataset-driven via the T147 harness; SC-012 via the T137 load rig); manual protocol (SC-001 timed UX walkthrough, documented checklist)
-- [ ] T141 [P] ADR backlog: record R1–R18a decisions as ADRs, including the ai/search persistence decision (ai schema owned by the AI module; search owns no schema — an interpretation of Principle III) in docs/adr/
+- [ ] T141 [P] ADR backlog: record R1–R18a decisions as ADRs, including the ai/search persistence decision (ai schema owned by the AI module; search owns no schema — an interpretation of Principle III) and the notifications ADR's Principle XI anti-abuse deferral rationale (V1 defers frequency caps/rate limits because its only senders are two platform alert types — prep expiry, account-deactivation warning — and no establishment senders exist until Phase 2) in docs/adr/
 - [ ] T142 [P] Documentation: OpenAPI review sign-off, module boundary map, quickstart.md validation run in docs/
 - [ ] T143 Run all quickstart.md scenarios 1–12 end-to-end and record results in specs/001-specpour-v1/quickstart-results.md
 
@@ -396,7 +400,7 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - **US11 (Phase 14)**: requires US5 (costing); print of prep/shopping artifacts depends on US9/US10
 - **US12 (Phase 15)**: requires T068 + content stories for grounding
 - **US13 (Phase 16)**: requires US1 + US2
-- **US14 (Phase 17)**: requires US1 (recipes) — client-only
+- **US14 (Phase 17)**: requires US1 (recipes) — client-only; prep-list bar mode (FR-051) additionally requires US10, already satisfied by phase order (17 after 13)
 - **US15 (Phase 18)**: requires US1 content + US3 (user-authored edits for conflicts) + US11 (pins)
 - **Polish (Phase 19)**: after desired stories complete
 

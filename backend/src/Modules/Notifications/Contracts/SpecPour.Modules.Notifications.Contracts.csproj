@@ -6,4 +6,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- INotificationEvent extends IDomainEvent — future event-publishing modules
+         (Identity's AccountDeactivated, Prep's PrepExpired, ...) implement this
+         marker on their own event types to opt into the inbox automatically. -->
+    <ProjectReference Include="..\..\..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
+  </ItemGroup>
+
 </Project>

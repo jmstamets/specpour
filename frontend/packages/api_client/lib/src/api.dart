@@ -10,6 +10,8 @@ import 'package:api_client/src/auth/basic_auth.dart';
 import 'package:api_client/src/auth/bearer_auth.dart';
 import 'package:api_client/src/auth/oauth.dart';
 import 'package:api_client/src/api/authorization_api.dart';
+import 'package:api_client/src/api/compliance_api.dart';
+import 'package:api_client/src/api/notifications_api.dart';
 
 class ApiClient {
   static const String basePath = r'/api/v1';
@@ -109,5 +111,17 @@ class ApiClient {
   /// by doing that all interceptors will not be executed
   AuthorizationApi getAuthorizationApi() {
     return AuthorizationApi(dio, serializers);
+  }
+
+  /// Get ComplianceApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  ComplianceApi getComplianceApi() {
+    return ComplianceApi(dio, serializers);
+  }
+
+  /// Get NotificationsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  NotificationsApi getNotificationsApi() {
+    return NotificationsApi(dio, serializers);
   }
 }
