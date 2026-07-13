@@ -22,5 +22,11 @@ void main() {
       // TODO
     });
 
+    // Resolved parent-ingredient name for hierarchy display (contract sweep).
+    // String parentName
+    test('to test the property `parentName`', () async {
+      // TODO
+    });
+
   });
 }

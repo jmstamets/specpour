@@ -261,6 +261,9 @@
   <Folder Name="/src/Tools/Seeder/">
     <Project Path="src/Tools/Seeder/SpecPour.Tools.Seeder.csproj" />
   </Folder>
+  <Folder Name="/src/Tools/SearchBackfill/">
+    <Project Path="src/Tools/SearchBackfill/SpecPour.Tools.SearchBackfill.csproj" />
+  </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/Acceptance/">
     <Project Path="tests/Acceptance/SpecPour.Tests.Acceptance.csproj" />

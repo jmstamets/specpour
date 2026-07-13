@@ -141,6 +141,354 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We\'re sorry, you must be of legal drinking age to use SpecPour.'**
   String get ageGateUnderageMessage;
+
+  /// App bar title of the discover/browse/search home screen (T041).
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get discoverTitle;
+
+  /// Placeholder text in the discover screen's search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Search recipes, ingredients, glossary…'**
+  String get discoverSearchHint;
+
+  /// Shown when the curated-library browse list has no results.
+  ///
+  /// In en, this message translates to:
+  /// **'No recipes to show yet.'**
+  String get discoverBrowseEmpty;
+
+  /// Shown when a search query returns no results.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found.'**
+  String get discoverSearchEmpty;
+
+  /// Section header grouping recipe search results (FR-049 typed/grouped results).
+  ///
+  /// In en, this message translates to:
+  /// **'Recipes'**
+  String get discoverGroupRecipes;
+
+  /// Section header grouping ingredient search results.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get discoverGroupIngredients;
+
+  /// Section header grouping equipment search results.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get discoverGroupEquipment;
+
+  /// Section header grouping glossary term and article search results.
+  ///
+  /// In en, this message translates to:
+  /// **'Glossary'**
+  String get discoverGroupGlossary;
+
+  /// Display name for the family.cocktail taxonomy key (T157: backend sends i18n keys, client resolves).
+  ///
+  /// In en, this message translates to:
+  /// **'Cocktail'**
+  String get familyCocktail;
+
+  /// Display name for family.spiritForward.
+  ///
+  /// In en, this message translates to:
+  /// **'Spirit-Forward'**
+  String get familySpiritForward;
+
+  /// Display name for family.sour.
+  ///
+  /// In en, this message translates to:
+  /// **'Sour'**
+  String get familySour;
+
+  /// Display name for family.highball.
+  ///
+  /// In en, this message translates to:
+  /// **'Highball'**
+  String get familyHighball;
+
+  /// Display name for family.cobbler.
+  ///
+  /// In en, this message translates to:
+  /// **'Cobbler'**
+  String get familyCobbler;
+
+  /// Display name for family.julep.
+  ///
+  /// In en, this message translates to:
+  /// **'Julep'**
+  String get familyJulep;
+
+  /// Display name for family.smash.
+  ///
+  /// In en, this message translates to:
+  /// **'Smash'**
+  String get familySmash;
+
+  /// Display name for family.flip.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip'**
+  String get familyFlip;
+
+  /// Display name for family.nog.
+  ///
+  /// In en, this message translates to:
+  /// **'Nog'**
+  String get familyNog;
+
+  /// Display name for the egg allergen key (FR-055 chips).
+  ///
+  /// In en, this message translates to:
+  /// **'Egg'**
+  String get allergenEgg;
+
+  /// Display name for the dairy allergen key.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy'**
+  String get allergenDairy;
+
+  /// Display name for the treeNut allergen key.
+  ///
+  /// In en, this message translates to:
+  /// **'Tree nut'**
+  String get allergenTreeNut;
+
+  /// Display name for the peanut allergen key.
+  ///
+  /// In en, this message translates to:
+  /// **'Peanut'**
+  String get allergenPeanut;
+
+  /// Display name for the gluten allergen key.
+  ///
+  /// In en, this message translates to:
+  /// **'Gluten'**
+  String get allergenGluten;
+
+  /// Display name for the sulfites allergen key.
+  ///
+  /// In en, this message translates to:
+  /// **'Sulfites'**
+  String get allergenSulfites;
+
+  /// Section heading for a recipe's ingredient lines (T042).
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get recipeDetailIngredientsTitle;
+
+  /// Section heading for a recipe's step-by-step instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions'**
+  String get recipeDetailInstructionsTitle;
+
+  /// Section heading for a recipe's garnishes.
+  ///
+  /// In en, this message translates to:
+  /// **'Garnish'**
+  String get recipeDetailGarnishTitle;
+
+  /// Label for a recipe's ice specification (T158: previously the ice spec was mislabeled under Garnish).
+  ///
+  /// In en, this message translates to:
+  /// **'Ice'**
+  String get recipeDetailIceTitle;
+
+  /// Section heading for a recipe's acceptable glassware (FR-020).
+  ///
+  /// In en, this message translates to:
+  /// **'Glassware'**
+  String get recipeDetailGlasswareTitle;
+
+  /// Section heading for a recipe's required equipment (FR-020).
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get recipeDetailEquipmentTitle;
+
+  /// Section heading for a recipe's rolled-up allergen flags (FR-055).
+  ///
+  /// In en, this message translates to:
+  /// **'Contains'**
+  String get recipeDetailAllergensTitle;
+
+  /// Derived ABV and standard-drinks display (FR-022), values pre-formatted by the caller.
+  ///
+  /// In en, this message translates to:
+  /// **'{abv}% ABV · {standardDrinks} standard drinks'**
+  String recipeDetailAbvStandardDrinks(String abv, String standardDrinks);
+
+  /// Section heading for a recipe's history/background text.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get recipeDetailHistoryTitle;
+
+  /// Attribution line naming the recipe's creator/originator.
+  ///
+  /// In en, this message translates to:
+  /// **'Created by {creator}'**
+  String recipeDetailCreatorLabel(String creator);
+
+  /// Section heading for a concept page's linked variant recipes (FR-021).
+  ///
+  /// In en, this message translates to:
+  /// **'Variants'**
+  String get conceptDetailVariantsTitle;
+
+  /// Title of the sign-in prompt shown when a guest attempts an account-gated action (T043).
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to continue'**
+  String get guestGatePromptTitle;
+
+  /// Body of the guest-gate sign-in prompt; {action} describes the attempted action.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or create an account to {action}. We\'ll pick up right where you left off.'**
+  String guestGatePromptBody(String action);
+
+  /// Sign-in button in the guest-gate prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get guestGateSignInButton;
+
+  /// Register button in the guest-gate prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get guestGateRegisterButton;
+
+  /// Dismiss button in the guest-gate prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get guestGateDismissButton;
+
+  /// Default responsible-consumption message (FR-067); resolved from the backend's 'responsibleUse.message.default' content key.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enjoy responsibly. Know your limits, and never drink and drive.'**
+  String get responsibleUseMessageDefault;
+
+  /// Shown when the backend returns a responsible-consumption content key the client doesn't recognize — never leave the surface without a message (FR-067).
+  ///
+  /// In en, this message translates to:
+  /// **'Please enjoy responsibly.'**
+  String get responsibleUseMessageFallback;
+
+  /// Button/link opening the jurisdiction-aware support resources (FR-069).
+  ///
+  /// In en, this message translates to:
+  /// **'Support resources'**
+  String get responsibleUseSupportResourcesButton;
+
+  /// Title of the support-resources sheet (FR-069).
+  ///
+  /// In en, this message translates to:
+  /// **'Get support'**
+  String get responsibleUseSupportResourcesTitle;
+
+  /// Title of the about/settings surface (FR-067 footer/about; FR-069).
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutTitle;
+
+  /// T156 entity info popover: shown when the entity has no curated description.
+  ///
+  /// In en, this message translates to:
+  /// **'No description yet.'**
+  String get entityInfoNoDescription;
+
+  /// T156 entity info popover: label preceding equipment usage guidance.
+  ///
+  /// In en, this message translates to:
+  /// **'How to use'**
+  String get entityInfoUsageLabel;
+
+  /// T156 entity info popover: link to the entity's full detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Full entry'**
+  String get entityInfoFullEntryButton;
+
+  /// T156 ingredient detail: shown when the ingredient has a parent category ingredient.
+  ///
+  /// In en, this message translates to:
+  /// **'Type of {parentName}'**
+  String ingredientDetailParentLabel(String parentName);
+
+  /// T156 ingredient detail: label for the ingredient's brand/source examples.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get ingredientDetailSourcesTitle;
+
+  /// T156 ingredient detail: label for the ingredient's own allergen flags.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergens'**
+  String get ingredientDetailAllergensTitle;
+
+  /// T156 ingredient detail: label for the ingredient's own ABV percentage, when it is a spirit/liqueur.
+  ///
+  /// In en, this message translates to:
+  /// **'ABV'**
+  String get ingredientDetailAbvLabel;
+
+  /// T156 ingredient detail: label linking a house-made ingredient to the recipe that defines it.
+  ///
+  /// In en, this message translates to:
+  /// **'House-made from'**
+  String get ingredientDetailDefiningRecipeLabel;
+
+  /// T156 ingredient detail: label for house-made yield quantity/unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Yield'**
+  String get ingredientDetailYieldLabel;
+
+  /// T156 ingredient detail: label for house-made shelf life.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf life'**
+  String get ingredientDetailShelfLifeLabel;
+
+  /// T156 ingredient detail: label for house-made storage instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get ingredientDetailStorageTitle;
+
+  /// T156 equipment detail: label for the equipment category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get equipmentDetailCategoryLabel;
+
+  /// T156 equipment detail: label for usage guidance.
+  ///
+  /// In en, this message translates to:
+  /// **'How to use'**
+  String get equipmentDetailUsageTitle;
+
+  /// T156 equipment detail: label for the list of typical applications.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical uses'**
+  String get equipmentDetailApplicationsTitle;
 }
 
 class _AppLocalizationsDelegate

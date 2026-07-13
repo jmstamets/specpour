@@ -17,6 +17,7 @@ doc/EntitlementManifest.md
 doc/EquipmentApi.md
 doc/EquipmentDetail.md
 doc/EquipmentPage.md
+doc/EquipmentRef.md
 doc/EquipmentSummary.md
 doc/GlossaryApi.md
 doc/GlossaryArticleDetail.md
@@ -29,6 +30,8 @@ doc/InboxMessage.md
 doc/InboxPage.md
 doc/IngredientDetail.md
 doc/IngredientPage.md
+doc/IngredientRecipeRef.md
+doc/IngredientRecipes.md
 doc/IngredientSummary.md
 doc/IngredientsApi.md
 doc/NotificationsApi.md
@@ -37,10 +40,13 @@ doc/RecipeDetail.md
 doc/RecipeIngredientLine.md
 doc/RecipePage.md
 doc/RecipeSummary.md
+doc/ResponsibleConsumptionMessageResponse.md
 doc/RoleGrantSummary.md
 doc/SearchApi.md
 doc/SearchResult.md
 doc/SearchResultPage.md
+doc/SupportResourceResponse.md
+doc/SupportResourcesResponse.md
 lib/api_client.dart
 lib/src/api.dart
 lib/src/api/authorization_api.dart
@@ -70,6 +76,7 @@ lib/src/model/date.dart
 lib/src/model/entitlement_manifest.dart
 lib/src/model/equipment_detail.dart
 lib/src/model/equipment_page.dart
+lib/src/model/equipment_ref.dart
 lib/src/model/equipment_summary.dart
 lib/src/model/glossary_article_detail.dart
 lib/src/model/glossary_article_page.dart
@@ -81,15 +88,20 @@ lib/src/model/inbox_message.dart
 lib/src/model/inbox_page.dart
 lib/src/model/ingredient_detail.dart
 lib/src/model/ingredient_page.dart
+lib/src/model/ingredient_recipe_ref.dart
+lib/src/model/ingredient_recipes.dart
 lib/src/model/ingredient_summary.dart
 lib/src/model/problem_details.dart
 lib/src/model/recipe_detail.dart
 lib/src/model/recipe_ingredient_line.dart
 lib/src/model/recipe_page.dart
 lib/src/model/recipe_summary.dart
+lib/src/model/responsible_consumption_message_response.dart
 lib/src/model/role_grant_summary.dart
 lib/src/model/search_result.dart
 lib/src/model/search_result_page.dart
+lib/src/model/support_resource_response.dart
+lib/src/model/support_resources_response.dart
 lib/src/serializers.dart
 pubspec.yaml
 test/age_gate_response_test.dart
@@ -107,6 +119,7 @@ test/entitlement_manifest_test.dart
 test/equipment_api_test.dart
 test/equipment_detail_test.dart
 test/equipment_page_test.dart
+test/equipment_ref_test.dart
 test/equipment_summary_test.dart
 test/glossary_api_test.dart
 test/glossary_article_detail_test.dart
@@ -119,6 +132,8 @@ test/inbox_message_test.dart
 test/inbox_page_test.dart
 test/ingredient_detail_test.dart
 test/ingredient_page_test.dart
+test/ingredient_recipe_ref_test.dart
+test/ingredient_recipes_test.dart
 test/ingredient_summary_test.dart
 test/ingredients_api_test.dart
 test/notifications_api_test.dart
@@ -127,7 +142,10 @@ test/recipe_detail_test.dart
 test/recipe_ingredient_line_test.dart
 test/recipe_page_test.dart
 test/recipe_summary_test.dart
+test/responsible_consumption_message_response_test.dart
 test/role_grant_summary_test.dart
 test/search_api_test.dart
 test/search_result_page_test.dart
 test/search_result_test.dart
+test/support_resource_response_test.dart
+test/support_resources_response_test.dart

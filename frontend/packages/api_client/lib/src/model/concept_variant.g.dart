@@ -10,12 +10,17 @@ class _$ConceptVariant extends ConceptVariant {
   @override
   final String recipeId;
   @override
+  final String recipeName;
+  @override
   final String differentiatorText;
 
   factory _$ConceptVariant([void Function(ConceptVariantBuilder)? updates]) =>
       (ConceptVariantBuilder()..update(updates))._build();
 
-  _$ConceptVariant._({required this.recipeId, required this.differentiatorText})
+  _$ConceptVariant._(
+      {required this.recipeId,
+      required this.recipeName,
+      required this.differentiatorText})
       : super._();
   @override
   ConceptVariant rebuild(void Function(ConceptVariantBuilder) updates) =>
@@ -29,6 +34,7 @@ class _$ConceptVariant extends ConceptVariant {
     if (identical(other, this)) return true;
     return other is ConceptVariant &&
         recipeId == other.recipeId &&
+        recipeName == other.recipeName &&
         differentiatorText == other.differentiatorText;
   }
 
@@ -36,6 +42,7 @@ class _$ConceptVariant extends ConceptVariant {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, recipeId.hashCode);
+    _$hash = $jc(_$hash, recipeName.hashCode);
     _$hash = $jc(_$hash, differentiatorText.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -45,6 +52,7 @@ class _$ConceptVariant extends ConceptVariant {
   String toString() {
     return (newBuiltValueToStringHelper(r'ConceptVariant')
           ..add('recipeId', recipeId)
+          ..add('recipeName', recipeName)
           ..add('differentiatorText', differentiatorText))
         .toString();
   }
@@ -57,6 +65,10 @@ class ConceptVariantBuilder
   String? _recipeId;
   String? get recipeId => _$this._recipeId;
   set recipeId(String? recipeId) => _$this._recipeId = recipeId;
+
+  String? _recipeName;
+  String? get recipeName => _$this._recipeName;
+  set recipeName(String? recipeName) => _$this._recipeName = recipeName;
 
   String? _differentiatorText;
   String? get differentiatorText => _$this._differentiatorText;
@@ -71,6 +83,7 @@ class ConceptVariantBuilder
     final $v = _$v;
     if ($v != null) {
       _recipeId = $v.recipeId;
+      _recipeName = $v.recipeName;
       _differentiatorText = $v.differentiatorText;
       _$v = null;
     }
@@ -95,6 +108,8 @@ class ConceptVariantBuilder
         _$ConceptVariant._(
           recipeId: BuiltValueNullFieldError.checkNotNull(
               recipeId, r'ConceptVariant', 'recipeId'),
+          recipeName: BuiltValueNullFieldError.checkNotNull(
+              recipeName, r'ConceptVariant', 'recipeName'),
           differentiatorText: BuiltValueNullFieldError.checkNotNull(
               differentiatorText, r'ConceptVariant', 'differentiatorText'),
         );

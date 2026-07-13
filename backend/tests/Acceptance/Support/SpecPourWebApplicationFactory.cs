@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Time;
 
 namespace SpecPour.Tests.Acceptance.Support;
@@ -48,6 +49,14 @@ public sealed class SpecPourWebApplicationFactory : WebApplicationFactory<Progra
         {
             services.RemoveAll<IClock>();
             services.AddSingleton<IClock>(Clock);
+
+            // T155: the outbox dispatcher's production default (5s polling) would make
+            // the rename-refresh acceptance scenario slow/flaky to poll against — fast
+            // enough here that a short bounded poll in the step definition is enough,
+            // production behavior (and the ADR-0002-documented eventual-consistency
+            // window) is unaffected since this only applies to the test host.
+            services.Configure<OutboxDispatcherOptions>(options =>
+                options.PollingInterval = TimeSpan.FromMilliseconds(200));
         });
     }
 }

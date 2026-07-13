@@ -52,9 +52,12 @@ public static class ConceptEndpoints
 
         // Only Approved variants are shown publicly — Proposed/Rejected are
         // curator-moderation working state (FR-021), not guest-visible content.
+        // RecipeName is resolved via a same-schema join (Recipe lives in this
+        // same Catalog module, unlike RecipeIngredientLine's cross-module
+        // IngredientId) so the client can render a link, not a raw GUID.
         var variants = await db.ConceptVariantLinks
             .Where(v => v.ConceptId == id && v.State == ConceptVariantState.Approved)
-            .Select(v => new ConceptVariantResponse(v.RecipeId, v.DifferentiatorText))
+            .Join(db.Recipes, v => v.RecipeId, r => r.Id, (v, r) => new ConceptVariantResponse(v.RecipeId, r.PrimaryName, v.DifferentiatorText))
             .ToListAsync(cancellationToken);
 
         return TypedResults.Ok(new ConceptDetailResponse(concept.Id, concept.Name, concept.Description, variants));
@@ -65,6 +68,6 @@ public sealed record ConceptPageResponse(IReadOnlyList<ConceptSummaryResponse> I
 
 public sealed record ConceptSummaryResponse(Guid Id, string Name, string Description);
 
-public sealed record ConceptVariantResponse(Guid RecipeId, string DifferentiatorText);
+public sealed record ConceptVariantResponse(Guid RecipeId, string RecipeName, string DifferentiatorText);
 
 public sealed record ConceptDetailResponse(Guid Id, string Name, string Description, IReadOnlyList<ConceptVariantResponse> Variants);

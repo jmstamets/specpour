@@ -43,6 +43,34 @@ ingredientById:
       '404':
         $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
+ingredientRecipes:
+  get:
+    operationId: getIngredientRecipes
+    tags: [ingredients]
+    summary: Recipes using this ingredient, hierarchy-aware (T155, FR-014a)
+    description: >-
+      A class-level ingredient (e.g. "Rum") lists recipes using it or any
+      descendant ("Aged Rum", "White Rum", ...) — mirrors FR-024's
+      equipment-to-recipes linking. Unpaginated: a single ingredient's usage
+      list is small at V1 scale.
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: Recipes using this ingredient or a descendant.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngredientRecipes'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
 components:
   schemas:
     IngredientSummary:
@@ -51,6 +79,7 @@ components:
         id: { type: string, format: uuid }
         name: { type: string }
         parentId: { type: [string, "null"], format: uuid }
+        parentName: { type: [string, "null"], description: "Resolved parent-ingredient name for hierarchy display (contract sweep)." }
       required: [id, name]
     IngredientPage:
       type: object
@@ -66,13 +95,28 @@ components:
         id: { type: string, format: uuid }
         name: { type: string }
         parentId: { type: [string, "null"], format: uuid }
+        parentName: { type: [string, "null"], description: "Resolved parent-ingredient name (contract sweep)." }
         sources: { type: array, items: { type: string } }
         description: { type: [string, "null"] }
         abvPercent: { type: [number, "null"] }
         allergens: { type: array, items: { type: string } }
         definingRecipeId: { type: [string, "null"], format: uuid }
+        definingRecipeName: { type: [string, "null"], description: "Resolved defining-recipe name for house-made ingredients (contract sweep)." }
         yieldQuantity: { type: [number, "null"] }
         yieldUnit: { type: [string, "null"] }
         shelfLife: { type: [string, "null"], description: "ISO 8601 duration, when this is a house-made ingredient." }
         storageInstructions: { type: [string, "null"] }
       required: [id, name, sources, allergens]
+    IngredientRecipeRef:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+      required: [id, name]
+    IngredientRecipes:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/IngredientRecipeRef' }
+      required: [items]

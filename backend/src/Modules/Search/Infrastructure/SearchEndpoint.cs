@@ -22,7 +22,14 @@ public static class SearchEndpoint
         endpoints.MapApiV1Group().MapGet("/search", HandleAsync);
 
     private static async Task<SearchResponse> HandleAsync(
-        string? q, string? cursor, int? limit, ISearchPort searchPort, CancellationToken cancellationToken)
+        string? q,
+        string? cursor,
+        int? limit,
+        string? uses,
+        ISearchPort searchPort,
+        Ingredients.Contracts.IIngredientLookupPort ingredientLookup,
+        Catalog.Contracts.IRecipeLookupPort recipeLookup,
+        CancellationToken cancellationToken)
     {
         var pageSize = Math.Clamp(limit ?? DefaultLimit, 1, 100);
 
@@ -30,8 +37,27 @@ public static class SearchEndpoint
             new SearchQuery(q, new Dictionary<string, IReadOnlyList<string>>(), cursor, pageSize),
             cancellationToken);
 
+        var items = page.Items;
+
+        // T155/FR-050: hierarchy-aware "uses:<ingredient>" facet, complementing text
+        // search — narrows to recipe-type results referencing the ingredient (or any
+        // descendant). Applied as a post-filter (same shape as RecipeEndpoints'
+        // equipment/glassware facets) rather than a change to
+        // PostgresFullTextSearchAdapter's generic union query, so Search stays
+        // entity-agnostic (T141 ADR). Known limitation: it filters AFTER the
+        // adapter's own pagination, so a page can come back with fewer than `limit`
+        // items when this facet removes matches — full facet-aware pagination is
+        // T148/T149's job (still-open tasks whose explicit purpose is completing
+        // ISearchPort's facet composition), not this one.
+        if (uses is not null && Guid.TryParse(uses, out var usesIngredientId))
+        {
+            var descendantIds = await ingredientLookup.GetDescendantIdsAsync(usesIngredientId, cancellationToken);
+            var matchingRecipeIds = await recipeLookup.GetRecipeIdsUsingIngredientsAsync(descendantIds, cancellationToken);
+            items = [.. items.Where(i => i.EntityType == "recipe" && matchingRecipeIds.Contains(i.EntityId))];
+        }
+
         return new SearchResponse(
-            [.. page.Items.Select(i => new SearchResultResponse(i.EntityType, i.EntityId, i.Title, i.Snippet, i.Score))],
+            [.. items.Select(i => new SearchResultResponse(i.EntityType, i.EntityId, i.Title, i.Snippet, i.Score))],
             page.NextCursor);
     }
 }

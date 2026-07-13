@@ -35,12 +35,14 @@ public static class RecipeEndpoints
         string? equipment,
         string? glassware,
         string? ice,
+        string? uses,
         string? allergenExclude,
         string? source,
         string? cursor,
         int? limit,
         CatalogDbContext db,
         Ingredients.Contracts.IIngredientLookupPort ingredientLookup,
+        Contracts.IRecipeLookupPort recipeLookup,
         CancellationToken cancellationToken)
     {
         var pageSize = Math.Clamp(limit ?? DefaultLimit, 1, 100);
@@ -102,6 +104,17 @@ public static class RecipeEndpoints
             recipes = [.. recipes.Where(r => recipeIds.Contains(r.Id))];
         }
 
+        // T155/FR-050: hierarchy-aware "uses:<ingredient>" facet — a class-level
+        // ingredient (e.g. "Rum") matches recipes using it or any descendant ("Aged
+        // Rum", "White Rum", ...). Same in-memory post-filter shape as
+        // equipment/glassware above (same reasoning — crosses into ingredients' schema).
+        if (uses is not null && Guid.TryParse(uses, out var usesIngredientId))
+        {
+            var descendantIds = await ingredientLookup.GetDescendantIdsAsync(usesIngredientId, cancellationToken);
+            var recipeIds = await recipeLookup.GetRecipeIdsUsingIngredientsAsync(descendantIds, cancellationToken);
+            recipes = [.. recipes.Where(r => recipeIds.Contains(r.Id))];
+        }
+
         if (allergenExclude is not null)
         {
             var excluded = new HashSet<string>(allergenExclude.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), StringComparer.OrdinalIgnoreCase);
@@ -140,6 +153,8 @@ public static class RecipeEndpoints
         Guid id,
         CatalogDbContext db,
         IRecipeDerivedDataCalculator calculator,
+        Ingredients.Contracts.IIngredientLookupPort ingredientLookup,
+        Equipment.Contracts.IEquipmentLookupPort equipmentLookup,
         CancellationToken cancellationToken)
     {
         var recipe = await db.Recipes.FirstOrDefaultAsync(r => r.Id == id && r.Visibility == ContentVisibility.Public, cancellationToken);
@@ -170,8 +185,32 @@ public static class RecipeEndpoints
         var glasswareIds = await db.RecipeGlassware.Where(rg => rg.RecipeId == id).Select(rg => rg.EquipmentId).ToListAsync(cancellationToken);
         var equipmentIds = await db.RecipeEquipment.Where(re => re.RecipeId == id).Select(re => re.EquipmentId).ToListAsync(cancellationToken);
 
+        // Resolve glassware/equipment IDs to names (contract sweep) — a raw GUID
+        // can't be rendered as FR-020's "acceptable glasses" / "required equipment"
+        // list. Cross-module into the equipment schema via its lookup port.
+        var equipmentNames = await equipmentLookup.GetNamesAsync(
+            [.. glasswareIds.Concat(equipmentIds).Distinct()], cancellationToken);
+        var glassware = glasswareIds
+            .Select(e => new EquipmentRefResponse(e, equipmentNames.GetValueOrDefault(e)))
+            .ToList();
+        var equipment = equipmentIds
+            .Select(e => new EquipmentRefResponse(e, equipmentNames.GetValueOrDefault(e)))
+            .ToList();
+
+        // A raw ingredientId is meaningless to render — FR-020's "ingredient
+        // reference" needs the referenced ingredient's name to actually display
+        // an ingredient line. Reuses the same cross-module lookup port the ABV
+        // calculator above already needed.
+        var ingredientSummaries = await ingredientLookup.GetSummariesAsync(
+            [.. lines.Select(l => l.IngredientId).Distinct()], cancellationToken);
         var ingredientLines = lines.Select(l => new RecipeIngredientLineResponse(
-            l.Position, l.IngredientId, l.Quantity, l.Unit, l.Purpose, l.ScalingRule.ToString())).ToList();
+            l.Position,
+            l.IngredientId,
+            ingredientSummaries.TryGetValue(l.IngredientId, out var summary) ? summary.Name : null,
+            l.Quantity,
+            l.Unit,
+            l.Purpose,
+            l.ScalingRule.ToString())).ToList();
 
         return TypedResults.Ok(new RecipeDetailResponse(
             recipe.Id,
@@ -185,8 +224,8 @@ public static class RecipeEndpoints
             recipe.Instructions,
             recipe.Garnishes,
             recipe.IceSpec,
-            glasswareIds,
-            equipmentIds,
+            glassware,
+            equipment,
             recipe.CreatorAttribution,
             recipe.History,
             recipe.Notes,
@@ -200,7 +239,10 @@ public sealed record RecipePageResponse(IReadOnlyList<RecipeSummaryResponse> Ite
 
 public sealed record RecipeSummaryResponse(Guid Id, string PrimaryName, string? FamilyKey);
 
-public sealed record RecipeIngredientLineResponse(int Position, Guid IngredientId, decimal Quantity, string Unit, string? Purpose, string ScalingRule);
+public sealed record RecipeIngredientLineResponse(int Position, Guid IngredientId, string? IngredientName, decimal Quantity, string Unit, string? Purpose, string ScalingRule);
+
+/// <summary>A recipe's glassware/equipment reference — the cross-module equipment ID plus its resolved name (contract sweep). Name is null only if the equipment can no longer be resolved.</summary>
+public sealed record EquipmentRefResponse(Guid Id, string? Name);
 
 public sealed record RecipeDetailResponse(
     Guid Id,
@@ -214,8 +256,8 @@ public sealed record RecipeDetailResponse(
     IReadOnlyList<string> Instructions,
     IReadOnlyList<string> Garnishes,
     string IceSpec,
-    IReadOnlyList<Guid> GlasswareIds,
-    IReadOnlyList<Guid> EquipmentIds,
+    IReadOnlyList<EquipmentRefResponse> Glassware,
+    IReadOnlyList<EquipmentRefResponse> Equipment,
     string? CreatorAttribution,
     string? History,
     string? Notes,

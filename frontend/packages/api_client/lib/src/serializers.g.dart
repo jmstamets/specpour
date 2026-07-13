@@ -19,6 +19,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(EntitlementManifest.serializer)
       ..add(EquipmentDetail.serializer)
       ..add(EquipmentPage.serializer)
+      ..add(EquipmentRef.serializer)
       ..add(EquipmentSummary.serializer)
       ..add(GlossaryArticleDetail.serializer)
       ..add(GlossaryArticlePage.serializer)
@@ -30,6 +31,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(InboxPage.serializer)
       ..add(IngredientDetail.serializer)
       ..add(IngredientPage.serializer)
+      ..add(IngredientRecipeRef.serializer)
+      ..add(IngredientRecipes.serializer)
       ..add(IngredientSummary.serializer)
       ..add(ProblemDetails.serializer)
       ..add(RecipeDetail.serializer)
@@ -37,11 +40,14 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RecipeIngredientLineScalingRuleEnum.serializer)
       ..add(RecipePage.serializer)
       ..add(RecipeSummary.serializer)
+      ..add(ResponsibleConsumptionMessageResponse.serializer)
       ..add(RoleGrantSummary.serializer)
       ..add(RoleGrantSummaryScopeTypeEnum.serializer)
       ..add(SearchResult.serializer)
       ..add(SearchResultEntityTypeEnum.serializer)
       ..add(SearchResultPage.serializer)
+      ..add(SupportResourceResponse.serializer)
+      ..add(SupportResourcesResponse.serializer)
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(AutoLinkMatch)]),
           () => ListBuilder<AutoLinkMatch>())
@@ -65,6 +71,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(InboxMessage)]),
           () => ListBuilder<InboxMessage>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(IngredientRecipeRef)]),
+          () => ListBuilder<IngredientRecipeRef>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(IngredientSummary)]),
           () => ListBuilder<IngredientSummary>())
@@ -115,14 +125,18 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+          const FullType(BuiltList, const [const FullType(EquipmentRef)]),
+          () => ListBuilder<EquipmentRef>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(EquipmentRef)]),
+          () => ListBuilder<EquipmentRef>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+          const FullType(
+              BuiltList, const [const FullType(SupportResourceResponse)]),
+          () => ListBuilder<SupportResourceResponse>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType.nullable(JsonObject)]),

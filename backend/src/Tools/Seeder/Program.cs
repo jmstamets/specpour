@@ -12,10 +12,12 @@ using SpecPour.Modules.Authorization.Domain;
 using SpecPour.Modules.Authorization.Infrastructure;
 using SpecPour.Modules.Authorization.Infrastructure.Audit;
 using SpecPour.Modules.Catalog.Infrastructure;
+using SpecPour.Modules.Catalog.Infrastructure.Search;
 using SpecPour.Modules.Equipment.Infrastructure;
 using SpecPour.Modules.Glossary.Infrastructure;
 using SpecPour.Modules.Identity.Application.Ports;
 using SpecPour.Modules.Identity.Infrastructure;
+using SpecPour.Modules.Ingredients.Contracts;
 using SpecPour.Modules.Ingredients.Infrastructure;
 using SpecPour.Tools.Seeder;
 using SpecPour.Tools.Seeder.Content;
@@ -67,6 +69,12 @@ services.AddDbContext<IngredientsDbContext>(o => o.UseNpgsql(connectionString));
 services.AddDbContext<EquipmentDbContext>(o => o.UseNpgsql(connectionString));
 services.AddDbContext<GlossaryDbContext>(o => o.UseNpgsql(connectionString));
 services.AddScoped<CuratedContentImporter>();
+// T155: search documents for the recipes just imported (or already present from a
+// prior run) need to be (re)computed — RefreshAllAsync is idempotent/re-runnable,
+// same instance the standalone SearchBackfill tool uses for an already-deployed
+// database that predates this feature.
+services.AddScoped<IIngredientLookupPort, IngredientLookupAdapter>();
+services.AddScoped<RecipeSearchDocumentRefresher>();
 
 await using var provider = services.BuildServiceProvider();
 await using (var scope = provider.CreateAsyncScope())
@@ -83,6 +91,17 @@ await using (var scope = provider.CreateAsyncScope())
         Console.WriteLine($"Importing {importer.ContentType}...");
         await importer.ImportAsync(contentDirectory, CancellationToken.None);
     }
+}
+
+// T155: (re)compute every recipe's search document — covers both freshly-imported
+// recipes and, since this is idempotent/re-runnable, recipes from a prior Seeder
+// run against a database that predates this feature.
+await using (var scope = provider.CreateAsyncScope())
+{
+    Console.WriteLine("Refreshing recipe search documents...");
+    var refresher = scope.ServiceProvider.GetRequiredService<RecipeSearchDocumentRefresher>();
+    await refresher.RefreshAllAsync(CancellationToken.None);
+    await scope.ServiceProvider.GetRequiredService<CatalogDbContext>().SaveChangesAsync(CancellationToken.None);
 }
 
 Console.WriteLine("Seeder complete.");

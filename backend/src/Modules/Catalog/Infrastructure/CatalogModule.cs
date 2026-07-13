@@ -2,9 +2,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SpecPour.BuildingBlocks.Events;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Catalog.Application.DerivedData;
+using SpecPour.Modules.Catalog.Contracts;
+using SpecPour.Modules.Catalog.Infrastructure.Search;
+using SpecPour.Modules.Ingredients.Contracts.Events;
 using SpecPour.Modules.Search.Contracts;
 
 namespace SpecPour.Modules.Catalog.Infrastructure;
@@ -19,11 +23,25 @@ public sealed class CatalogModule : IModule
     {
         var connectionString = configuration.GetSpecPourConnectionString();
 
-        services.AddDbContext<CatalogDbContext>(options => options.UseNpgsql(connectionString));
+        // T155: the outbox interceptor must be attached here (not merely
+        // DI-registered) for OutboxSaveChangesInterceptor to actually run — a
+        // gap discovered while wiring T155's ingredient-rename event (the first
+        // real outbox producer/consumer in the codebase). Fixed identically
+        // across every module for consistency.
+        services.AddDbContext<CatalogDbContext>((sp, options) =>
+        {
+            options.UseNpgsql(connectionString);
+            options.AddInterceptors(sp.GetRequiredService<OutboxSaveChangesInterceptor>());
+        });
         services.AddSpecPourOutboxWriter(Name);
 
         services.AddHostedService<CatalogSearchRegistrationHostedService>();
         services.AddScoped<IRecipeDerivedDataCalculator, RecipeDerivedDataCalculator>();
+        services.AddScoped<IRecipeLookupPort, RecipeLookupAdapter>();
+
+        // T155/ADR-0002: event-maintained search document.
+        services.AddScoped<RecipeSearchDocumentRefresher>();
+        services.AddScoped<IDomainEventHandler<IngredientRenamed>, IngredientRenamedSearchDocumentHandler>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)

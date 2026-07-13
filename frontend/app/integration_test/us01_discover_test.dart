@@ -4,16 +4,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:specpour_app/core/app.dart';
 
-/// T031: failing-first Flutter integration test for US1 (guest browse/search/
-/// recipe view). Run on a real device/browser (CI:
-/// reactivecircus/android-emulator-runner, per .github/workflows/ci.yml's
-/// frontend-integration-tests job) against the composed app + a real backend, per
-/// the same convention as integration_test/age_gate_test.dart. Every key this test
-/// looks for (discoverSearchField, recipeResultTile, recipeDetailScreen, ...)
-/// belongs to the discover feature (T041/T042), which doesn't exist yet — expected
-/// to fail until then. See test/features/discover/us01_discover_widget_test.dart
-/// for the sandbox-runnable twin (no device/emulator available here — same
-/// limitation noted since Phase 1).
+import 'support/no_raw_l10n_keys.dart';
+
+/// T031: Flutter integration test for US1 (guest browse/search/recipe view).
+/// Run on a real device/browser (CI: reactivecircus/android-emulator-runner, per
+/// .github/workflows/ci.yml's frontend-integration-tests job) against the
+/// composed app + a real backend, per the same convention as
+/// integration_test/age_gate_test.dart. See
+/// test/features/discover/us01_discover_widget_test.dart for the
+/// sandbox-runnable twin (no device/emulator available in the dev sandbox —
+/// same limitation noted since Phase 1). T157 adds the no-raw-localization-keys
+/// rendering assertion after each screen settles.
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -42,6 +43,7 @@ void main() {
         find.byKey(const Key('recipeAbvAndStandardDrinks')),
         findsOneWidget,
       );
+      expectNoRawLocalizationKeys(tester);
     },
   );
 
@@ -62,6 +64,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('recipeAllergenFlag-egg')), findsOneWidget);
+      expectNoRawLocalizationKeys(tester);
     },
   );
 
@@ -73,5 +76,6 @@ void main() {
 
     expect(find.byKey(const Key('discoverBrowseList')), findsOneWidget);
     expect(find.byKey(const Key('accountGateSignInPrompt')), findsNothing);
+    expectNoRawLocalizationKeys(tester);
   });
 }

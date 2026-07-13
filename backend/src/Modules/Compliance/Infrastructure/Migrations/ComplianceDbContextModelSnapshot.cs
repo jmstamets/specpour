@@ -92,6 +92,110 @@ namespace SpecPour.Modules.Compliance.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SpecPour.Modules.Compliance.Domain.ResponsibleConsumptionMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("EffectiveAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("JurisdictionCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MessageContentKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlacementDescriptor")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SurfaceClass")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JurisdictionCode", "SurfaceClass")
+                        .IsUnique();
+
+                    b.ToTable("ResponsibleConsumptionMessages", "compliance");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000401"),
+                            EffectiveAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            JurisdictionCode = "default",
+                            MessageContentKey = "responsibleUse.message.default",
+                            PlacementDescriptor = "below-content",
+                            SurfaceClass = "recipe"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000402"),
+                            EffectiveAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            JurisdictionCode = "default",
+                            MessageContentKey = "responsibleUse.message.default",
+                            PlacementDescriptor = "below-content",
+                            SurfaceClass = "batch_output"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000403"),
+                            EffectiveAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            JurisdictionCode = "default",
+                            MessageContentKey = "responsibleUse.message.default",
+                            PlacementDescriptor = "footer",
+                            SurfaceClass = "footer_about"
+                        });
+                });
+
+            modelBuilder.Entity("SpecPour.Modules.Compliance.Domain.SupportResource", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("EffectiveAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("JurisdictionCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResourceName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JurisdictionCode", "DisplayOrder");
+
+                    b.ToTable("SupportResources", "compliance");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000411"),
+                            DisplayOrder = 1,
+                            EffectiveAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            JurisdictionCode = "default",
+                            Link = "https://www.who.int/health-topics/alcohol",
+                            ResourceName = "International drug and alcohol support directory"
+                        });
+                });
+
             modelBuilder.Entity("SpecPour.Modules.Compliance.Domain.SurfaceGateConfig", b =>
                 {
                     b.Property<string>("SurfaceKey")

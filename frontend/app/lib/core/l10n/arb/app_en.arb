@@ -31,5 +31,218 @@
   "ageGateUnderageMessage": "We're sorry, you must be of legal drinking age to use SpecPour.",
   "@ageGateUnderageMessage": {
     "description": "Rejection message shown when the entered date of birth is under the legal drinking age threshold."
+  },
+  "discoverTitle": "Discover",
+  "@discoverTitle": {
+    "description": "App bar title of the discover/browse/search home screen (T041)."
+  },
+  "discoverSearchHint": "Search recipes, ingredients, glossary…",
+  "@discoverSearchHint": {
+    "description": "Placeholder text in the discover screen's search field."
+  },
+  "discoverBrowseEmpty": "No recipes to show yet.",
+  "@discoverBrowseEmpty": {
+    "description": "Shown when the curated-library browse list has no results."
+  },
+  "discoverSearchEmpty": "No results found.",
+  "@discoverSearchEmpty": {
+    "description": "Shown when a search query returns no results."
+  },
+  "discoverGroupRecipes": "Recipes",
+  "@discoverGroupRecipes": {
+    "description": "Section header grouping recipe search results (FR-049 typed/grouped results)."
+  },
+  "discoverGroupIngredients": "Ingredients",
+  "@discoverGroupIngredients": {
+    "description": "Section header grouping ingredient search results."
+  },
+  "discoverGroupEquipment": "Equipment",
+  "@discoverGroupEquipment": {
+    "description": "Section header grouping equipment search results."
+  },
+  "discoverGroupGlossary": "Glossary",
+  "@discoverGroupGlossary": {
+    "description": "Section header grouping glossary term and article search results."
+  },
+  "familyCocktail": "Cocktail",
+  "@familyCocktail": { "description": "Display name for the family.cocktail taxonomy key (T157: backend sends i18n keys, client resolves)." },
+  "familySpiritForward": "Spirit-Forward",
+  "@familySpiritForward": { "description": "Display name for family.spiritForward." },
+  "familySour": "Sour",
+  "@familySour": { "description": "Display name for family.sour." },
+  "familyHighball": "Highball",
+  "@familyHighball": { "description": "Display name for family.highball." },
+  "familyCobbler": "Cobbler",
+  "@familyCobbler": { "description": "Display name for family.cobbler." },
+  "familyJulep": "Julep",
+  "@familyJulep": { "description": "Display name for family.julep." },
+  "familySmash": "Smash",
+  "@familySmash": { "description": "Display name for family.smash." },
+  "familyFlip": "Flip",
+  "@familyFlip": { "description": "Display name for family.flip." },
+  "familyNog": "Nog",
+  "@familyNog": { "description": "Display name for family.nog." },
+  "allergenEgg": "Egg",
+  "@allergenEgg": { "description": "Display name for the egg allergen key (FR-055 chips)." },
+  "allergenDairy": "Dairy",
+  "@allergenDairy": { "description": "Display name for the dairy allergen key." },
+  "allergenTreeNut": "Tree nut",
+  "@allergenTreeNut": { "description": "Display name for the treeNut allergen key." },
+  "allergenPeanut": "Peanut",
+  "@allergenPeanut": { "description": "Display name for the peanut allergen key." },
+  "allergenGluten": "Gluten",
+  "@allergenGluten": { "description": "Display name for the gluten allergen key." },
+  "allergenSulfites": "Sulfites",
+  "@allergenSulfites": { "description": "Display name for the sulfites allergen key." },
+  "recipeDetailIngredientsTitle": "Ingredients",
+  "@recipeDetailIngredientsTitle": {
+    "description": "Section heading for a recipe's ingredient lines (T042)."
+  },
+  "recipeDetailInstructionsTitle": "Instructions",
+  "@recipeDetailInstructionsTitle": {
+    "description": "Section heading for a recipe's step-by-step instructions."
+  },
+  "recipeDetailGarnishTitle": "Garnish",
+  "@recipeDetailGarnishTitle": {
+    "description": "Section heading for a recipe's garnishes."
+  },
+  "recipeDetailIceTitle": "Ice",
+  "@recipeDetailIceTitle": {
+    "description": "Label for a recipe's ice specification (T158: previously the ice spec was mislabeled under Garnish)."
+  },
+  "recipeDetailGlasswareTitle": "Glassware",
+  "@recipeDetailGlasswareTitle": {
+    "description": "Section heading for a recipe's acceptable glassware (FR-020)."
+  },
+  "recipeDetailEquipmentTitle": "Equipment",
+  "@recipeDetailEquipmentTitle": {
+    "description": "Section heading for a recipe's required equipment (FR-020)."
+  },
+  "recipeDetailAllergensTitle": "Contains",
+  "@recipeDetailAllergensTitle": {
+    "description": "Section heading for a recipe's rolled-up allergen flags (FR-055)."
+  },
+  "recipeDetailAbvStandardDrinks": "{abv}% ABV · {standardDrinks} standard drinks",
+  "@recipeDetailAbvStandardDrinks": {
+    "description": "Derived ABV and standard-drinks display (FR-022), values pre-formatted by the caller.",
+    "placeholders": {
+      "abv": { "type": "String" },
+      "standardDrinks": { "type": "String" }
+    }
+  },
+  "recipeDetailHistoryTitle": "History",
+  "@recipeDetailHistoryTitle": {
+    "description": "Section heading for a recipe's history/background text."
+  },
+  "recipeDetailCreatorLabel": "Created by {creator}",
+  "@recipeDetailCreatorLabel": {
+    "description": "Attribution line naming the recipe's creator/originator.",
+    "placeholders": {
+      "creator": { "type": "String" }
+    }
+  },
+  "conceptDetailVariantsTitle": "Variants",
+  "@conceptDetailVariantsTitle": {
+    "description": "Section heading for a concept page's linked variant recipes (FR-021)."
+  },
+  "guestGatePromptTitle": "Sign in to continue",
+  "@guestGatePromptTitle": {
+    "description": "Title of the sign-in prompt shown when a guest attempts an account-gated action (T043)."
+  },
+  "guestGatePromptBody": "Sign in or create an account to {action}. We'll pick up right where you left off.",
+  "@guestGatePromptBody": {
+    "description": "Body of the guest-gate sign-in prompt; {action} describes the attempted action.",
+    "placeholders": {
+      "action": { "type": "String" }
+    }
+  },
+  "guestGateSignInButton": "Sign in",
+  "@guestGateSignInButton": {
+    "description": "Sign-in button in the guest-gate prompt."
+  },
+  "guestGateRegisterButton": "Create account",
+  "@guestGateRegisterButton": {
+    "description": "Register button in the guest-gate prompt."
+  },
+  "guestGateDismissButton": "Not now",
+  "@guestGateDismissButton": {
+    "description": "Dismiss button in the guest-gate prompt."
+  },
+  "responsibleUseMessageDefault": "Please enjoy responsibly. Know your limits, and never drink and drive.",
+  "@responsibleUseMessageDefault": {
+    "description": "Default responsible-consumption message (FR-067); resolved from the backend's 'responsibleUse.message.default' content key."
+  },
+  "responsibleUseMessageFallback": "Please enjoy responsibly.",
+  "@responsibleUseMessageFallback": {
+    "description": "Shown when the backend returns a responsible-consumption content key the client doesn't recognize — never leave the surface without a message (FR-067)."
+  },
+  "responsibleUseSupportResourcesButton": "Support resources",
+  "@responsibleUseSupportResourcesButton": {
+    "description": "Button/link opening the jurisdiction-aware support resources (FR-069)."
+  },
+  "responsibleUseSupportResourcesTitle": "Get support",
+  "@responsibleUseSupportResourcesTitle": {
+    "description": "Title of the support-resources sheet (FR-069)."
+  },
+  "aboutTitle": "About",
+  "@aboutTitle": {
+    "description": "Title of the about/settings surface (FR-067 footer/about; FR-069)."
+  },
+  "entityInfoNoDescription": "No description yet.",
+  "@entityInfoNoDescription": {
+    "description": "T156 entity info popover: shown when the entity has no curated description."
+  },
+  "entityInfoUsageLabel": "How to use",
+  "@entityInfoUsageLabel": {
+    "description": "T156 entity info popover: label preceding equipment usage guidance."
+  },
+  "entityInfoFullEntryButton": "Full entry",
+  "@entityInfoFullEntryButton": {
+    "description": "T156 entity info popover: link to the entity's full detail screen."
+  },
+  "ingredientDetailParentLabel": "Type of {parentName}",
+  "@ingredientDetailParentLabel": {
+    "description": "T156 ingredient detail: shown when the ingredient has a parent category ingredient.",
+    "placeholders": { "parentName": { "type": "String" } }
+  },
+  "ingredientDetailSourcesTitle": "Sources",
+  "@ingredientDetailSourcesTitle": {
+    "description": "T156 ingredient detail: label for the ingredient's brand/source examples."
+  },
+  "ingredientDetailAllergensTitle": "Allergens",
+  "@ingredientDetailAllergensTitle": {
+    "description": "T156 ingredient detail: label for the ingredient's own allergen flags."
+  },
+  "ingredientDetailAbvLabel": "ABV",
+  "@ingredientDetailAbvLabel": {
+    "description": "T156 ingredient detail: label for the ingredient's own ABV percentage, when it is a spirit/liqueur."
+  },
+  "ingredientDetailDefiningRecipeLabel": "House-made from",
+  "@ingredientDetailDefiningRecipeLabel": {
+    "description": "T156 ingredient detail: label linking a house-made ingredient to the recipe that defines it."
+  },
+  "ingredientDetailYieldLabel": "Yield",
+  "@ingredientDetailYieldLabel": {
+    "description": "T156 ingredient detail: label for house-made yield quantity/unit."
+  },
+  "ingredientDetailShelfLifeLabel": "Shelf life",
+  "@ingredientDetailShelfLifeLabel": {
+    "description": "T156 ingredient detail: label for house-made shelf life."
+  },
+  "ingredientDetailStorageTitle": "Storage",
+  "@ingredientDetailStorageTitle": {
+    "description": "T156 ingredient detail: label for house-made storage instructions."
+  },
+  "equipmentDetailCategoryLabel": "Category",
+  "@equipmentDetailCategoryLabel": {
+    "description": "T156 equipment detail: label for the equipment category."
+  },
+  "equipmentDetailUsageTitle": "How to use",
+  "@equipmentDetailUsageTitle": {
+    "description": "T156 equipment detail: label for usage guidance."
+  },
+  "equipmentDetailApplicationsTitle": "Typical uses",
+  "@equipmentDetailApplicationsTitle": {
+    "description": "T156 equipment detail: label for the list of typical applications."
   }
 }

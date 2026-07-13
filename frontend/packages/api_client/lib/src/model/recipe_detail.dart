@@ -3,6 +3,7 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:api_client/src/model/equipment_ref.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:api_client/src/model/recipe_ingredient_line.dart';
 import 'package:built_value/built_value.dart';
@@ -24,8 +25,8 @@ part 'recipe_detail.g.dart';
 /// * [instructions] 
 /// * [garnishes] 
 /// * [iceSpec] 
-/// * [glasswareIds] 
-/// * [equipmentIds] 
+/// * [glassware] 
+/// * [equipment] 
 /// * [creatorAttribution] 
 /// * [history] 
 /// * [notes] 
@@ -67,11 +68,11 @@ abstract class RecipeDetail implements Built<RecipeDetail, RecipeDetailBuilder> 
   @BuiltValueField(wireName: r'iceSpec')
   String get iceSpec;
 
-  @BuiltValueField(wireName: r'glasswareIds')
-  BuiltList<String>? get glasswareIds;
+  @BuiltValueField(wireName: r'glassware')
+  BuiltList<EquipmentRef> get glassware;
 
-  @BuiltValueField(wireName: r'equipmentIds')
-  BuiltList<String>? get equipmentIds;
+  @BuiltValueField(wireName: r'equipment')
+  BuiltList<EquipmentRef> get equipment;
 
   @BuiltValueField(wireName: r'creatorAttribution')
   String? get creatorAttribution;
@@ -181,20 +182,16 @@ class _$RecipeDetailSerializer implements PrimitiveSerializer<RecipeDetail> {
       object.iceSpec,
       specifiedType: const FullType(String),
     );
-    if (object.glasswareIds != null) {
-      yield r'glasswareIds';
-      yield serializers.serialize(
-        object.glasswareIds,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
-      );
-    }
-    if (object.equipmentIds != null) {
-      yield r'equipmentIds';
-      yield serializers.serialize(
-        object.equipmentIds,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
-      );
-    }
+    yield r'glassware';
+    yield serializers.serialize(
+      object.glassware,
+      specifiedType: const FullType(BuiltList, [FullType(EquipmentRef)]),
+    );
+    yield r'equipment';
+    yield serializers.serialize(
+      object.equipment,
+      specifiedType: const FullType(BuiltList, [FullType(EquipmentRef)]),
+    );
     if (object.creatorAttribution != null) {
       yield r'creatorAttribution';
       yield serializers.serialize(
@@ -332,19 +329,19 @@ class _$RecipeDetailSerializer implements PrimitiveSerializer<RecipeDetail> {
           ) as String;
           result.iceSpec = valueDes;
           break;
-        case r'glasswareIds':
+        case r'glassware':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
-          ) as BuiltList<String>;
-          result.glasswareIds.replace(valueDes);
+            specifiedType: const FullType(BuiltList, [FullType(EquipmentRef)]),
+          ) as BuiltList<EquipmentRef>;
+          result.glassware.replace(valueDes);
           break;
-        case r'equipmentIds':
+        case r'equipment':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
-          ) as BuiltList<String>;
-          result.equipmentIds.replace(valueDes);
+            specifiedType: const FullType(BuiltList, [FullType(EquipmentRef)]),
+          ) as BuiltList<EquipmentRef>;
+          result.equipment.replace(valueDes);
           break;
         case r'creatorAttribution':
           final valueDes = serializers.deserialize(

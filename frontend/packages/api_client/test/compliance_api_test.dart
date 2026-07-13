@@ -16,5 +16,23 @@ void main() {
       // TODO
     });
 
+    // Get the persistent responsible-consumption message for a surface (FR-067)
+    //
+    // Jurisdiction-configurable, counsel-reviewed message shown persistently on recipe pages, batch outputs, and the footer/about surface (FR-067). The content is returned as an i18n key resolved client-side, never hard-coded copy. Falls back to the default message for the surface when the caller's jurisdiction is unresolved. Guest-accessible.
+    //
+    //Future<ResponsibleConsumptionMessageResponse> getResponsibleConsumptionMessage(String surface, { String jurisdiction }) async
+    test('test getResponsibleConsumptionMessage', () async {
+      // TODO
+    });
+
+    // Get jurisdiction-aware support resources (FR-069)
+    //
+    // Localized helpline/organization links, reachable from the responsible-consumption messaging and settings/about (FR-069). Falls back to the default set when the caller's jurisdiction is unresolved. Guest-accessible.
+    //
+    //Future<SupportResourcesResponse> getSupportResources({ String jurisdiction }) async
+    test('test getSupportResources', () async {
+      // TODO
+    });
+
   });
 }

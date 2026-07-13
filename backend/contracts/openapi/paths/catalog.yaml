@@ -35,6 +35,12 @@ recipes:
       - name: ice
         in: query
         schema: { type: string }
+      - name: uses
+        in: query
+        schema: { type: string, format: uuid }
+        description: >-
+          Hierarchy-aware "uses:<ingredient>" facet (T155/FR-050) — a class-level
+          ingredient ID matches recipes using it or any descendant.
       - name: allergenExclude
         in: query
         schema: { type: string }
@@ -139,6 +145,9 @@ components:
       properties:
         position: { type: integer }
         ingredientId: { type: string, format: uuid }
+        ingredientName:
+          type: [string, "null"]
+          description: Resolved for display (FR-020); null only if the referenced ingredient can no longer be resolved.
         quantity: { type: number }
         unit: { type: string }
         purpose: { type: [string, "null"] }
@@ -160,8 +169,12 @@ components:
         instructions: { type: array, items: { type: string } }
         garnishes: { type: array, items: { type: string } }
         iceSpec: { type: string }
-        glasswareIds: { type: array, items: { type: string, format: uuid } }
-        equipmentIds: { type: array, items: { type: string, format: uuid } }
+        glassware:
+          type: array
+          items: { $ref: '#/components/schemas/EquipmentRef' }
+        equipment:
+          type: array
+          items: { $ref: '#/components/schemas/EquipmentRef' }
         creatorAttribution: { type: [string, "null"] }
         history: { type: [string, "null"] }
         notes: { type: [string, "null"] }
@@ -173,7 +186,14 @@ components:
           type: array
           items: { type: string }
           description: Rolled up from ingredient allergen attributes, conservative for uncertain (FR-055).
-      required: [id, primaryName, alternateNames, ingredientLines, instructions, iceSpec, abvPercent, standardDrinks, allergens]
+      required: [id, primaryName, alternateNames, ingredientLines, instructions, iceSpec, glassware, equipment, abvPercent, standardDrinks, allergens]
+    EquipmentRef:
+      type: object
+      description: A glassware/equipment reference with its resolved name (contract sweep). name is null only if the equipment can no longer be resolved.
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: [string, "null"] }
+      required: [id]
     ConceptSummary:
       type: object
       properties:
@@ -193,8 +213,9 @@ components:
       type: object
       properties:
         recipeId: { type: string, format: uuid }
+        recipeName: { type: string }
         differentiatorText: { type: string }
-      required: [recipeId, differentiatorText]
+      required: [recipeId, recipeName, differentiatorText]
     ConceptDetail:
       type: object
       properties:

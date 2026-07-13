@@ -14,6 +14,8 @@ class _$IngredientDetail extends IngredientDetail {
   @override
   final String? parentId;
   @override
+  final String? parentName;
+  @override
   final BuiltList<String> sources;
   @override
   final String? description;
@@ -23,6 +25,8 @@ class _$IngredientDetail extends IngredientDetail {
   final BuiltList<String> allergens;
   @override
   final String? definingRecipeId;
+  @override
+  final String? definingRecipeName;
   @override
   final num? yieldQuantity;
   @override
@@ -40,11 +44,13 @@ class _$IngredientDetail extends IngredientDetail {
       {required this.id,
       required this.name,
       this.parentId,
+      this.parentName,
       required this.sources,
       this.description,
       this.abvPercent,
       required this.allergens,
       this.definingRecipeId,
+      this.definingRecipeName,
       this.yieldQuantity,
       this.yieldUnit,
       this.shelfLife,
@@ -65,11 +71,13 @@ class _$IngredientDetail extends IngredientDetail {
         id == other.id &&
         name == other.name &&
         parentId == other.parentId &&
+        parentName == other.parentName &&
         sources == other.sources &&
         description == other.description &&
         abvPercent == other.abvPercent &&
         allergens == other.allergens &&
         definingRecipeId == other.definingRecipeId &&
+        definingRecipeName == other.definingRecipeName &&
         yieldQuantity == other.yieldQuantity &&
         yieldUnit == other.yieldUnit &&
         shelfLife == other.shelfLife &&
@@ -82,11 +90,13 @@ class _$IngredientDetail extends IngredientDetail {
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, parentId.hashCode);
+    _$hash = $jc(_$hash, parentName.hashCode);
     _$hash = $jc(_$hash, sources.hashCode);
     _$hash = $jc(_$hash, description.hashCode);
     _$hash = $jc(_$hash, abvPercent.hashCode);
     _$hash = $jc(_$hash, allergens.hashCode);
     _$hash = $jc(_$hash, definingRecipeId.hashCode);
+    _$hash = $jc(_$hash, definingRecipeName.hashCode);
     _$hash = $jc(_$hash, yieldQuantity.hashCode);
     _$hash = $jc(_$hash, yieldUnit.hashCode);
     _$hash = $jc(_$hash, shelfLife.hashCode);
@@ -101,11 +111,13 @@ class _$IngredientDetail extends IngredientDetail {
           ..add('id', id)
           ..add('name', name)
           ..add('parentId', parentId)
+          ..add('parentName', parentName)
           ..add('sources', sources)
           ..add('description', description)
           ..add('abvPercent', abvPercent)
           ..add('allergens', allergens)
           ..add('definingRecipeId', definingRecipeId)
+          ..add('definingRecipeName', definingRecipeName)
           ..add('yieldQuantity', yieldQuantity)
           ..add('yieldUnit', yieldUnit)
           ..add('shelfLife', shelfLife)
@@ -130,6 +142,10 @@ class IngredientDetailBuilder
   String? get parentId => _$this._parentId;
   set parentId(String? parentId) => _$this._parentId = parentId;
 
+  String? _parentName;
+  String? get parentName => _$this._parentName;
+  set parentName(String? parentName) => _$this._parentName = parentName;
+
   ListBuilder<String>? _sources;
   ListBuilder<String> get sources => _$this._sources ??= ListBuilder<String>();
   set sources(ListBuilder<String>? sources) => _$this._sources = sources;
@@ -152,6 +168,11 @@ class IngredientDetailBuilder
   String? get definingRecipeId => _$this._definingRecipeId;
   set definingRecipeId(String? definingRecipeId) =>
       _$this._definingRecipeId = definingRecipeId;
+
+  String? _definingRecipeName;
+  String? get definingRecipeName => _$this._definingRecipeName;
+  set definingRecipeName(String? definingRecipeName) =>
+      _$this._definingRecipeName = definingRecipeName;
 
   num? _yieldQuantity;
   num? get yieldQuantity => _$this._yieldQuantity;
@@ -181,11 +202,13 @@ class IngredientDetailBuilder
       _id = $v.id;
       _name = $v.name;
       _parentId = $v.parentId;
+      _parentName = $v.parentName;
       _sources = $v.sources.toBuilder();
       _description = $v.description;
       _abvPercent = $v.abvPercent;
       _allergens = $v.allergens.toBuilder();
       _definingRecipeId = $v.definingRecipeId;
+      _definingRecipeName = $v.definingRecipeName;
       _yieldQuantity = $v.yieldQuantity;
       _yieldUnit = $v.yieldUnit;
       _shelfLife = $v.shelfLife;
@@ -218,11 +241,13 @@ class IngredientDetailBuilder
             name: BuiltValueNullFieldError.checkNotNull(
                 name, r'IngredientDetail', 'name'),
             parentId: parentId,
+            parentName: parentName,
             sources: sources.build(),
             description: description,
             abvPercent: abvPercent,
             allergens: allergens.build(),
             definingRecipeId: definingRecipeId,
+            definingRecipeName: definingRecipeName,
             yieldQuantity: yieldQuantity,
             yieldUnit: yieldUnit,
             shelfLife: shelfLife,

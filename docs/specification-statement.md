@@ -1,4 +1,4 @@
-# Spec-Kit Specification Statement — SpecPour
+# Spec-Kit Specification Statement — Craft Cocktail Platform
 
 Use the following statement as the input to spec-kit's `/specify` step. It defines the business logic and functional requirements of the application. Engineering principles (stack, architecture, testing practice) are defined separately in the constitution. V1 may be released in phases, but everything marked V1 below is in the V1 scope.
 
@@ -24,6 +24,7 @@ Full CRUD for ingredients with:
 - **Classification hierarchy — best-in-class requirement.** Ingredients form a taxonomy from broad class to specific product, e.g., Spirit → Rum → Rhum Agricole → _specific brand/bottling_. Recipes may reference any level (a recipe calls for "London dry gin"; a user's inventory holds "Beefeater"). The hierarchy powers:
   - **Substitution:** curated substitution relationships (with suitability notes, e.g., "acceptable in stirred drinks, changes profile") plus hierarchy-implied substitution (any descendant satisfies an ancestor requirement). Substitution suggestions appear wherever an ingredient gap blocks a recipe.
   - **Inventory matching** (Section 6) and shopping intelligence (Section 8).
+- **Bidirectional recipe links:** every ingredient entry surfaces the recipes that use it (hierarchy-aware: a class-level ingredient lists recipes using it or any descendant), mirroring the equipment↔recipe bidirectional linking in Section 4.
 - Categories include (extensible, curator-managed): spirit, liqueur, fortified wine, mixer, syrup, bitters, juice, dairy/egg, produce/garnish ingredient, and others as needed. Categories are curator-extensible, not hard-coded.
 - **Purpose-in-recipe:** when an ingredient is used in a recipe, its functional role can be captured (base spirit, modifier, sweetener, sour/acid, lengthener, aromatic, garnish, etc.).
 - **Allergen and dietary attributes** per ingredient (egg, dairy, nuts — e.g., orgeat, sulfites, gluten, etc.), which roll up automatically to recipes (Section 5).
@@ -100,7 +101,7 @@ Per-user, private-by-default log: "made it" history, personal ratings and notes 
 
 ## 13. Search and Filtering
 
-Full-text search across recipes (all names), ingredients, equipment, glossary definitions, and articles. Faceted filtering by family, category, tags, flavor profile, glassware, ice, equipment, allergens (exclude), ABV range, makeable-from-inventory, rating, and source (core library / my library / public). Tag search available wherever tags exist.
+Full-text search across recipes, ingredients, equipment, glossary definitions, and articles. **Search-document composition:** a recipe's search document includes all its names, its ingredient names (at the referenced hierarchy level), garnishes, and description/history text — so searching an ingredient (e.g., "rum") surfaces recipes that use it, not only recipes named for it. **Results are typed and grouped** in presentation (recipes / ingredients / equipment / glossary), so the user always knows what kind of entity each result is. Faceted filtering by family, category, tags, flavor profile, glassware, ice, equipment, allergens (exclude), ABV range, makeable-from-inventory, rating, and source (core library / my library / public); an ingredient-contains facet ("uses: <ingredient>", hierarchy-aware) complements text search. Tag search available wherever tags exist.
 
 ## 14. Bar Mode (Hands-Free Operation)
 

@@ -48,22 +48,22 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
             entity.HasIndex(r => r.PrimaryName);
             entity.HasIndex(r => r.OwnerId);
 
-            // Search registration (tsvector column, trigram index) is added by raw
-            // SQL in the initial migration rather than TsVectorMigrationExtensions,
-            // because FR-018 requires AlternateNames (a text[] column) to be
-            // searchable too, and the shared helper only concatenates plain columns.
-            // Modeled here as a DB-computed shadow property purely so EF's model
-            // snapshot knows this column exists and never proposes dropping it in a
-            // future migration diff — nothing in the app ever reads/writes it
+            // T155/ADR-0002: SearchVector is generated from SearchDocumentText, a
+            // plain mapped column RecipeSearchDocumentRefresher maintains (event-driven
+            // on ingredient rename, synchronous on recipe/line writes) — replacing the
+            // former direct PrimaryName+AlternateNames generation, which couldn't be
+            // extended to include ingredient names without a cross-schema reference
+            // (constitution Principle III; see the ADR for the full reasoning). Still
+            // a DB-computed shadow property purely so EF's model snapshot knows this
+            // column exists — nothing in the app reads/writes SearchVector itself
             // through EF (PostgresFullTextSearchAdapter queries it via raw SQL).
-            // to_tsvector('english', ...) directly, and array_to_string(...) on
-            // AlternateNames, are both rejected by Postgres inside a GENERATED
-            // STORED expression ("generation expression is not immutable") — routed
-            // through the IMMUTABLE wrapper functions the migration creates
+            // to_tsvector('english', ...) directly is rejected by Postgres inside a
+            // GENERATED STORED expression ("generation expression is not immutable")
+            // — routed through the IMMUTABLE wrapper function the migration creates
             // (TsVectorMigrationExtensions.EnsureImmutableToTsVectorFunction).
             entity.Property<NpgsqlTsVector>("SearchVector")
                 .HasComputedColumnSql(
-                    "specpour_immutable_to_tsvector_english(coalesce(\"PrimaryName\", '') || ' ' || coalesce(specpour_immutable_array_to_string(\"AlternateNames\", ' '), ''))",
+                    "specpour_immutable_to_tsvector_english(coalesce(\"SearchDocumentText\", ''))",
                     stored: true);
         });
 

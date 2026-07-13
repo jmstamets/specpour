@@ -13,7 +13,7 @@ Method | HTTP request | Description
 
 
 # **search**
-> SearchResultPage search(q, cursor, limit)
+> SearchResultPage search(q, uses, cursor, limit)
 
 Full-text search across recipes, ingredients, equipment, glossary terms, and articles (FR-049)
 
@@ -25,11 +25,12 @@ import 'package:api_client/api.dart';
 
 final api = ApiClient().getSearchApi();
 final String q = q_example; // String | Free-text query (websearch_to_tsquery syntax).
+final String uses = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050), narrowing results to recipes referencing the ingredient (or any descendant). Applied after ranking/pagination — a page can return fewer than `limit` items when this facet removes matches.
 final String cursor = cursor_example; // String | Opaque pagination cursor from a previous page's `nextCursor`.
 final int limit = 56; // int | Maximum number of items to return.
 
 try {
-    final response = api.search(q, cursor, limit);
+    final response = api.search(q, uses, cursor, limit);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling SearchApi->search: $e\n');
@@ -41,6 +42,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **q** | **String**| Free-text query (websearch_to_tsquery syntax). | [optional] 
+ **uses** | **String**| Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050), narrowing results to recipes referencing the ingredient (or any descendant). Applied after ranking/pagination — a page can return fewer than `limit` items when this facet removes matches. | [optional] 
  **cursor** | **String**| Opaque pagination cursor from a previous page's `nextCursor`. | [optional] 
  **limit** | **int**| Maximum number of items to return. | [optional] [default to 20]
 

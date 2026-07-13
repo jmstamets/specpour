@@ -74,6 +74,8 @@ Class | Method | HTTP request | Description
 [*CatalogApi*](doc/CatalogApi.md) | [**listConcepts**](doc/CatalogApi.md#listconcepts) | **GET** /concepts | Browse concept pages (FR-021)
 [*CatalogApi*](doc/CatalogApi.md) | [**listRecipes**](doc/CatalogApi.md#listrecipes) | **GET** /recipes | Browse/search recipes with content facets (FR-050)
 [*ComplianceApi*](doc/ComplianceApi.md) | [**getAgeGate**](doc/ComplianceApi.md#getagegate) | **GET** /compliance/age-gate | Get the per-surface age-gate configuration and jurisdiction rule
+[*ComplianceApi*](doc/ComplianceApi.md) | [**getResponsibleConsumptionMessage**](doc/ComplianceApi.md#getresponsibleconsumptionmessage) | **GET** /compliance/messaging | Get the persistent responsible-consumption message for a surface (FR-067)
+[*ComplianceApi*](doc/ComplianceApi.md) | [**getSupportResources**](doc/ComplianceApi.md#getsupportresources) | **GET** /compliance/support-resources | Get jurisdiction-aware support resources (FR-069)
 [*EquipmentApi*](doc/EquipmentApi.md) | [**getEquipmentItem**](doc/EquipmentApi.md#getequipmentitem) | **GET** /equipment/{id} | Get an equipment item&#39;s full detail (FR-024)
 [*EquipmentApi*](doc/EquipmentApi.md) | [**listEquipment**](doc/EquipmentApi.md#listequipment) | **GET** /equipment | Browse equipment (FR-024)
 [*GlossaryApi*](doc/GlossaryApi.md) | [**getGlossaryArticle**](doc/GlossaryApi.md#getglossaryarticle) | **GET** /glossary/articles/{id} | Get an article&#39;s full body (FR-026)
@@ -82,6 +84,7 @@ Class | Method | HTTP request | Description
 [*GlossaryApi*](doc/GlossaryApi.md) | [**listGlossaryArticles**](doc/GlossaryApi.md#listglossaryarticles) | **GET** /glossary/articles | Browse glossary articles (FR-026)
 [*GlossaryApi*](doc/GlossaryApi.md) | [**listGlossaryTerms**](doc/GlossaryApi.md#listglossaryterms) | **GET** /glossary/terms | Browse glossary terms (FR-025)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**getIngredient**](doc/IngredientsApi.md#getingredient) | **GET** /ingredients/{id} | Get an ingredient&#39;s full detail, including allergen attributes (FR-016)
+[*IngredientsApi*](doc/IngredientsApi.md) | [**getIngredientRecipes**](doc/IngredientsApi.md#getingredientrecipes) | **GET** /ingredients/{id}/recipes | Recipes using this ingredient, hierarchy-aware (T155, FR-014a)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**listIngredients**](doc/IngredientsApi.md#listingredients) | **GET** /ingredients | Browse ingredients (FR-014)
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getInbox**](doc/NotificationsApi.md#getinbox) | **GET** /inbox | Get the caller&#39;s inbox messages
 [*SearchApi*](doc/SearchApi.md) | [**search**](doc/SearchApi.md#search) | **GET** /search | Full-text search across recipes, ingredients, equipment, glossary terms, and articles (FR-049)
@@ -100,6 +103,7 @@ Class | Method | HTTP request | Description
  - [EntitlementManifest](doc/EntitlementManifest.md)
  - [EquipmentDetail](doc/EquipmentDetail.md)
  - [EquipmentPage](doc/EquipmentPage.md)
+ - [EquipmentRef](doc/EquipmentRef.md)
  - [EquipmentSummary](doc/EquipmentSummary.md)
  - [GlossaryArticleDetail](doc/GlossaryArticleDetail.md)
  - [GlossaryArticlePage](doc/GlossaryArticlePage.md)
@@ -111,15 +115,20 @@ Class | Method | HTTP request | Description
  - [InboxPage](doc/InboxPage.md)
  - [IngredientDetail](doc/IngredientDetail.md)
  - [IngredientPage](doc/IngredientPage.md)
+ - [IngredientRecipeRef](doc/IngredientRecipeRef.md)
+ - [IngredientRecipes](doc/IngredientRecipes.md)
  - [IngredientSummary](doc/IngredientSummary.md)
  - [ProblemDetails](doc/ProblemDetails.md)
  - [RecipeDetail](doc/RecipeDetail.md)
  - [RecipeIngredientLine](doc/RecipeIngredientLine.md)
  - [RecipePage](doc/RecipePage.md)
  - [RecipeSummary](doc/RecipeSummary.md)
+ - [ResponsibleConsumptionMessageResponse](doc/ResponsibleConsumptionMessageResponse.md)
  - [RoleGrantSummary](doc/RoleGrantSummary.md)
  - [SearchResult](doc/SearchResult.md)
  - [SearchResultPage](doc/SearchResultPage.md)
+ - [SupportResourceResponse](doc/SupportResourceResponse.md)
+ - [SupportResourcesResponse](doc/SupportResourcesResponse.md)
 
 
 ## Documentation For Authorization

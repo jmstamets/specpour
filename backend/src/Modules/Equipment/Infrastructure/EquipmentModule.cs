@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
+using SpecPour.Modules.Equipment.Contracts;
 using SpecPour.Modules.Search.Contracts;
 
 namespace SpecPour.Modules.Equipment.Infrastructure;
@@ -18,10 +19,20 @@ public sealed class EquipmentModule : IModule
     {
         var connectionString = configuration.GetSpecPourConnectionString();
 
-        services.AddDbContext<EquipmentDbContext>(options => options.UseNpgsql(connectionString));
+        // T155: the outbox interceptor must be attached here (not merely
+        // DI-registered) for OutboxSaveChangesInterceptor to actually run — a
+        // gap discovered while wiring T155's ingredient-rename event (the first
+        // real outbox producer/consumer in the codebase). Fixed identically
+        // across every module for consistency.
+        services.AddDbContext<EquipmentDbContext>((sp, options) =>
+        {
+            options.UseNpgsql(connectionString);
+            options.AddInterceptors(sp.GetRequiredService<OutboxSaveChangesInterceptor>());
+        });
         services.AddSpecPourOutboxWriter(Name);
 
         services.AddHostedService<EquipmentSearchRegistrationHostedService>();
+        services.AddScoped<IEquipmentLookupPort, EquipmentLookupAdapter>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)

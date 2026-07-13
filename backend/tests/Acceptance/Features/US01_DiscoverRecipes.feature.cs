@@ -122,7 +122,7 @@ namespace SpecPour.Tests.Acceptance.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US01_DiscoverRecipes.feature.ndjson", 9);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US01_DiscoverRecipes.feature.ndjson", 11);
         }
         
         async global::System.Threading.Tasks.Task global::Xunit.IAsyncLifetime.InitializeAsync()
@@ -404,6 +404,89 @@ namespace SpecPour.Tests.Acceptance.Features
 #line hidden
 #line 43
     await testRunner.AndAsync("the age gate response includes a legal drinking age", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="9 - Public recipe content is served as crawlable HTML (T044, FR-004b)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US1 - Discover and follow curated recipes")]
+        [global::Xunit.TraitAttribute("Description", "9 - Public recipe content is served as crawlable HTML (T044, FR-004b)")]
+        public async global::System.Threading.Tasks.Task _9_PublicRecipeContentIsServedAsCrawlableHTMLT044FR_004B()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "7";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("9 - Public recipe content is served as crawlable HTML (T044, FR-004b)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 45
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 11
+  await this.FeatureBackgroundAsync();
+#line hidden
+#line 46
+    await testRunner.WhenAsync("I request the SEO page for the Mai Tai recipe", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 47
+    await testRunner.ThenAsync("the SEO page responds successfully as \"text/html\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 48
+    await testRunner.AndAsync("the SEO page contains the recipe name \"Mai Tai\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 49
+    await testRunner.AndAsync("the SEO page contains a meta description", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="10 - A persistent responsible-consumption message is available for recipe pages (" +
+            "T150, FR-067/FR-069)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US1 - Discover and follow curated recipes")]
+        [global::Xunit.TraitAttribute("Description", "10 - A persistent responsible-consumption message is available for recipe pages (" +
+            "T150, FR-067/FR-069)")]
+        public async global::System.Threading.Tasks.Task _10_APersistentResponsible_ConsumptionMessageIsAvailableForRecipePagesT150FR_067FR_069()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "8";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("10 - A persistent responsible-consumption message is available for recipe pages (" +
+                    "T150, FR-067/FR-069)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 51
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 11
+  await this.FeatureBackgroundAsync();
+#line hidden
+#line 52
+    await testRunner.WhenAsync("I request the responsible-consumption message for the \"recipe\" surface", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 53
+    await testRunner.ThenAsync("the messaging response includes a message content key", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 54
+    await testRunner.WhenAsync("I request the support resources", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 55
+    await testRunner.ThenAsync("the support resources response includes at least one resource", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

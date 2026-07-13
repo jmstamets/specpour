@@ -16,6 +16,16 @@ public interface IIngredientLookupPort
     /// </summary>
     Task<IReadOnlyDictionary<Guid, IngredientSummary>> GetSummariesAsync(
         IReadOnlyCollection<Guid> ingredientIds, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// T155/FR-014a/FR-050: resolves <paramref name="ingredientId"/> plus every
+    /// descendant in its class -&gt; ... -&gt; product hierarchy (FR-012's
+    /// <c>Ingredient.ParentId</c> chain) — inclusive, so a class-level ingredient
+    /// matches itself and every descendant, and a product-level (leaf) ingredient
+    /// resolves to just itself. Used by the hierarchy-aware "uses:&lt;ingredient&gt;"
+    /// facet and the ingredient-&gt;recipes bidirectional surface.
+    /// </summary>
+    Task<IReadOnlyList<Guid>> GetDescendantIdsAsync(Guid ingredientId, CancellationToken cancellationToken);
 }
 
 /// <summary>

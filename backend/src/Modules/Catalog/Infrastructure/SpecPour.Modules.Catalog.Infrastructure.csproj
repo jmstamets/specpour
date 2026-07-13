@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\SpecPour.Modules.Catalog.Application.csproj" />
-    <!-- Cross-module Contracts-only dependency (constitution Principle III): Catalog
-         registers its searchable tables with Search at startup (T032), same pattern
-         every future content module follows. -->
+    <!-- Cross-module Contracts-only dependencies (constitution Principle III): Catalog
+         registers its searchable tables with Search at startup (T032), and the recipe
+         detail endpoint resolves glassware/equipment IDs to names via Equipment's
+         lookup port (contract sweep). -->
     <ProjectReference Include="..\..\Search\Contracts\SpecPour.Modules.Search.Contracts.csproj" />
+    <ProjectReference Include="..\..\Equipment\Contracts\SpecPour.Modules.Equipment.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

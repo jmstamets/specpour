@@ -285,6 +285,7 @@ class CatalogApi {
   /// * [equipment] 
   /// * [glassware] 
   /// * [ice] 
+  /// * [uses] - Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050) — a class-level ingredient ID matches recipes using it or any descendant.
   /// * [allergenExclude] - Comma-separated allergen keys to exclude.
   /// * [source_] 
   /// * [cursor] - Opaque pagination cursor from a previous page's `nextCursor`.
@@ -306,6 +307,7 @@ class CatalogApi {
     String? equipment,
     String? glassware,
     String? ice,
+    String? uses,
     String? allergenExclude,
     String? source_,
     String? cursor,
@@ -344,6 +346,7 @@ class CatalogApi {
       if (equipment != null) r'equipment': encodeQueryParameter(_serializers, equipment, const FullType(String)),
       if (glassware != null) r'glassware': encodeQueryParameter(_serializers, glassware, const FullType(String)),
       if (ice != null) r'ice': encodeQueryParameter(_serializers, ice, const FullType(String)),
+      if (uses != null) r'uses': encodeQueryParameter(_serializers, uses, const FullType(String)),
       if (allergenExclude != null) r'allergenExclude': encodeQueryParameter(_serializers, allergenExclude, const FullType(String)),
       if (source_ != null) r'source': encodeQueryParameter(_serializers, source_, const FullType(String)),
       if (cursor != null) r'cursor': encodeQueryParameter(_serializers, cursor, const FullType(String)),

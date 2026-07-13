@@ -41,3 +41,15 @@ Feature: US1 - Discover and follow curated recipes
     When I request the age gate for the "registration" surface
     Then the age gate responds successfully
     And the age gate response includes a legal drinking age
+
+  Scenario: 9 - Public recipe content is served as crawlable HTML (T044, FR-004b)
+    When I request the SEO page for the Mai Tai recipe
+    Then the SEO page responds successfully as "text/html"
+    And the SEO page contains the recipe name "Mai Tai"
+    And the SEO page contains a meta description
+
+  Scenario: 10 - A persistent responsible-consumption message is available for recipe pages (T150, FR-067/FR-069)
+    When I request the responsible-consumption message for the "recipe" surface
+    Then the messaging response includes a message content key
+    When I request the support resources
+    Then the support resources response includes at least one resource

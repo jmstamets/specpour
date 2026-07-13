@@ -25,6 +25,7 @@ import 'package:api_client/src/model/cursor_page.dart';
 import 'package:api_client/src/model/entitlement_manifest.dart';
 import 'package:api_client/src/model/equipment_detail.dart';
 import 'package:api_client/src/model/equipment_page.dart';
+import 'package:api_client/src/model/equipment_ref.dart';
 import 'package:api_client/src/model/equipment_summary.dart';
 import 'package:api_client/src/model/glossary_article_detail.dart';
 import 'package:api_client/src/model/glossary_article_page.dart';
@@ -36,15 +37,20 @@ import 'package:api_client/src/model/inbox_message.dart';
 import 'package:api_client/src/model/inbox_page.dart';
 import 'package:api_client/src/model/ingredient_detail.dart';
 import 'package:api_client/src/model/ingredient_page.dart';
+import 'package:api_client/src/model/ingredient_recipe_ref.dart';
+import 'package:api_client/src/model/ingredient_recipes.dart';
 import 'package:api_client/src/model/ingredient_summary.dart';
 import 'package:api_client/src/model/problem_details.dart';
 import 'package:api_client/src/model/recipe_detail.dart';
 import 'package:api_client/src/model/recipe_ingredient_line.dart';
 import 'package:api_client/src/model/recipe_page.dart';
 import 'package:api_client/src/model/recipe_summary.dart';
+import 'package:api_client/src/model/responsible_consumption_message_response.dart';
 import 'package:api_client/src/model/role_grant_summary.dart';
 import 'package:api_client/src/model/search_result.dart';
 import 'package:api_client/src/model/search_result_page.dart';
+import 'package:api_client/src/model/support_resource_response.dart';
+import 'package:api_client/src/model/support_resources_response.dart';
 
 part 'serializers.g.dart';
 
@@ -60,6 +66,7 @@ part 'serializers.g.dart';
   EntitlementManifest,
   EquipmentDetail,
   EquipmentPage,
+  EquipmentRef,
   EquipmentSummary,
   GlossaryArticleDetail,
   GlossaryArticlePage,
@@ -71,15 +78,20 @@ part 'serializers.g.dart';
   InboxPage,
   IngredientDetail,
   IngredientPage,
+  IngredientRecipeRef,
+  IngredientRecipes,
   IngredientSummary,
   ProblemDetails,
   RecipeDetail,
   RecipeIngredientLine,
   RecipePage,
   RecipeSummary,
+  ResponsibleConsumptionMessageResponse,
   RoleGrantSummary,
   SearchResult,
   SearchResultPage,
+  SupportResourceResponse,
+  SupportResourcesResponse,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..add(const OneOfSerializer())

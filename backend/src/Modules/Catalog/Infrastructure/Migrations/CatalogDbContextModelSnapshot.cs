@@ -298,10 +298,14 @@ namespace SpecPour.Modules.Catalog.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("SearchDocumentText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<NpgsqlTsVector>("SearchVector")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("tsvector")
-                        .HasComputedColumnSql("specpour_immutable_to_tsvector_english(coalesce(\"PrimaryName\", '') || ' ' || coalesce(specpour_immutable_array_to_string(\"AlternateNames\", ' '), ''))", true);
+                        .HasComputedColumnSql("specpour_immutable_to_tsvector_english(coalesce(\"SearchDocumentText\", ''))", true);
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

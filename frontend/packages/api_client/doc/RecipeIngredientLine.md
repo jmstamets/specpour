@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **position** | **int** |  | 
 **ingredientId** | **String** |  | 
+**ingredientName** | **String** | Resolved for display (FR-020); null only if the referenced ingredient can no longer be resolved. | [optional] 
 **quantity** | **num** |  | 
 **unit** | **String** |  | 
 **purpose** | **String** |  | [optional] 

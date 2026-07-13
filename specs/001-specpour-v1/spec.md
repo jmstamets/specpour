@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "docs/specification-statement-rev2.md — Build a
+**Input**: User description: "docs/specification-statement.md — Build a
 cross-platform (Android, iOS, web) craft-cocktail application for home enthusiasts and
 professional bartenders. Category-leader positioning: every established killer feature
 of the cocktail-app market plus the gap-filling capabilities specified, with terminology
@@ -18,7 +18,7 @@ and technique conforming to professional craft-cocktail standards."
 
 - Q: Does the V1 default tier's "super-admin-equivalent" capability include curation and
   moderation powers, or are staff roles a separate axis from commercial tiers? → A:
-  Resolved by source revision (docs/specification-statement-rev2.md §18): tiers,
+  Resolved by source revision (docs/specification-statement.md §18): tiers,
   platform roles, and venue-scoped roles are three independent concepts. Role grants
   are modeled as (user, role, scope) — scope is the platform (curator/admin staff
   roles) or a specific venue — and roles carry granular permissions (view/edit/delete/
@@ -49,7 +49,7 @@ and technique conforming to professional craft-cocktail standards."
   automatically deleted via the standard deletion flow.
 - Q: Does constitution Principle XIII (legal-drinking-age gating) apply to V1's
   community features (browse/copy/rate), given FR-002 ships no age gating? → A:
-  Resolved by source revision (specification-statement-rev2.md §1): a
+  Resolved by source revision (specification-statement.md §1): a
   jurisdiction-aware age-affirmation capability ships in V1 — a DOB-entry gate (not a
   checkbox), jurisdiction selected by coarse geolocation, strictest applicable rule
   when uncertain, DOB checked and never stored (client-side "affirmed" flag only).
@@ -100,7 +100,7 @@ and technique conforming to professional craft-cocktail standards."
   fidelity or better.
 - Q: The spec used "admins" only in the venue-owner sense — what about platform/system
   administration (curation, account maintenance, billing)? → A: Resolved by source
-  revision (specification-statement-rev2.md §19, constitution v1.2.0): platform
+  revision (specification-statement.md §19, constitution v1.2.0): platform
   administration is a first-class V1 feature set on the (user, role, scope) model —
   a configuration-data role catalog (Super Admin, Curator, Moderator, Support; Billing
   Admin defined but dormant until paid tiers), administrative capabilities (tier
@@ -111,7 +111,7 @@ and technique conforming to professional craft-cocktail standards."
   Story 16 and FR-061–FR-066.
 - Q: Stored DOB was flowing into the database like ordinary profile data — what
   handling does it require? → A: Resolved by source revision
-  (specification-statement-rev2.md §1, constitution v1.3.0): DOB is sensitive PII,
+  (specification-statement.md §1, constitution v1.3.0): DOB is sensitive PII,
   purpose-bound to age verification and legal compliance. The identity capability
   exclusively owns the stored value and exposes only derived predicates (e.g.,
   of-legal-drinking-age for a jurisdiction) to all other features, APIs, staff views
@@ -124,7 +124,7 @@ and technique conforming to professional craft-cocktail standards."
   server-side storage. See FR-002b/FR-002c.
 - Q: (/speckit-analyze C1) Constitution XIII requires responsible-consumption
   messaging as a product requirement — the spec had none. → A: Resolved by source
-  revision (specification-statement-rev2.md §20, four-part package) as FR-067–FR-070:
+  revision (specification-statement.md §20, four-part package) as FR-067–FR-070:
   (1) persistent messaging on recipe pages, batch/scaling outputs, and app
   footer/about, jurisdiction-configurable text and placement; (2) quantified
   transparency — per-serving ABV/standard drinks designated to the principle, batch
@@ -830,6 +830,10 @@ action, target, timestamp, and before/after state.
 - **FR-014**: Ingredient categories (spirit, liqueur, fortified wine, mixer, syrup,
   bitters, juice, dairy/egg, produce/garnish, etc.) MUST be curator-extensible, not
   hard-coded.
+- **FR-014a** *(added 2026-07-12, reconciling specification-statement.md §2)*: Every
+  ingredient entry MUST surface the recipes that use it, hierarchy-aware — a
+  class-level ingredient lists recipes using it or any descendant — mirroring the
+  equipment↔recipe bidirectional linking in FR-024.
 - **FR-015**: When used in a recipe, an ingredient's functional role (base spirit,
   modifier, sweetener, sour/acid, lengthener, aromatic, garnish, etc.) MUST be
   capturable per line.
@@ -993,13 +997,23 @@ action, target, timestamp, and before/after state.
 
 #### Search and Filtering
 
-- **FR-049**: System MUST provide full-text search across recipes (all names),
-  ingredients, equipment, glossary definitions, and articles, consumed through an
-  internal search abstraction so the engine can be replaced without feature change.
-- **FR-050**: System MUST provide faceted filtering by family, category, tags, flavor
+- **FR-049** *(amended 2026-07-12, reconciling specification-statement.md §13)*:
+  System MUST provide full-text search across recipes, ingredients, equipment,
+  glossary definitions, and articles, consumed through an internal search abstraction
+  so the engine can be replaced without feature change. **Search-document
+  composition**: a recipe's search document MUST include all its names, its
+  ingredient names (at the referenced hierarchy level), garnishes, and
+  description/history text — so searching an ingredient (e.g., "rum") surfaces
+  recipes that use it, not only recipes named for it. **Results MUST be typed and
+  grouped in presentation** (recipes / ingredients / equipment / glossary), so the
+  user always knows what kind of entity each result is.
+- **FR-050** *(amended 2026-07-12, reconciling specification-statement.md §13)*:
+  System MUST provide faceted filtering by family, category, tags, flavor
   profile, glassware, ice, equipment, allergens (exclude), ABV range,
   makeable-from-inventory, rating, and source (core library / my library / public),
-  with tag search wherever tags exist.
+  with tag search wherever tags exist; an ingredient-contains facet
+  ("uses: <ingredient>", hierarchy-aware — a class-level ingredient matches recipes
+  using it or any descendant) complements text search.
 
 #### Bar Mode
 

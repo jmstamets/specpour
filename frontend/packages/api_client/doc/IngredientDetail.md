@@ -11,11 +11,13 @@ Name | Type | Description | Notes
 **id** | **String** |  | 
 **name** | **String** |  | 
 **parentId** | **String** |  | [optional] 
+**parentName** | **String** | Resolved parent-ingredient name (contract sweep). | [optional] 
 **sources** | **BuiltList&lt;String&gt;** |  | 
 **description** | **String** |  | [optional] 
 **abvPercent** | **num** |  | [optional] 
 **allergens** | **BuiltList&lt;String&gt;** |  | 
 **definingRecipeId** | **String** |  | [optional] 
+**definingRecipeName** | **String** | Resolved defining-recipe name for house-made ingredients (contract sweep). | [optional] 
 **yieldQuantity** | **num** |  | [optional] 
 **yieldUnit** | **String** |  | [optional] 
 **shelfLife** | **String** | ISO 8601 duration, when this is a house-made ingredient. | [optional] 

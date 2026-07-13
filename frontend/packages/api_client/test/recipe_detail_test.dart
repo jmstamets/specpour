@@ -62,13 +62,13 @@ void main() {
       // TODO
     });
 
-    // BuiltList<String> glasswareIds
-    test('to test the property `glasswareIds`', () async {
+    // BuiltList<EquipmentRef> glassware
+    test('to test the property `glassware`', () async {
       // TODO
     });
 
-    // BuiltList<String> equipmentIds
-    test('to test the property `equipmentIds`', () async {
+    // BuiltList<EquipmentRef> equipment
+    test('to test the property `equipment`', () async {
       // TODO
     });
 

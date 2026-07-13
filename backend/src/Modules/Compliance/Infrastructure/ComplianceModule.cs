@@ -18,7 +18,16 @@ public sealed class ComplianceModule : IModule
     {
         var connectionString = configuration.GetSpecPourConnectionString();
 
-        services.AddDbContext<ComplianceDbContext>(options => options.UseNpgsql(connectionString));
+        // T155: the outbox interceptor must be attached here (not merely
+        // DI-registered) for OutboxSaveChangesInterceptor to actually run — a
+        // gap discovered while wiring T155's ingredient-rename event (the first
+        // real outbox producer/consumer in the codebase). Fixed identically
+        // across every module for consistency.
+        services.AddDbContext<ComplianceDbContext>((sp, options) =>
+        {
+            options.UseNpgsql(connectionString);
+            options.AddInterceptors(sp.GetRequiredService<OutboxSaveChangesInterceptor>());
+        });
         services.AddSpecPourOutboxWriter(Name);
 
         services.AddSingleton<IGeoIpPort, MaxMindGeoIpAdapter>();
@@ -27,7 +36,6 @@ public sealed class ComplianceModule : IModule
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
         AgeGateEndpoint.Map(endpoints);
-
-        // Responsible-consumption messaging + support resources land in T150.
+        ResponsibleConsumptionEndpoints.Map(endpoints);
     }
 }

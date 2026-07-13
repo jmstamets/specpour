@@ -1,20 +1,53 @@
-// T028: go_router navigation shell. Deep-linkable routes (R18 — Flutter web serves
-// crawlable/shareable URLs for public content). Feature routes are added here as
-// each story lands (discover T041/T042, identity T055, etc.); this establishes the
-// router provider and the one route that already exists.
+// T028's go_router navigation shell, extended by T041/T042 (discover feature)
+// with the discover home route plus recipe/concept detail routes. Deep-linkable
+// (R18 — Flutter web serves crawlable/shareable URLs for public content).
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/home/home_page.dart';
+import '../../features/about/about_screen.dart';
+import '../../features/discover/concept_detail/concept_detail_screen.dart';
+import '../../features/discover/discover_screen.dart';
+import '../../features/discover/equipment_detail/equipment_detail_screen.dart';
+import '../../features/discover/ingredient_detail/ingredient_detail_screen.dart';
+import '../../features/discover/recipe_detail/recipe_detail_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     routes: [
       GoRoute(
         path: '/',
-        name: 'home',
-        builder: (context, state) => const HomePage(),
+        name: 'discover',
+        builder: (context, state) => const DiscoverScreen(),
+      ),
+      GoRoute(
+        path: '/recipes/:id',
+        name: 'recipeDetail',
+        builder: (context, state) =>
+            RecipeDetailScreen(recipeId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/concepts/:id',
+        name: 'conceptDetail',
+        builder: (context, state) =>
+            ConceptDetailScreen(conceptId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/about',
+        name: 'about',
+        builder: (context, state) => const AboutScreen(),
+      ),
+      GoRoute(
+        path: '/ingredients/:id',
+        name: 'ingredientDetail',
+        builder: (context, state) =>
+            IngredientDetailScreen(ingredientId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/equipment/:id',
+        name: 'equipmentDetail',
+        builder: (context, state) =>
+            EquipmentDetailScreen(equipmentId: state.pathParameters['id']!),
       ),
     ],
   );

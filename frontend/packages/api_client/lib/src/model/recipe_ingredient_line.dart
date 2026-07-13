@@ -14,6 +14,7 @@ part 'recipe_ingredient_line.g.dart';
 /// Properties:
 /// * [position] 
 /// * [ingredientId] 
+/// * [ingredientName] - Resolved for display (FR-020); null only if the referenced ingredient can no longer be resolved.
 /// * [quantity] 
 /// * [unit] 
 /// * [purpose] 
@@ -25,6 +26,10 @@ abstract class RecipeIngredientLine implements Built<RecipeIngredientLine, Recip
 
   @BuiltValueField(wireName: r'ingredientId')
   String get ingredientId;
+
+  /// Resolved for display (FR-020); null only if the referenced ingredient can no longer be resolved.
+  @BuiltValueField(wireName: r'ingredientName')
+  String? get ingredientName;
 
   @BuiltValueField(wireName: r'quantity')
   num get quantity;
@@ -72,6 +77,13 @@ class _$RecipeIngredientLineSerializer implements PrimitiveSerializer<RecipeIngr
       object.ingredientId,
       specifiedType: const FullType(String),
     );
+    if (object.ingredientName != null) {
+      yield r'ingredientName';
+      yield serializers.serialize(
+        object.ingredientName,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
     yield r'quantity';
     yield serializers.serialize(
       object.quantity,
@@ -130,6 +142,14 @@ class _$RecipeIngredientLineSerializer implements PrimitiveSerializer<RecipeIngr
             specifiedType: const FullType(String),
           ) as String;
           result.ingredientId = valueDes;
+          break;
+        case r'ingredientName':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.ingredientName = valueDes;
           break;
         case r'quantity':
           final valueDes = serializers.deserialize(

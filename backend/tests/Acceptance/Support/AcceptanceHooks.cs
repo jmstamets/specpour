@@ -17,6 +17,15 @@ public static class AcceptanceHooks
 
     public static SpecPourWebApplicationFactory Factory { get; private set; } = null!;
 
+    /// <summary>
+    /// The shared Testcontainers connection string, exposed so tests that need
+    /// their OWN composed host (e.g. the rate-limiting test, which must not spend
+    /// the shared host's anonymous rate-limit budget and skew other scenarios)
+    /// can point a fresh factory at the same already-migrated database.
+    /// </summary>
+    public static string ConnectionString =>
+        _postgres?.GetConnectionString() ?? throw new InvalidOperationException("Testcontainers PostgreSQL not started yet.");
+
     [BeforeTestRun]
     public static async Task BeforeTestRunAsync()
     {

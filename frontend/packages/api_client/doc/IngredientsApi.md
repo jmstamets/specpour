@@ -10,6 +10,7 @@ All URIs are relative to */api/v1*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getIngredient**](IngredientsApi.md#getingredient) | **GET** /ingredients/{id} | Get an ingredient&#39;s full detail, including allergen attributes (FR-016)
+[**getIngredientRecipes**](IngredientsApi.md#getingredientrecipes) | **GET** /ingredients/{id}/recipes | Recipes using this ingredient, hierarchy-aware (T155, FR-014a)
 [**listIngredients**](IngredientsApi.md#listingredients) | **GET** /ingredients | Browse ingredients (FR-014)
 
 
@@ -42,6 +43,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**IngredientDetail**](IngredientDetail.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getIngredientRecipes**
+> IngredientRecipes getIngredientRecipes(id)
+
+Recipes using this ingredient, hierarchy-aware (T155, FR-014a)
+
+A class-level ingredient (e.g. \"Rum\") lists recipes using it or any descendant (\"Aged Rum\", \"White Rum\", ...) — mirrors FR-024's equipment-to-recipes linking. Unpaginated: a single ingredient's usage list is small at V1 scale.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIngredientsApi();
+final String id = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    final response = api.getIngredientRecipes(id);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IngredientsApi->getIngredientRecipes: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**IngredientRecipes**](IngredientRecipes.md)
 
 ### Authorization
 

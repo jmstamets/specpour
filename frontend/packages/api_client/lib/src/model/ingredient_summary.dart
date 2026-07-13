@@ -14,6 +14,7 @@ part 'ingredient_summary.g.dart';
 /// * [id] 
 /// * [name] 
 /// * [parentId] 
+/// * [parentName] - Resolved parent-ingredient name for hierarchy display (contract sweep).
 @BuiltValue()
 abstract class IngredientSummary implements Built<IngredientSummary, IngredientSummaryBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -24,6 +25,10 @@ abstract class IngredientSummary implements Built<IngredientSummary, IngredientS
 
   @BuiltValueField(wireName: r'parentId')
   String? get parentId;
+
+  /// Resolved parent-ingredient name for hierarchy display (contract sweep).
+  @BuiltValueField(wireName: r'parentName')
+  String? get parentName;
 
   IngredientSummary._();
 
@@ -62,6 +67,13 @@ class _$IngredientSummarySerializer implements PrimitiveSerializer<IngredientSum
       yield r'parentId';
       yield serializers.serialize(
         object.parentId,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
+    if (object.parentName != null) {
+      yield r'parentName';
+      yield serializers.serialize(
+        object.parentName,
         specifiedType: const FullType.nullable(String),
       );
     }
@@ -109,6 +121,14 @@ class _$IngredientSummarySerializer implements PrimitiveSerializer<IngredientSum
           ) as String?;
           if (valueDes == null) continue;
           result.parentId = valueDes;
+          break;
+        case r'parentName':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.parentName = valueDes;
           break;
         default:
           unhandled.add(key);

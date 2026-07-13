@@ -141,7 +141,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **listRecipes**
-> RecipePage listRecipes(family, category, tag, flavorProfile, equipment, glassware, ice, allergenExclude, source_, cursor, limit)
+> RecipePage listRecipes(family, category, tag, flavorProfile, equipment, glassware, ice, uses, allergenExclude, source_, cursor, limit)
 
 Browse/search recipes with content facets (FR-050)
 
@@ -159,13 +159,14 @@ final String flavorProfile = flavorProfile_example; // String |
 final String equipment = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
 final String glassware = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
 final String ice = ice_example; // String | 
+final String uses = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050) — a class-level ingredient ID matches recipes using it or any descendant.
 final String allergenExclude = allergenExclude_example; // String | Comma-separated allergen keys to exclude.
 final String source_ = source__example; // String | 
 final String cursor = cursor_example; // String | Opaque pagination cursor from a previous page's `nextCursor`.
 final int limit = 56; // int | Maximum number of items to return.
 
 try {
-    final response = api.listRecipes(family, category, tag, flavorProfile, equipment, glassware, ice, allergenExclude, source_, cursor, limit);
+    final response = api.listRecipes(family, category, tag, flavorProfile, equipment, glassware, ice, uses, allergenExclude, source_, cursor, limit);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling CatalogApi->listRecipes: $e\n');
@@ -183,6 +184,7 @@ Name | Type | Description  | Notes
  **equipment** | **String**|  | [optional] 
  **glassware** | **String**|  | [optional] 
  **ice** | **String**|  | [optional] 
+ **uses** | **String**| Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050) — a class-level ingredient ID matches recipes using it or any descendant. | [optional] 
  **allergenExclude** | **String**| Comma-separated allergen keys to exclude. | [optional] 
  **source_** | **String**|  | [optional] 
  **cursor** | **String**| Opaque pagination cursor from a previous page's `nextCursor`. | [optional] 

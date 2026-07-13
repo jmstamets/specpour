@@ -65,3 +65,31 @@ final notificationsApiProvider = Provider<NotificationsApi>(
     ref.watch(apiClientProvider).serializers,
   ),
 );
+
+final catalogApiProvider = Provider<CatalogApi>(
+  (ref) => CatalogApi(
+    ref.watch(apiClientProvider).dio,
+    ref.watch(apiClientProvider).serializers,
+  ),
+);
+
+final searchApiProvider = Provider<SearchApi>(
+  (ref) => SearchApi(
+    ref.watch(apiClientProvider).dio,
+    ref.watch(apiClientProvider).serializers,
+  ),
+);
+
+final ingredientsApiProvider = Provider<IngredientsApi>(
+  (ref) => IngredientsApi(
+    ref.watch(apiClientProvider).dio,
+    ref.watch(apiClientProvider).serializers,
+  ),
+);
+
+final equipmentApiProvider = Provider<EquipmentApi>(
+  (ref) => EquipmentApi(
+    ref.watch(apiClientProvider).dio,
+    ref.watch(apiClientProvider).serializers,
+  ),
+);

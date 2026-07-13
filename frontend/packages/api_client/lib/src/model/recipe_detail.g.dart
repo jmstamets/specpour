@@ -30,9 +30,9 @@ class _$RecipeDetail extends RecipeDetail {
   @override
   final String iceSpec;
   @override
-  final BuiltList<String>? glasswareIds;
+  final BuiltList<EquipmentRef> glassware;
   @override
-  final BuiltList<String>? equipmentIds;
+  final BuiltList<EquipmentRef> equipment;
   @override
   final String? creatorAttribution;
   @override
@@ -61,8 +61,8 @@ class _$RecipeDetail extends RecipeDetail {
       required this.instructions,
       this.garnishes,
       required this.iceSpec,
-      this.glasswareIds,
-      this.equipmentIds,
+      required this.glassware,
+      required this.equipment,
       this.creatorAttribution,
       this.history,
       this.notes,
@@ -92,8 +92,8 @@ class _$RecipeDetail extends RecipeDetail {
         instructions == other.instructions &&
         garnishes == other.garnishes &&
         iceSpec == other.iceSpec &&
-        glasswareIds == other.glasswareIds &&
-        equipmentIds == other.equipmentIds &&
+        glassware == other.glassware &&
+        equipment == other.equipment &&
         creatorAttribution == other.creatorAttribution &&
         history == other.history &&
         notes == other.notes &&
@@ -116,8 +116,8 @@ class _$RecipeDetail extends RecipeDetail {
     _$hash = $jc(_$hash, instructions.hashCode);
     _$hash = $jc(_$hash, garnishes.hashCode);
     _$hash = $jc(_$hash, iceSpec.hashCode);
-    _$hash = $jc(_$hash, glasswareIds.hashCode);
-    _$hash = $jc(_$hash, equipmentIds.hashCode);
+    _$hash = $jc(_$hash, glassware.hashCode);
+    _$hash = $jc(_$hash, equipment.hashCode);
     _$hash = $jc(_$hash, creatorAttribution.hashCode);
     _$hash = $jc(_$hash, history.hashCode);
     _$hash = $jc(_$hash, notes.hashCode);
@@ -142,8 +142,8 @@ class _$RecipeDetail extends RecipeDetail {
           ..add('instructions', instructions)
           ..add('garnishes', garnishes)
           ..add('iceSpec', iceSpec)
-          ..add('glasswareIds', glasswareIds)
-          ..add('equipmentIds', equipmentIds)
+          ..add('glassware', glassware)
+          ..add('equipment', equipment)
           ..add('creatorAttribution', creatorAttribution)
           ..add('history', history)
           ..add('notes', notes)
@@ -214,17 +214,17 @@ class RecipeDetailBuilder
   String? get iceSpec => _$this._iceSpec;
   set iceSpec(String? iceSpec) => _$this._iceSpec = iceSpec;
 
-  ListBuilder<String>? _glasswareIds;
-  ListBuilder<String> get glasswareIds =>
-      _$this._glasswareIds ??= ListBuilder<String>();
-  set glasswareIds(ListBuilder<String>? glasswareIds) =>
-      _$this._glasswareIds = glasswareIds;
+  ListBuilder<EquipmentRef>? _glassware;
+  ListBuilder<EquipmentRef> get glassware =>
+      _$this._glassware ??= ListBuilder<EquipmentRef>();
+  set glassware(ListBuilder<EquipmentRef>? glassware) =>
+      _$this._glassware = glassware;
 
-  ListBuilder<String>? _equipmentIds;
-  ListBuilder<String> get equipmentIds =>
-      _$this._equipmentIds ??= ListBuilder<String>();
-  set equipmentIds(ListBuilder<String>? equipmentIds) =>
-      _$this._equipmentIds = equipmentIds;
+  ListBuilder<EquipmentRef>? _equipment;
+  ListBuilder<EquipmentRef> get equipment =>
+      _$this._equipment ??= ListBuilder<EquipmentRef>();
+  set equipment(ListBuilder<EquipmentRef>? equipment) =>
+      _$this._equipment = equipment;
 
   String? _creatorAttribution;
   String? get creatorAttribution => _$this._creatorAttribution;
@@ -272,8 +272,8 @@ class RecipeDetailBuilder
       _instructions = $v.instructions.toBuilder();
       _garnishes = $v.garnishes?.toBuilder();
       _iceSpec = $v.iceSpec;
-      _glasswareIds = $v.glasswareIds?.toBuilder();
-      _equipmentIds = $v.equipmentIds?.toBuilder();
+      _glassware = $v.glassware.toBuilder();
+      _equipment = $v.equipment.toBuilder();
       _creatorAttribution = $v.creatorAttribution;
       _history = $v.history;
       _notes = $v.notes;
@@ -317,8 +317,8 @@ class RecipeDetailBuilder
             garnishes: _garnishes?.build(),
             iceSpec: BuiltValueNullFieldError.checkNotNull(
                 iceSpec, r'RecipeDetail', 'iceSpec'),
-            glasswareIds: _glasswareIds?.build(),
-            equipmentIds: _equipmentIds?.build(),
+            glassware: glassware.build(),
+            equipment: equipment.build(),
             creatorAttribution: creatorAttribution,
             history: history,
             notes: notes,
@@ -347,10 +347,10 @@ class RecipeDetailBuilder
         _$failedField = 'garnishes';
         _garnishes?.build();
 
-        _$failedField = 'glasswareIds';
-        _glasswareIds?.build();
-        _$failedField = 'equipmentIds';
-        _equipmentIds?.build();
+        _$failedField = 'glassware';
+        glassware.build();
+        _$failedField = 'equipment';
+        equipment.build();
 
         _$failedField = 'allergens';
         allergens.build();

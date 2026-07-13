@@ -1,8 +1,10 @@
 using Serilog;
 using SpecPour.Api;
+using SpecPour.Api.Cors;
 using SpecPour.Api.Health;
 using SpecPour.Api.Observability;
 using SpecPour.Api.RateLimiting;
+using SpecPour.Api.Seo;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Http;
 using SpecPour.BuildingBlocks.Time;
@@ -18,6 +20,7 @@ var connectionString = builder.Configuration.GetSpecPourConnectionString();
 builder.Services.AddOpenApi();
 
 builder.Services.AddSpecPourProblemDetails();
+builder.Services.AddSpecPourCors(builder.Configuration);
 builder.Services.AddSpecPourRateLimiting();
 builder.Services.AddSpecPourHealthChecks(connectionString);
 // AddAuthentication() is registered by IdentityModule (T017: cookie scheme for the
@@ -63,6 +66,8 @@ app.UseStatusCodePages();
 
 app.UseRateLimiter();
 
+app.UseCors(SpecPour.Api.Cors.CorsExtensions.PolicyName);
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -74,6 +79,10 @@ foreach (var module in ModuleRegistry.All)
 {
     module.MapEndpoints(app);
 }
+
+// SEO HTML projections for public content (T044) — plain /pages/... URLs, outside
+// the versioned /api/v1 surface, for crawlers and shareable links (FR-004b, R18).
+app.MapSpecPourSeoPages();
 
 app.Run();
 

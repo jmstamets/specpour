@@ -57,6 +57,10 @@ paths:
     $ref: './paths/authorization.yaml#/meEntitlements'
   /compliance/age-gate:
     $ref: './paths/compliance.yaml#/ageGate'
+  /compliance/messaging:
+    $ref: './paths/compliance.yaml#/messaging'
+  /compliance/support-resources:
+    $ref: './paths/compliance.yaml#/supportResources'
   /inbox:
     $ref: './paths/notifications.yaml#/inbox'
   /recipes:
@@ -71,6 +75,8 @@ paths:
     $ref: './paths/ingredients.yaml#/ingredients'
   /ingredients/{id}:
     $ref: './paths/ingredients.yaml#/ingredientById'
+  /ingredients/{id}/recipes:
+    $ref: './paths/ingredients.yaml#/ingredientRecipes'
   /equipment:
     $ref: './paths/equipment.yaml#/equipment'
   /equipment/{id}:

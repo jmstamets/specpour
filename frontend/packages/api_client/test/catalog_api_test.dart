@@ -32,7 +32,7 @@ void main() {
     //
     // Guest-accessible (FR-004b). Only public/core recipes are returned — private personal-library recipes land with the personal-library story (US3). The rating and makeable-from-inventory facets are staged (T149/T148); ABV-range filtering computes ABV per candidate at request time rather than from a stored column, since ABV is always derived, never persisted (data-model.md).
     //
-    //Future<RecipePage> listRecipes({ String family, String category, String tag, String flavorProfile, String equipment, String glassware, String ice, String allergenExclude, String source_, String cursor, int limit }) async
+    //Future<RecipePage> listRecipes({ String family, String category, String tag, String flavorProfile, String equipment, String glassware, String ice, String uses, String allergenExclude, String source_, String cursor, int limit }) async
     test('test listRecipes', () async {
       // TODO
     });

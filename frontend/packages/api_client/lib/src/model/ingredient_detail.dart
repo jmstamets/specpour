@@ -15,11 +15,13 @@ part 'ingredient_detail.g.dart';
 /// * [id] 
 /// * [name] 
 /// * [parentId] 
+/// * [parentName] - Resolved parent-ingredient name (contract sweep).
 /// * [sources] 
 /// * [description] 
 /// * [abvPercent] 
 /// * [allergens] 
 /// * [definingRecipeId] 
+/// * [definingRecipeName] - Resolved defining-recipe name for house-made ingredients (contract sweep).
 /// * [yieldQuantity] 
 /// * [yieldUnit] 
 /// * [shelfLife] - ISO 8601 duration, when this is a house-made ingredient.
@@ -35,6 +37,10 @@ abstract class IngredientDetail implements Built<IngredientDetail, IngredientDet
   @BuiltValueField(wireName: r'parentId')
   String? get parentId;
 
+  /// Resolved parent-ingredient name (contract sweep).
+  @BuiltValueField(wireName: r'parentName')
+  String? get parentName;
+
   @BuiltValueField(wireName: r'sources')
   BuiltList<String> get sources;
 
@@ -49,6 +55,10 @@ abstract class IngredientDetail implements Built<IngredientDetail, IngredientDet
 
   @BuiltValueField(wireName: r'definingRecipeId')
   String? get definingRecipeId;
+
+  /// Resolved defining-recipe name for house-made ingredients (contract sweep).
+  @BuiltValueField(wireName: r'definingRecipeName')
+  String? get definingRecipeName;
 
   @BuiltValueField(wireName: r'yieldQuantity')
   num? get yieldQuantity;
@@ -103,6 +113,13 @@ class _$IngredientDetailSerializer implements PrimitiveSerializer<IngredientDeta
         specifiedType: const FullType.nullable(String),
       );
     }
+    if (object.parentName != null) {
+      yield r'parentName';
+      yield serializers.serialize(
+        object.parentName,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
     yield r'sources';
     yield serializers.serialize(
       object.sources,
@@ -131,6 +148,13 @@ class _$IngredientDetailSerializer implements PrimitiveSerializer<IngredientDeta
       yield r'definingRecipeId';
       yield serializers.serialize(
         object.definingRecipeId,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
+    if (object.definingRecipeName != null) {
+      yield r'definingRecipeName';
+      yield serializers.serialize(
+        object.definingRecipeName,
         specifiedType: const FullType.nullable(String),
       );
     }
@@ -207,6 +231,14 @@ class _$IngredientDetailSerializer implements PrimitiveSerializer<IngredientDeta
           if (valueDes == null) continue;
           result.parentId = valueDes;
           break;
+        case r'parentName':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.parentName = valueDes;
+          break;
         case r'sources':
           final valueDes = serializers.deserialize(
             value,
@@ -244,6 +276,14 @@ class _$IngredientDetailSerializer implements PrimitiveSerializer<IngredientDeta
           ) as String?;
           if (valueDes == null) continue;
           result.definingRecipeId = valueDes;
+          break;
+        case r'definingRecipeName':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.definingRecipeName = valueDes;
           break;
         case r'yieldQuantity':
           final valueDes = serializers.deserialize(

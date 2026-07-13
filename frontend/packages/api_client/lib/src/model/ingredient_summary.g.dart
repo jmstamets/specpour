@@ -13,12 +13,15 @@ class _$IngredientSummary extends IngredientSummary {
   final String name;
   @override
   final String? parentId;
+  @override
+  final String? parentName;
 
   factory _$IngredientSummary(
           [void Function(IngredientSummaryBuilder)? updates]) =>
       (IngredientSummaryBuilder()..update(updates))._build();
 
-  _$IngredientSummary._({required this.id, required this.name, this.parentId})
+  _$IngredientSummary._(
+      {required this.id, required this.name, this.parentId, this.parentName})
       : super._();
   @override
   IngredientSummary rebuild(void Function(IngredientSummaryBuilder) updates) =>
@@ -34,7 +37,8 @@ class _$IngredientSummary extends IngredientSummary {
     return other is IngredientSummary &&
         id == other.id &&
         name == other.name &&
-        parentId == other.parentId;
+        parentId == other.parentId &&
+        parentName == other.parentName;
   }
 
   @override
@@ -43,6 +47,7 @@ class _$IngredientSummary extends IngredientSummary {
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, parentId.hashCode);
+    _$hash = $jc(_$hash, parentName.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -52,7 +57,8 @@ class _$IngredientSummary extends IngredientSummary {
     return (newBuiltValueToStringHelper(r'IngredientSummary')
           ..add('id', id)
           ..add('name', name)
-          ..add('parentId', parentId))
+          ..add('parentId', parentId)
+          ..add('parentName', parentName))
         .toString();
   }
 }
@@ -73,6 +79,10 @@ class IngredientSummaryBuilder
   String? get parentId => _$this._parentId;
   set parentId(String? parentId) => _$this._parentId = parentId;
 
+  String? _parentName;
+  String? get parentName => _$this._parentName;
+  set parentName(String? parentName) => _$this._parentName = parentName;
+
   IngredientSummaryBuilder() {
     IngredientSummary._defaults(this);
   }
@@ -83,6 +93,7 @@ class IngredientSummaryBuilder
       _id = $v.id;
       _name = $v.name;
       _parentId = $v.parentId;
+      _parentName = $v.parentName;
       _$v = null;
     }
     return this;
@@ -109,6 +120,7 @@ class IngredientSummaryBuilder
           name: BuiltValueNullFieldError.checkNotNull(
               name, r'IngredientSummary', 'name'),
           parentId: parentId,
+          parentName: parentName,
         );
     replace(_$result);
     return _$result;

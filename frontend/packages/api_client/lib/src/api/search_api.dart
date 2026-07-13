@@ -24,6 +24,7 @@ class SearchApi {
   ///
   /// Parameters:
   /// * [q] - Free-text query (websearch_to_tsquery syntax).
+  /// * [uses] - Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050), narrowing results to recipes referencing the ingredient (or any descendant). Applied after ranking/pagination — a page can return fewer than `limit` items when this facet removes matches.
   /// * [cursor] - Opaque pagination cursor from a previous page's `nextCursor`.
   /// * [limit] - Maximum number of items to return.
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -37,6 +38,7 @@ class SearchApi {
   /// Throws [DioException] if API call or serialization fails
   Future<Response<SearchResultPage>> search({ 
     String? q,
+    String? uses,
     String? cursor,
     int? limit = 20,
     CancelToken? cancelToken,
@@ -67,6 +69,7 @@ class SearchApi {
 
     final _queryParameters = <String, dynamic>{
       if (q != null) r'q': encodeQueryParameter(_serializers, q, const FullType(String)),
+      if (uses != null) r'uses': encodeQueryParameter(_serializers, uses, const FullType(String)),
       if (cursor != null) r'cursor': encodeQueryParameter(_serializers, cursor, const FullType(String)),
       if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
     };

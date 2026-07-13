@@ -12,11 +12,15 @@ part 'concept_variant.g.dart';
 ///
 /// Properties:
 /// * [recipeId] 
+/// * [recipeName] 
 /// * [differentiatorText] 
 @BuiltValue()
 abstract class ConceptVariant implements Built<ConceptVariant, ConceptVariantBuilder> {
   @BuiltValueField(wireName: r'recipeId')
   String get recipeId;
+
+  @BuiltValueField(wireName: r'recipeName')
+  String get recipeName;
 
   @BuiltValueField(wireName: r'differentiatorText')
   String get differentiatorText;
@@ -47,6 +51,11 @@ class _$ConceptVariantSerializer implements PrimitiveSerializer<ConceptVariant> 
     yield r'recipeId';
     yield serializers.serialize(
       object.recipeId,
+      specifiedType: const FullType(String),
+    );
+    yield r'recipeName';
+    yield serializers.serialize(
+      object.recipeName,
       specifiedType: const FullType(String),
     );
     yield r'differentiatorText';
@@ -83,6 +92,13 @@ class _$ConceptVariantSerializer implements PrimitiveSerializer<ConceptVariant> 
             specifiedType: const FullType(String),
           ) as String;
           result.recipeId = valueDes;
+          break;
+        case r'recipeName':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.recipeName = valueDes;
           break;
         case r'differentiatorText':
           final valueDes = serializers.deserialize(

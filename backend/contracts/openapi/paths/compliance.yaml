@@ -30,8 +30,89 @@ ageGate:
             schema:
               $ref: '#/components/schemas/AgeGateResponse'
 
+messaging:
+  get:
+    operationId: getResponsibleConsumptionMessage
+    tags: [compliance]
+    summary: Get the persistent responsible-consumption message for a surface (FR-067)
+    description: >-
+      Jurisdiction-configurable, counsel-reviewed message shown persistently on
+      recipe pages, batch outputs, and the footer/about surface (FR-067). The
+      content is returned as an i18n key resolved client-side, never hard-coded
+      copy. Falls back to the default message for the surface when the caller's
+      jurisdiction is unresolved. Guest-accessible.
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: surface
+        in: query
+        required: true
+        description: The surface class requesting a message.
+        schema: { type: string, enum: [recipe, batch_output, footer_about] }
+      - name: jurisdiction
+        in: query
+        required: false
+        schema: { type: string }
+    responses:
+      '200':
+        description: The responsible-consumption message for the surface.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsibleConsumptionMessageResponse'
+
+supportResources:
+  get:
+    operationId: getSupportResources
+    tags: [compliance]
+    summary: Get jurisdiction-aware support resources (FR-069)
+    description: >-
+      Localized helpline/organization links, reachable from the
+      responsible-consumption messaging and settings/about (FR-069). Falls back to
+      the default set when the caller's jurisdiction is unresolved. Guest-accessible.
+    security:
+      - {}
+      - bearerAuth: []
+    parameters:
+      - name: jurisdiction
+        in: query
+        required: false
+        schema: { type: string }
+    responses:
+      '200':
+        description: The applicable support resources, in display order.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportResourcesResponse'
+
 components:
   schemas:
+    ResponsibleConsumptionMessageResponse:
+      type: object
+      properties:
+        surface: { type: string }
+        jurisdictionCode: { type: string }
+        placement: { type: string }
+        messageContentKey:
+          type: string
+          description: i18n key for the message copy — resolved client-side, never hard-coded.
+      required: [surface, jurisdictionCode, placement, messageContentKey]
+    SupportResourceResponse:
+      type: object
+      properties:
+        name: { type: string }
+        link: { type: string }
+        displayOrder: { type: integer }
+      required: [name, link, displayOrder]
+    SupportResourcesResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/SupportResourceResponse' }
+      required: [items]
     AgeGateResponse:
       type: object
       properties:

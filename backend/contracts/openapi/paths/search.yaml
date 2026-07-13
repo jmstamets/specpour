@@ -16,6 +16,14 @@ search:
         in: query
         description: Free-text query (websearch_to_tsquery syntax).
         schema: { type: string }
+      - name: uses
+        in: query
+        schema: { type: string, format: uuid }
+        description: >-
+          Hierarchy-aware "uses:<ingredient>" facet (T155/FR-050), narrowing
+          results to recipes referencing the ingredient (or any descendant).
+          Applied after ranking/pagination — a page can return fewer than `limit`
+          items when this facet removes matches.
       - $ref: '../openapi.yaml#/components/parameters/CursorParam'
       - $ref: '../openapi.yaml#/components/parameters/LimitParam'
     responses:

@@ -12,6 +12,11 @@ void main() {
       // TODO
     });
 
+    // String recipeName
+    test('to test the property `recipeName`', () async {
+      // TODO
+    });
+
     // String differentiatorText
     test('to test the property `differentiatorText`', () async {
       // TODO

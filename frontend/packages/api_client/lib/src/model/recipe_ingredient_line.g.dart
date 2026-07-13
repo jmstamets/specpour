@@ -90,6 +90,8 @@ class _$RecipeIngredientLine extends RecipeIngredientLine {
   @override
   final String ingredientId;
   @override
+  final String? ingredientName;
+  @override
   final num quantity;
   @override
   final String unit;
@@ -105,6 +107,7 @@ class _$RecipeIngredientLine extends RecipeIngredientLine {
   _$RecipeIngredientLine._(
       {required this.position,
       required this.ingredientId,
+      this.ingredientName,
       required this.quantity,
       required this.unit,
       this.purpose,
@@ -125,6 +128,7 @@ class _$RecipeIngredientLine extends RecipeIngredientLine {
     return other is RecipeIngredientLine &&
         position == other.position &&
         ingredientId == other.ingredientId &&
+        ingredientName == other.ingredientName &&
         quantity == other.quantity &&
         unit == other.unit &&
         purpose == other.purpose &&
@@ -136,6 +140,7 @@ class _$RecipeIngredientLine extends RecipeIngredientLine {
     var _$hash = 0;
     _$hash = $jc(_$hash, position.hashCode);
     _$hash = $jc(_$hash, ingredientId.hashCode);
+    _$hash = $jc(_$hash, ingredientName.hashCode);
     _$hash = $jc(_$hash, quantity.hashCode);
     _$hash = $jc(_$hash, unit.hashCode);
     _$hash = $jc(_$hash, purpose.hashCode);
@@ -149,6 +154,7 @@ class _$RecipeIngredientLine extends RecipeIngredientLine {
     return (newBuiltValueToStringHelper(r'RecipeIngredientLine')
           ..add('position', position)
           ..add('ingredientId', ingredientId)
+          ..add('ingredientName', ingredientName)
           ..add('quantity', quantity)
           ..add('unit', unit)
           ..add('purpose', purpose)
@@ -168,6 +174,11 @@ class RecipeIngredientLineBuilder
   String? _ingredientId;
   String? get ingredientId => _$this._ingredientId;
   set ingredientId(String? ingredientId) => _$this._ingredientId = ingredientId;
+
+  String? _ingredientName;
+  String? get ingredientName => _$this._ingredientName;
+  set ingredientName(String? ingredientName) =>
+      _$this._ingredientName = ingredientName;
 
   num? _quantity;
   num? get quantity => _$this._quantity;
@@ -195,6 +206,7 @@ class RecipeIngredientLineBuilder
     if ($v != null) {
       _position = $v.position;
       _ingredientId = $v.ingredientId;
+      _ingredientName = $v.ingredientName;
       _quantity = $v.quantity;
       _unit = $v.unit;
       _purpose = $v.purpose;
@@ -224,6 +236,7 @@ class RecipeIngredientLineBuilder
               position, r'RecipeIngredientLine', 'position'),
           ingredientId: BuiltValueNullFieldError.checkNotNull(
               ingredientId, r'RecipeIngredientLine', 'ingredientId'),
+          ingredientName: ingredientName,
           quantity: BuiltValueNullFieldError.checkNotNull(
               quantity, r'RecipeIngredientLine', 'quantity'),
           unit: BuiltValueNullFieldError.checkNotNull(

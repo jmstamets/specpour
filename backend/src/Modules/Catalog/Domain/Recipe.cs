@@ -60,4 +60,14 @@ public sealed class Recipe
     public required DateTimeOffset CreatedAt { get; init; }
 
     public required DateTimeOffset UpdatedAt { get; set; }
+
+    /// <summary>
+    /// T155/ADR-0002/FR-049: the denormalized text <see cref="SearchVector"/> (the
+    /// EF shadow property in CatalogDbContext) is generated FROM — names, ingredient
+    /// names at the referenced hierarchy level, garnishes, and history/notes.
+    /// Maintained by <c>RecipeSearchDocumentRefresher</c>, never hand-edited; a plain
+    /// mapped column (not shadow) because application code writes it directly,
+    /// unlike SearchVector which only Postgres ever writes.
+    /// </summary>
+    public string SearchDocumentText { get; set; } = string.Empty;
 }

@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- T155: IngredientRenamed extends DomainEvent so other modules (Catalog) can
+         subscribe via IDomainEventHandler<IngredientRenamed> without depending on
+         Ingredients' Domain/Infrastructure — same reasoning as Notifications.Contracts'
+         INotificationEvent reference. -->
+    <ProjectReference Include="..\..\..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
+  </ItemGroup>
+
 </Project>

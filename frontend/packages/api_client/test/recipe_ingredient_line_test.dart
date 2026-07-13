@@ -17,6 +17,12 @@ void main() {
       // TODO
     });
 
+    // Resolved for display (FR-020); null only if the referenced ingredient can no longer be resolved.
+    // String ingredientName
+    test('to test the property `ingredientName`', () async {
+      // TODO
+    });
+
     // num quantity
     test('to test the property `quantity`', () async {
       // TODO

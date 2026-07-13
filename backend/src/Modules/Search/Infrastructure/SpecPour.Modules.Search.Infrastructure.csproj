@@ -8,6 +8,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\SpecPour.Modules.Search.Application.csproj" />
+    <!-- Cross-module Contracts-only dependencies (constitution Principle III): T155's
+         "uses:<ingredient>" facet on GET /search is a post-filter over the recipe-type
+         results (Search stays entity-agnostic per the T141 ADR — this doesn't touch
+         PostgresFullTextSearchAdapter's generic UNION query), needing Ingredients'
+         hierarchy-descendant expansion and Catalog's ingredient->recipe-IDs lookup. -->
+    <ProjectReference Include="..\..\Ingredients\Contracts\SpecPour.Modules.Ingredients.Contracts.csproj" />
+    <ProjectReference Include="..\..\Catalog\Contracts\SpecPour.Modules.Catalog.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

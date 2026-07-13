@@ -19,8 +19,8 @@ Name | Type | Description | Notes
 **instructions** | **BuiltList&lt;String&gt;** |  | 
 **garnishes** | **BuiltList&lt;String&gt;** |  | [optional] 
 **iceSpec** | **String** |  | 
-**glasswareIds** | **BuiltList&lt;String&gt;** |  | [optional] 
-**equipmentIds** | **BuiltList&lt;String&gt;** |  | [optional] 
+**glassware** | [**BuiltList&lt;EquipmentRef&gt;**](EquipmentRef.md) |  | 
+**equipment** | [**BuiltList&lt;EquipmentRef&gt;**](EquipmentRef.md) |  | 
 **creatorAttribution** | **String** |  | [optional] 
 **history** | **String** |  | [optional] 
 **notes** | **String** |  | [optional] 

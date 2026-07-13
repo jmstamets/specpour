@@ -45,6 +45,7 @@ public sealed class US01DiscoverRecipesSteps
 
     private HttpResponseMessage _lastResponse = null!;
     private JsonDocument? _lastJson;
+    private string _lastResponseBody = string.Empty;
     private JsonElement _foundRecipeRef;
     private readonly List<HttpResponseMessage> _anonymousResponses = [];
 
@@ -187,9 +188,15 @@ public sealed class US01DiscoverRecipesSteps
         Assert.True(root.GetProperty("ingredientLines").GetArrayLength() > 0);
         Assert.True(root.GetProperty("instructions").GetArrayLength() > 0);
         Assert.True(root.GetProperty("garnishes").GetArrayLength() > 0);
-        Assert.True(root.GetProperty("glasswareIds").GetArrayLength() > 0);
+        // Contract sweep: glassware/equipment are now {id,name} objects, not raw
+        // ID arrays — assert both that they're present and that names resolved.
+        var glassware = root.GetProperty("glassware");
+        Assert.True(glassware.GetArrayLength() > 0);
+        Assert.False(string.IsNullOrWhiteSpace(glassware[0].GetProperty("name").GetString()));
         Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("iceSpec").GetString()));
-        Assert.True(root.GetProperty("equipmentIds").GetArrayLength() > 0);
+        var equipment = root.GetProperty("equipment");
+        Assert.True(equipment.GetArrayLength() > 0);
+        Assert.False(string.IsNullOrWhiteSpace(equipment[0].GetProperty("name").GetString()));
         Assert.Equal(expectedCreator, root.GetProperty("creatorAttribution").GetString());
         Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("history").GetString()));
     }
@@ -283,6 +290,59 @@ public sealed class US01DiscoverRecipesSteps
     [Then(@"the age gate response includes a legal drinking age")]
     public void ThenAgeGateIncludesLegalDrinkingAge() =>
         Assert.True(_lastJson!.RootElement.GetProperty("legalDrinkingAge").GetInt32() > 0);
+
+    [When(@"I request the SEO page for the Mai Tai recipe")]
+    public async Task WhenIRequestTheSeoPageForMaiTai()
+    {
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        _lastResponse = await client.GetAsync(new Uri($"/pages/recipes/{SeedIds.MaiTaiRecipe}", UriKind.Relative));
+        _lastResponseBody = await _lastResponse.Content.ReadAsStringAsync();
+    }
+
+    [Then(@"the SEO page responds successfully as ""(.*)""")]
+    public void ThenTheSeoPageRespondsSuccessfullyAs(string expectedContentType)
+    {
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        Assert.Contains(expectedContentType, _lastResponse.Content.Headers.ContentType?.MediaType ?? string.Empty, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Then(@"the SEO page contains the recipe name ""(.*)""")]
+    public void ThenTheSeoPageContainsRecipeName(string name) =>
+        Assert.Contains(name, _lastResponseBody, StringComparison.Ordinal);
+
+    [Then(@"the SEO page contains a meta description")]
+    public void ThenTheSeoPageContainsMetaDescription() =>
+        Assert.Contains("<meta name=\"description\"", _lastResponseBody, StringComparison.Ordinal);
+
+    [When(@"I request the responsible-consumption message for the ""(.*)"" surface")]
+    public async Task WhenIRequestTheResponsibleConsumptionMessage(string surface)
+    {
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        _lastResponse = await client.GetAsync(new Uri($"/api/v1/compliance/messaging?surface={Uri.EscapeDataString(surface)}", UriKind.Relative));
+        await CaptureJsonAsync();
+    }
+
+    [Then(@"the messaging response includes a message content key")]
+    public void ThenMessagingIncludesContentKey()
+    {
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        Assert.False(string.IsNullOrWhiteSpace(_lastJson!.RootElement.GetProperty("messageContentKey").GetString()));
+    }
+
+    [When(@"I request the support resources")]
+    public async Task WhenIRequestSupportResources()
+    {
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        _lastResponse = await client.GetAsync(new Uri("/api/v1/compliance/support-resources", UriKind.Relative));
+        await CaptureJsonAsync();
+    }
+
+    [Then(@"the support resources response includes at least one resource")]
+    public void ThenSupportResourcesIncludesAtLeastOne()
+    {
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        Assert.True(_lastJson!.RootElement.GetProperty("items").GetArrayLength() > 0);
+    }
 
     private async Task RequestRecipeAsync(Guid id)
     {

@@ -22,6 +22,12 @@ void main() {
       // TODO
     });
 
+    // Resolved parent-ingredient name (contract sweep).
+    // String parentName
+    test('to test the property `parentName`', () async {
+      // TODO
+    });
+
     // BuiltList<String> sources
     test('to test the property `sources`', () async {
       // TODO
@@ -44,6 +50,12 @@ void main() {
 
     // String definingRecipeId
     test('to test the property `definingRecipeId`', () async {
+      // TODO
+    });
+
+    // Resolved defining-recipe name for house-made ingredients (contract sweep).
+    // String definingRecipeName
+    test('to test the property `definingRecipeName`', () async {
       // TODO
     });
 
