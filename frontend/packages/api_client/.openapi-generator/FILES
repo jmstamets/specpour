@@ -3,6 +3,7 @@
 README.md
 analysis_options.yaml
 doc/AgeGateResponse.md
+doc/AuthAccount.md
 doc/AuthorizationApi.md
 doc/AutoLinkMatch.md
 doc/AutoLinkResponse.md
@@ -26,6 +27,7 @@ doc/GlossaryArticleSummary.md
 doc/GlossaryTermDetail.md
 doc/GlossaryTermPage.md
 doc/GlossaryTermSummary.md
+doc/IdentityApi.md
 doc/InboxMessage.md
 doc/InboxPage.md
 doc/IngredientDetail.md
@@ -34,12 +36,14 @@ doc/IngredientRecipeRef.md
 doc/IngredientRecipes.md
 doc/IngredientSummary.md
 doc/IngredientsApi.md
+doc/LoginRequest.md
 doc/NotificationsApi.md
 doc/ProblemDetails.md
 doc/RecipeDetail.md
 doc/RecipeIngredientLine.md
 doc/RecipePage.md
 doc/RecipeSummary.md
+doc/RegisterRequest.md
 doc/ResponsibleConsumptionMessageResponse.md
 doc/RoleGrantSummary.md
 doc/SearchApi.md
@@ -54,6 +58,7 @@ lib/src/api/catalog_api.dart
 lib/src/api/compliance_api.dart
 lib/src/api/equipment_api.dart
 lib/src/api/glossary_api.dart
+lib/src/api/identity_api.dart
 lib/src/api/ingredients_api.dart
 lib/src/api/notifications_api.dart
 lib/src/api/search_api.dart
@@ -65,6 +70,7 @@ lib/src/auth/bearer_auth.dart
 lib/src/auth/oauth.dart
 lib/src/date_serializer.dart
 lib/src/model/age_gate_response.dart
+lib/src/model/auth_account.dart
 lib/src/model/auto_link_match.dart
 lib/src/model/auto_link_response.dart
 lib/src/model/concept_detail.dart
@@ -91,11 +97,13 @@ lib/src/model/ingredient_page.dart
 lib/src/model/ingredient_recipe_ref.dart
 lib/src/model/ingredient_recipes.dart
 lib/src/model/ingredient_summary.dart
+lib/src/model/login_request.dart
 lib/src/model/problem_details.dart
 lib/src/model/recipe_detail.dart
 lib/src/model/recipe_ingredient_line.dart
 lib/src/model/recipe_page.dart
 lib/src/model/recipe_summary.dart
+lib/src/model/register_request.dart
 lib/src/model/responsible_consumption_message_response.dart
 lib/src/model/role_grant_summary.dart
 lib/src/model/search_result.dart
@@ -105,6 +113,7 @@ lib/src/model/support_resources_response.dart
 lib/src/serializers.dart
 pubspec.yaml
 test/age_gate_response_test.dart
+test/auth_account_test.dart
 test/authorization_api_test.dart
 test/auto_link_match_test.dart
 test/auto_link_response_test.dart
@@ -128,6 +137,7 @@ test/glossary_article_summary_test.dart
 test/glossary_term_detail_test.dart
 test/glossary_term_page_test.dart
 test/glossary_term_summary_test.dart
+test/identity_api_test.dart
 test/inbox_message_test.dart
 test/inbox_page_test.dart
 test/ingredient_detail_test.dart
@@ -136,12 +146,14 @@ test/ingredient_recipe_ref_test.dart
 test/ingredient_recipes_test.dart
 test/ingredient_summary_test.dart
 test/ingredients_api_test.dart
+test/login_request_test.dart
 test/notifications_api_test.dart
 test/problem_details_test.dart
 test/recipe_detail_test.dart
 test/recipe_ingredient_line_test.dart
 test/recipe_page_test.dart
 test/recipe_summary_test.dart
+test/register_request_test.dart
 test/responsible_consumption_message_response_test.dart
 test/role_grant_summary_test.dart
 test/search_api_test.dart

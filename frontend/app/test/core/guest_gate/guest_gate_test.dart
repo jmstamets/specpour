@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:specpour_app/core/api/api_client_provider.dart';
 import 'package:specpour_app/core/guest_gate/guest_gate.dart';
 import 'package:specpour_app/core/guest_gate/pending_intent.dart';
@@ -93,5 +94,54 @@ void main() {
 
     expect(ran, isTrue);
     expect(find.byKey(const Key('accountGateSignInPrompt')), findsNothing);
+  });
+
+  testWidgets('tapping "Sign in" on the prompt navigates to the sign-in route', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => Consumer(
+            builder: (context, ref, _) => Scaffold(
+              body: ElevatedButton(
+                key: const Key('gatedAction'),
+                onPressed: () => requireAccount(
+                  ref: ref,
+                  context: context,
+                  actionLabel: 'save this recipe',
+                  onAuthenticated: () {},
+                ),
+                child: const Text('Save'),
+              ),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/sign-in',
+          builder: (context, state) =>
+              const Scaffold(body: Text('SIGN IN', key: Key('signInMarker'))),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp.router(
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byKey(const Key('gatedAction')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('accountGateSignInButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('signInMarker')), findsOneWidget);
   });
 }

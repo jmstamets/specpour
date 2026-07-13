@@ -31,7 +31,15 @@ public static class CorsExtensions
                 policy.SetIsOriginAllowed(IsLocalhostOrigin);
             }
 
-            policy.AllowAnyHeader().AllowAnyMethod();
+            // T047/ADR-0003: the web client's cookie-based sign-in flow (register/
+            // login set a cookie; /connect/authorize redeems it) is a cross-origin
+            // request from the app's own origin to the API's — without
+            // AllowCredentials, the browser would silently drop the Set-Cookie
+            // response and never send it back, breaking the whole flow with no
+            // visible error (found before it ever reached a real browser).
+            // Compatible with WithOrigins/SetIsOriginAllowed above; CORS forbids
+            // AllowCredentials only alongside a wildcard AllowAnyOrigin, unused here.
+            policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
         }));
 
         return services;

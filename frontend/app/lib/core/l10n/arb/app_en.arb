@@ -244,5 +244,57 @@
   "equipmentDetailApplicationsTitle": "Typical uses",
   "@equipmentDetailApplicationsTitle": {
     "description": "T156 equipment detail: label for the list of typical applications."
+  },
+  "registerTitle": "Create account",
+  "@registerTitle": {
+    "description": "T055 registration screen title."
+  },
+  "registerEmailLabel": "Email",
+  "@registerEmailLabel": {
+    "description": "T055 registration screen: email field label."
+  },
+  "registerPasswordLabel": "Password",
+  "@registerPasswordLabel": {
+    "description": "T055 registration screen: password field label."
+  },
+  "registerDisplayNameLabel": "Display name",
+  "@registerDisplayNameLabel": {
+    "description": "T055 registration screen: display name field label."
+  },
+  "registerDateOfBirthLabel": "Date of birth",
+  "@registerDateOfBirthLabel": {
+    "description": "T055 registration screen: date-of-birth field label (a real date picker, never a checkbox, same as the age gate)."
+  },
+  "registerDateOfBirthHint": "Select your date of birth",
+  "@registerDateOfBirthHint": {
+    "description": "T055 registration screen: date-picker placeholder before a date is chosen."
+  },
+  "registerSubmitButton": "Create account",
+  "@registerSubmitButton": {
+    "description": "T055 registration screen: submit button."
+  },
+  "registerMissingFieldsError": "Please fill in every field.",
+  "@registerMissingFieldsError": {
+    "description": "T055 registration screen: client-side validation message when a required field is empty."
+  },
+  "registerSignInInstead": "Already have an account? Sign in",
+  "@registerSignInInstead": {
+    "description": "T055 registration screen: link to the sign-in screen."
+  },
+  "signInTitle": "Sign in",
+  "@signInTitle": {
+    "description": "T055 sign-in screen title."
+  },
+  "signInSubmitButton": "Sign in",
+  "@signInSubmitButton": {
+    "description": "T055 sign-in screen: submit button."
+  },
+  "signInMissingFieldsError": "Please enter your email and password.",
+  "@signInMissingFieldsError": {
+    "description": "T055 sign-in screen: client-side validation message."
+  },
+  "signInRegisterInstead": "Don't have an account? Create one",
+  "@signInRegisterInstead": {
+    "description": "T055 sign-in screen: link to the registration screen."
   }
 }

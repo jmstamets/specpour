@@ -11,6 +11,8 @@ import '../../features/discover/discover_screen.dart';
 import '../../features/discover/equipment_detail/equipment_detail_screen.dart';
 import '../../features/discover/ingredient_detail/ingredient_detail_screen.dart';
 import '../../features/discover/recipe_detail/recipe_detail_screen.dart';
+import '../../features/identity/register_screen.dart';
+import '../../features/identity/sign_in_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -48,6 +50,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'equipmentDetail',
         builder: (context, state) =>
             EquipmentDetailScreen(equipmentId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/sign-in',
+        name: 'signIn',
+        builder: (context, state) => const SignInScreen(),
       ),
     ],
   );

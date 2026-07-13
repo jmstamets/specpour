@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore; // OpenIddictServerAspNetCoreHelpers: HttpContext.GetOpenIddictServerRequest()
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -31,11 +30,11 @@ public static class TokenEndpoints
 
     private static async Task<IResult> HandleAuthorizeAsync(HttpContext httpContext, UserManager<ApplicationUser> userManager)
     {
-        var result = await httpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        var result = await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
         if (result.Succeeded is not true || result.Principal is null)
         {
             return Results.Challenge(
-                authenticationSchemes: [CookieAuthenticationDefaults.AuthenticationScheme],
+                authenticationSchemes: [IdentityConstants.ApplicationScheme],
                 properties: new AuthenticationProperties { RedirectUri = httpContext.Request.GetEncodedUrl() });
         }
 

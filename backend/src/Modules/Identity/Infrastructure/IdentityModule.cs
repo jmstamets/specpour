@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
+using OpenIddict.Validation.AspNetCore;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Identity.Application.Ports;
@@ -57,22 +59,68 @@ public sealed class IdentityModule : IModule
             });
 
         services.AddScoped<IDateOfBirthCipher, DataProtectionDateOfBirthCipher>();
+        services.AddScoped<Contracts.IAgePredicatePort, AgePredicateAdapter>();
 
         services.AddIdentityCore<ApplicationUser>(options =>
             {
                 options.User.RequireUniqueEmail = true;
                 options.SignIn.RequireConfirmedEmail = true;
+
+                // T047: "modern credential handling" (FR-001) follows current NIST
+                // 800-63B guidance — length is the meaningful strength signal, not
+                // arbitrary composition rules (which push users toward predictable
+                // substitutions like "Password1!"). RequiredLength=12 was already set
+                // in T017; the other four ASP.NET Core Identity defaults
+                // (RequireDigit/RequireLowercase/RequireUppercase/RequireNonAlphanumeric,
+                // all true by default) were never explicitly overridden until this
+                // task actually exercised the policy — long passphrases like "correct
+                // horse battery staple" should be accepted.
                 options.Password.RequiredLength = 12;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
             })
             .AddEntityFrameworkStores<IdentityDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            // AddIdentityCore alone doesn't register SignInManager<TUser> — T047's
+            // register/login endpoints need it to establish the cookie session
+            // /connect/authorize depends on.
+            .AddSignInManager();
 
         // Cookie auth backs the interactive /connect/authorize step (the caller must
         // already be signed in via a cookie session before a code can be issued — see
-        // TokenEndpoints.HandleAuthorizeAsync); a login endpoint that establishes that
-        // cookie session lands in T047/T051.
-        services.AddAuthentication(options => options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie();
+        // TokenEndpoints.HandleAuthorizeAsync). Registered under IdentityConstants.
+        // ApplicationScheme ("Identity.Application") rather than the generic
+        // CookieAuthenticationDefaults name: SignInManager.SignInAsync (T047's
+        // AuthEndpoints) signs in against that scheme by convention, and
+        // TokenEndpoints must authenticate against the SAME scheme name or the two
+        // halves of "establish a cookie, then redeem it at /connect/authorize" never
+        // agree on which cookie they mean.
+        //
+        // The actual DEFAULT scheme is a policy scheme that picks cookie vs. bearer
+        // per-request (standard ASP.NET Core hybrid-auth pattern): endpoints that read
+        // httpContext.User without an explicit RequireAuthorization/scheme (e.g.
+        // EntitlementsEndpoint's guest-or-authenticated GetEntitlementManifestAsync)
+        // would otherwise only ever see the cookie scheme's view — an Authorization:
+        // Bearer header would sit unused. Discovered via T045's acceptance test: the
+        // first real end-to-end bearer token this codebase ever minted, checked
+        // against GET /me/entitlements, resolved as "guest" despite a valid token.
+        const string HybridSchemeName = "SpecPour.CookieOrBearer";
+        services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = HybridSchemeName;
+                options.DefaultChallengeScheme = HybridSchemeName;
+            })
+            .AddPolicyScheme(HybridSchemeName, "Cookie or bearer, selected per-request", options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                    context.Request.Headers.TryGetValue("Authorization", out StringValues authorization)
+                    && authorization.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                        ? OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
+                        : IdentityConstants.ApplicationScheme;
+            })
+            .AddCookie(IdentityConstants.ApplicationScheme);
 
         services.AddOpenIddict()
             .AddCore(options => options.UseEntityFrameworkCore().UseDbContext<IdentityDbContext>())
@@ -117,7 +165,8 @@ public sealed class IdentityModule : IModule
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
         TokenEndpoints.Map(endpoints);
+        Endpoints.AuthEndpoints.Map(endpoints);
 
-        // Registration, sign-in, MFA, session, and lifecycle endpoints land in T047-T054.
+        // MFA, session, and lifecycle endpoints land in T049-T054.
     }
 }

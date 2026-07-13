@@ -15,6 +15,7 @@ import 'package:api_client/src/date_serializer.dart';
 import 'package:api_client/src/model/date.dart';
 
 import 'package:api_client/src/model/age_gate_response.dart';
+import 'package:api_client/src/model/auth_account.dart';
 import 'package:api_client/src/model/auto_link_match.dart';
 import 'package:api_client/src/model/auto_link_response.dart';
 import 'package:api_client/src/model/concept_detail.dart';
@@ -40,11 +41,13 @@ import 'package:api_client/src/model/ingredient_page.dart';
 import 'package:api_client/src/model/ingredient_recipe_ref.dart';
 import 'package:api_client/src/model/ingredient_recipes.dart';
 import 'package:api_client/src/model/ingredient_summary.dart';
+import 'package:api_client/src/model/login_request.dart';
 import 'package:api_client/src/model/problem_details.dart';
 import 'package:api_client/src/model/recipe_detail.dart';
 import 'package:api_client/src/model/recipe_ingredient_line.dart';
 import 'package:api_client/src/model/recipe_page.dart';
 import 'package:api_client/src/model/recipe_summary.dart';
+import 'package:api_client/src/model/register_request.dart';
 import 'package:api_client/src/model/responsible_consumption_message_response.dart';
 import 'package:api_client/src/model/role_grant_summary.dart';
 import 'package:api_client/src/model/search_result.dart';
@@ -56,6 +59,7 @@ part 'serializers.g.dart';
 
 @SerializersFor([
   AgeGateResponse,
+  AuthAccount,
   AutoLinkMatch,
   AutoLinkResponse,
   ConceptDetail,
@@ -81,11 +85,13 @@ part 'serializers.g.dart';
   IngredientRecipeRef,
   IngredientRecipes,
   IngredientSummary,
+  LoginRequest,
   ProblemDetails,
   RecipeDetail,
   RecipeIngredientLine,
   RecipePage,
   RecipeSummary,
+  RegisterRequest,
   ResponsibleConsumptionMessageResponse,
   RoleGrantSummary,
   SearchResult,

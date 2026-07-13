@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\SpecPour.Modules.Compliance.Application.csproj" />
+    <ProjectReference Include="..\Contracts\SpecPour.Modules.Compliance.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

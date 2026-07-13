@@ -1,0 +1,97 @@
+register:
+  post:
+    operationId: registerAccount
+    tags: [identity]
+    summary: Email/password registration with DOB capture and underage rejection (FR-001/FR-002/FR-002c, T047)
+    description: >-
+      Anonymous. Rejects underage attempts with 403 and persists nothing (no DOB, no
+      identifying record of the attempt) — FR-002c. On success, establishes the
+      caller's cookie session (ADR-0003); the client then completes the standard
+      authorization-code+PKCE exchange against /connect/authorize and /connect/token
+      to obtain API access/refresh tokens — this endpoint never returns a token
+      directly.
+    security:
+      - {}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterRequest'
+    responses:
+      '201':
+        description: Account created; cookie session established.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthAccount'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '403':
+        description: Underage registration attempt — rejected, nothing persisted (FR-002c).
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ProblemDetails'
+
+login:
+  post:
+    operationId: login
+    tags: [identity]
+    summary: Email/password sign-in, establishing the cookie session (T047)
+    description: >-
+      Anonymous. On success, establishes the caller's cookie session (ADR-0003); the
+      client then completes the standard authorization-code+PKCE exchange to obtain
+      API access/refresh tokens, same as registration.
+    security:
+      - {}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoginRequest'
+    responses:
+      '200':
+        description: Signed in; cookie session established.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthAccount'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password, minLength: 12 }
+        displayName: { type: string }
+        dateOfBirth:
+          type: string
+          format: date
+          description: >-
+            Accepted as input only — never stored in plaintext (FR-002b) and never
+            echoed back in this or any other response.
+        unitPreference: { type: string, enum: [Milliliters, Ounces, Centiliters] }
+        locale: { type: string }
+      required: [email, password, displayName, dateOfBirth]
+    LoginRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+      required: [email, password]
+    AuthAccount:
+      type: object
+      description: >-
+        Deliberately minimal — no dateOfBirth field (sensitive-PII invariant, see
+        this document's top-level description) and no token (ADR-0003: tokens come
+        from the standard /connect/token exchange, never from these endpoints).
+      properties:
+        userId: { type: string, format: uuid }
+        email: { type: string, format: email }
+        displayName: { type: string }
+      required: [userId, email, displayName]

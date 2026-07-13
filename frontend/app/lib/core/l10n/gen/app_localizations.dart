@@ -489,6 +489,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Typical uses'**
   String get equipmentDetailApplicationsTitle;
+
+  /// T055 registration screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get registerTitle;
+
+  /// T055 registration screen: email field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get registerEmailLabel;
+
+  /// T055 registration screen: password field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get registerPasswordLabel;
+
+  /// T055 registration screen: display name field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get registerDisplayNameLabel;
+
+  /// T055 registration screen: date-of-birth field label (a real date picker, never a checkbox, same as the age gate).
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth'**
+  String get registerDateOfBirthLabel;
+
+  /// T055 registration screen: date-picker placeholder before a date is chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your date of birth'**
+  String get registerDateOfBirthHint;
+
+  /// T055 registration screen: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get registerSubmitButton;
+
+  /// T055 registration screen: client-side validation message when a required field is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in every field.'**
+  String get registerMissingFieldsError;
+
+  /// T055 registration screen: link to the sign-in screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get registerSignInInstead;
+
+  /// T055 sign-in screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signInTitle;
+
+  /// T055 sign-in screen: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signInSubmitButton;
+
+  /// T055 sign-in screen: client-side validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email and password.'**
+  String get signInMissingFieldsError;
+
+  /// T055 sign-in screen: link to the registration screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Create one'**
+  String get signInRegisterInstead;
 }
 
 class _AppLocalizationsDelegate

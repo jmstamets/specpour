@@ -48,6 +48,16 @@ dependencies:
   drift_flutter: ^0.3.1
   shared_preferences: ^2.5.5
 
+  # T047/ADR-0003: the identity sign-in flow needs direct Dio/cookie-jar access
+  # (register/login establish a cookie; the client then drives the
+  # authorization-code+PKCE exchange itself against /connect/authorize +
+  # /connect/token, reusing that cookie) — dio was previously dev-only (test
+  # fake-interceptor doubles); now needed in lib/ too.
+  dio: ^5.10.0
+  cookie_jar: ^4.0.8
+  dio_cookie_manager: ^3.2.0
+  crypto: ^3.0.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -62,7 +72,6 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   drift_dev: ^2.34.0
   build_runner: ^2.15.1
-  dio: ^5.10.0
 flutter:
 
   # Regenerates lib/core/l10n/gen/ from lib/core/l10n/arb/ (see l10n.yaml) on every

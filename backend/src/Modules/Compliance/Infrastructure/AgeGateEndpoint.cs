@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using SpecPour.BuildingBlocks.Http;
-using SpecPour.Modules.Compliance.Application.Ports;
+using SpecPour.Modules.Compliance.Contracts;
 using SpecPour.Modules.Compliance.Domain;
 
 namespace SpecPour.Modules.Compliance.Infrastructure;
@@ -20,7 +20,7 @@ public static class AgeGateEndpoint
         string surface,
         HttpContext httpContext,
         ComplianceDbContext db,
-        IGeoIpPort geoIp,
+        ILegalDrinkingAgePort legalDrinkingAge,
         CancellationToken cancellationToken)
     {
         var strictness = await db.SurfaceGateConfigs
@@ -30,25 +30,16 @@ public static class AgeGateEndpoint
             // (Principle XIII regulated-industry posture: unconfigured means gated).
             .FirstOrDefaultAsync(cancellationToken) ?? GateStrictness.Mandatory;
 
-        var remoteIp = httpContext.Connection.RemoteIpAddress;
-        var jurisdictionCode = remoteIp is not null
-            ? await geoIp.ResolveJurisdictionAsync(remoteIp, cancellationToken)
-            : null;
-
-        var strictestRuleApplied = jurisdictionCode is null;
-        var effectiveCode = jurisdictionCode ?? JurisdictionRule.DefaultCode;
-
-        var rule = await db.JurisdictionRules.FindAsync([effectiveCode], cancellationToken)
-            ?? await db.JurisdictionRules.FindAsync([JurisdictionRule.DefaultCode], cancellationToken)
-            ?? throw new InvalidOperationException("No default JurisdictionRule row is seeded.");
-
-        var appliedDefault = strictestRuleApplied || rule.JurisdictionCode == JurisdictionRule.DefaultCode;
+        // T155-pattern contract sweep: jurisdiction resolution moved to
+        // ILegalDrinkingAgePort so Identity's registration endpoint (T047) can reuse
+        // the identical logic — this handler's own behavior is unchanged.
+        var rule = await legalDrinkingAge.ResolveFromIpAsync(httpContext.Connection.RemoteIpAddress, cancellationToken);
 
         return new AgeGateResponse(
             strictness.ToString().ToLowerInvariant(),
             rule.JurisdictionCode,
             rule.LegalDrinkingAge,
-            appliedDefault);
+            rule.StrictestRuleApplied);
     }
 }
 

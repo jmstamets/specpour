@@ -53,6 +53,10 @@ tags:
   - name: seo
 
 paths:
+  /auth/register:
+    $ref: './paths/identity.yaml#/register'
+  /auth/login:
+    $ref: './paths/identity.yaml#/login'
   /me/entitlements:
     $ref: './paths/authorization.yaml#/meEntitlements'
   /compliance/age-gate:

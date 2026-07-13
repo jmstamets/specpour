@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using SpecPour.Tests.Contract.Support;
 
 namespace SpecPour.Tests.Contract;
@@ -44,6 +45,93 @@ public sealed class OpenApiConformanceTests(ComposedHostFixture host)
         Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
 
         var result = await OpenApiResponseValidator.ValidateAsync("GET", "/api/v1/inbox", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task PostAuthRegister_conforms_to_its_schema()
+    {
+        var payload = new
+        {
+            email = $"conformance-{Guid.NewGuid():N}@example.test",
+            password = "correct horse battery staple",
+            displayName = "Conformance Test",
+            dateOfBirth = "1990-01-01",
+        };
+
+        // Fresh client: registering sets a cookie, and host.Client is shared across
+        // every test in this fixture — other tests assume anonymous state on it.
+        using var client = host.CreateFreshClient();
+        var response = await client.PostAsJsonAsync(new Uri("/api/v1/auth/register", UriKind.Relative), payload);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
+        Assert.DoesNotContain("dateOfBirth", body, StringComparison.OrdinalIgnoreCase);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", "/api/v1/auth/register", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task PostAuthRegister_underage_conforms_to_its_403_schema()
+    {
+        var payload = new
+        {
+            email = $"conformance-underage-{Guid.NewGuid():N}@example.test",
+            password = "correct horse battery staple",
+            displayName = "Conformance Test",
+            dateOfBirth = DateTime.UtcNow.AddYears(-10).ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+        };
+
+        var response = await host.Client.PostAsJsonAsync(new Uri("/api/v1/auth/register", UriKind.Relative), payload);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", "/api/v1/auth/register", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task PostAuthLogin_conforms_to_its_401_schema()
+    {
+        var payload = new { email = "no-such-user@example.test", password = "whatever12345" };
+
+        var response = await host.Client.PostAsJsonAsync(new Uri("/api/v1/auth/login", UriKind.Relative), payload);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", "/api/v1/auth/login", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task PostAuthLogin_conforms_to_its_200_schema()
+    {
+        var email = $"conformance-login-{Guid.NewGuid():N}@example.test";
+        const string password = "correct horse battery staple";
+
+        // Fresh clients throughout: host.Client is shared across every test in this
+        // fixture, and registering/signing in sets a cookie — using it here would
+        // leak a signed-in session onto other tests that assume anonymous state.
+        using var registrationClient = host.CreateFreshClient();
+        await registrationClient.PostAsJsonAsync(
+            new Uri("/api/v1/auth/register", UriKind.Relative),
+            new { email, password, displayName = "Conformance Login Test", dateOfBirth = "1990-01-01" });
+
+        using var freshClient = host.CreateFreshClient();
+        var response = await freshClient.PostAsJsonAsync(new Uri("/api/v1/auth/login", UriKind.Relative), new { email, password });
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain("dateOfBirth", body, StringComparison.OrdinalIgnoreCase);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", "/api/v1/auth/login", (int)response.StatusCode, body);
 
         Assert.True(result.IsValid, DescribeErrors(result, body));
     }

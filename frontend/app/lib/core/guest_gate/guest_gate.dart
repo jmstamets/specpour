@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../api/api_client_provider.dart';
 import '../l10n/gen/app_localizations.dart';
@@ -79,17 +80,23 @@ class GuestGatePrompt extends ConsumerWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              // Navigation to the sign-in/register screens is wired by T055;
-              // until then these dismiss the sheet with the intent still captured.
+              // The intent stays captured (pendingGuestIntentProvider) across this
+              // navigation — the sign-in/register screen replays it on success.
               ElevatedButton(
                 key: const Key('accountGateSignInButton'),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.push('/sign-in');
+                },
                 child: Text(l10n.guestGateSignInButton),
               ),
               const SizedBox(width: 12),
               OutlinedButton(
                 key: const Key('accountGateRegisterButton'),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.push('/register');
+                },
                 child: Text(l10n.guestGateRegisterButton),
               ),
               const Spacer(),

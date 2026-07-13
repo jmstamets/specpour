@@ -216,4 +216,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get equipmentDetailApplicationsTitle => 'Typical uses';
+
+  @override
+  String get registerTitle => 'Create account';
+
+  @override
+  String get registerEmailLabel => 'Email';
+
+  @override
+  String get registerPasswordLabel => 'Password';
+
+  @override
+  String get registerDisplayNameLabel => 'Display name';
+
+  @override
+  String get registerDateOfBirthLabel => 'Date of birth';
+
+  @override
+  String get registerDateOfBirthHint => 'Select your date of birth';
+
+  @override
+  String get registerSubmitButton => 'Create account';
+
+  @override
+  String get registerMissingFieldsError => 'Please fill in every field.';
+
+  @override
+  String get registerSignInInstead => 'Already have an account? Sign in';
+
+  @override
+  String get signInTitle => 'Sign in';
+
+  @override
+  String get signInSubmitButton => 'Sign in';
+
+  @override
+  String get signInMissingFieldsError =>
+      'Please enter your email and password.';
+
+  @override
+  String get signInRegisterInstead => 'Don\'t have an account? Create one';
 }

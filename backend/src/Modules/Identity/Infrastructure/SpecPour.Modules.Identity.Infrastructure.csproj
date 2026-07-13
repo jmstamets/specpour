@@ -8,6 +8,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\SpecPour.Modules.Identity.Application.csproj" />
+    <ProjectReference Include="..\Contracts\SpecPour.Modules.Identity.Contracts.csproj" />
+    <!-- Cross-module Contracts-only dependencies (constitution Principle III): T047's
+         registration endpoint validates a submitted DOB against Compliance's
+         jurisdiction-aware legal-drinking-age rule (the same one GET /compliance/age-gate
+         uses), and T048's age-predicate port audit-logs every decrypt through
+         Authorization's shared audit writer. -->
+    <ProjectReference Include="..\..\Compliance\Contracts\SpecPour.Modules.Compliance.Contracts.csproj" />
+    <ProjectReference Include="..\..\Authorization\Contracts\SpecPour.Modules.Authorization.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

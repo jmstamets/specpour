@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Compliance.Application.Ports;
+using SpecPour.Modules.Compliance.Contracts;
 
 namespace SpecPour.Modules.Compliance.Infrastructure;
 
@@ -31,6 +32,7 @@ public sealed class ComplianceModule : IModule
         services.AddSpecPourOutboxWriter(Name);
 
         services.AddSingleton<IGeoIpPort, MaxMindGeoIpAdapter>();
+        services.AddScoped<ILegalDrinkingAgePort, LegalDrinkingAgeAdapter>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)

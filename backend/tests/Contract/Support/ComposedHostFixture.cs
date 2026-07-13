@@ -24,6 +24,14 @@ public sealed class ComposedHostFixture : IAsyncLifetime
 
     public HttpClient Client { get; private set; } = null!;
 
+    /// <summary>
+    /// A new client against the same composed host, with its own (empty) cookie
+    /// jar — for tests that need to exercise "not yet signed in" against a host
+    /// that other tests may have already established a cookie session on via the
+    /// shared <see cref="Client"/>.
+    /// </summary>
+    public HttpClient CreateFreshClient() => _factory!.CreateClient();
+
     public async Task InitializeAsync()
     {
         _postgres = new PostgreSqlBuilder("postgis/postgis:17-3.5")

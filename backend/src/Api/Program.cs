@@ -7,6 +7,7 @@ using SpecPour.Api.RateLimiting;
 using SpecPour.Api.Seo;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Http;
+using SpecPour.BuildingBlocks.Identifiers;
 using SpecPour.BuildingBlocks.Time;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,11 @@ builder.Services.AddSpecPourOutboxDispatcher(connectionString);
 // T026: acceptance tests override this with a settable TestClock via
 // WebApplicationFactory's ConfigureTestServices — production always gets real time.
 builder.Services.AddSingleton<IClock, SystemClock>();
+// T047: host-level so every module gets the same UUIDv7 convention (data-model.md's
+// "stable, non-reusable identifier suitable for future POS mapping," FR-059) without
+// re-registering it per module — previously only Seeder's own standalone service
+// collection had this, so the API host itself had no registration at all.
+builder.Services.AddSingleton<IUuidGenerator, UuidV7Generator>();
 
 foreach (var module in ModuleRegistry.All)
 {
