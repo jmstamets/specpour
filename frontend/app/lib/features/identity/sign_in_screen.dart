@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/guest_gate/guest_gate.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import 'social_sign_in_buttons.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
@@ -43,12 +44,17 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     });
 
     try {
-      await ref.read(identityAuthServiceProvider).signIn(
+      final requiresMfa = await ref.read(identityAuthServiceProvider).signIn(
             email: _emailController.text,
             password: _passwordController.text,
           );
 
       if (!mounted) {
+        return;
+      }
+
+      if (requiresMfa) {
+        context.push('/mfa-challenge');
         return;
       }
 
@@ -114,6 +120,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               onPressed: () => context.push('/register'),
               child: Text(l10n.signInRegisterInstead),
             ),
+            TextButton(
+              key: const Key('signInForgotPasswordLink'),
+              onPressed: () => context.push('/recovery'),
+              child: Text(l10n.signInForgotPasswordLink),
+            ),
+            const SocialSignInButtons(),
           ],
         ),
       ),

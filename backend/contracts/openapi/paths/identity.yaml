@@ -34,6 +34,89 @@ register:
             schema:
               $ref: '../openapi.yaml#/components/schemas/ProblemDetails'
 
+externalChallenge:
+  get:
+    operationId: challengeExternalSignIn
+    tags: [identity]
+    summary: Start social sign-in with a provider (T049)
+    description: >-
+      Anonymous. A real browser-redirect OAuth handshake, not a "submit a token you
+      already have" endpoint — redirects to the provider's own consent screen. The
+      client opens this URL in a system browser/tab (not a WebView — providers
+      discourage or block WebView-embedded sign-in) and waits for redirectUri to be
+      hit. redirectUri receives requiresMfa=true|false on success, or
+      needsDateOfBirth=true when this is a brand-new account (FR-002 requires a date
+      of birth for every registration method — the caller must then call POST
+      /auth/external/complete-registration), or error=external_auth_failed.
+    security:
+      - {}
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, apple, microsoft] }
+      - name: redirectUri
+        in: query
+        required: true
+        schema: { type: string }
+        description: Where the browser ends up when the whole flow (including any DOB completion) is done.
+    responses:
+      '302':
+        description: Redirect to the provider's consent screen.
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+externalCallback:
+  get:
+    operationId: externalSignInCallback
+    tags: [identity]
+    summary: Provider redirect target — not called directly by clients (T049)
+    security:
+      - {}
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string }
+    responses:
+      '302':
+        description: Redirect back to the redirectUri supplied to the challenge step.
+
+externalCompleteRegistration:
+  post:
+    operationId: completeExternalRegistration
+    tags: [identity]
+    summary: Finish a new account after social sign-in supplied no date of birth (T049)
+    description: >-
+      Anonymous — call this after the callback redirected with needsDateOfBirth=true.
+      Reads the pending external identity from the short-lived cookie the callback
+      step left in place; there is nothing else to authenticate this call with yet.
+      Same FR-002c underage handling as POST /auth/register: nothing is persisted on
+      rejection.
+    security:
+      - {}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CompleteExternalRegistrationRequest'
+    responses:
+      '201':
+        description: Account created; cookie session established.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthAccount'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '403':
+        description: Underage registration attempt — rejected, nothing persisted (FR-002c).
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ProblemDetails'
+
 login:
   post:
     operationId: login
@@ -53,13 +136,142 @@ login:
             $ref: '#/components/schemas/LoginRequest'
     responses:
       '200':
+        description: >-
+          Either a completed sign-in (requiresMfa=false, user fields populated) or an
+          MFA challenge (requiresMfa=true, user fields null) — call POST
+          /auth/login/mfa with a TOTP code to finish.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginResult'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+loginMfa:
+  post:
+    operationId: loginMfa
+    tags: [identity]
+    summary: Complete a sign-in that requiresMfa (T050)
+    description: >-
+      Anonymous (the caller isn't authenticated yet — the interim state is carried by
+      a short-lived cookie login set, not a bearer token). Call this after a login
+      response with requiresMfa=true, submitting the current 6-digit code from the
+      caller's authenticator app.
+    security:
+      - {}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoginMfaRequest'
+    responses:
+      '200':
         description: Signed in; cookie session established.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/AuthAccount'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
       '401':
         $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+recoveryRequest:
+  post:
+    operationId: requestAccountRecovery
+    tags: [identity]
+    summary: Request account recovery (T050, FR — lost-credential recovery)
+    description: >-
+      Anonymous. Always returns 202 regardless of whether the email matches an
+      account, to avoid account enumeration. If it matches, an email with a recovery
+      code is sent via the notifications email channel.
+    security:
+      - {}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecoveryRequest'
+    responses:
+      '202':
+        description: Recovery request accepted (irrespective of whether the account exists).
+
+recoveryConfirm:
+  post:
+    operationId: confirmAccountRecovery
+    tags: [identity]
+    summary: Complete account recovery with the emailed code and a new password (T050)
+    security:
+      - {}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecoveryConfirmRequest'
+    responses:
+      '200':
+        description: Password reset; the caller can now sign in with the new password.
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+meMfa:
+  get:
+    operationId: getMfaStatus
+    tags: [identity]
+    summary: Get the caller's TOTP MFA enrollment status (T050)
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Current MFA status.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaStatus'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+  post:
+    operationId: enrollOrConfirmMfa
+    tags: [identity]
+    summary: Start or confirm TOTP MFA enrollment (T050)
+    description: >-
+      Two-phase over a single endpoint: an empty/no-code body starts enrollment
+      (issues a new secret + otpauth:// URI for the caller's authenticator app); a
+      body carrying the 6-digit code confirms the most recently issued secret and
+      enables MFA. The secret/URI are returned only from the start-enrollment
+      response, never again afterward.
+    security:
+      - bearerAuth: []
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EnrollMfaRequest'
+    responses:
+      '200':
+        description: Enrollment started (secret issued) or confirmed (enabled).
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaEnrollment'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  delete:
+    operationId: disableMfa
+    tags: [identity]
+    summary: Disable TOTP MFA (T050)
+    security:
+      - bearerAuth: []
+    responses:
+      '204':
+        description: MFA disabled (idempotent — also 204 if it was never enabled).
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
 
 components:
   schemas:
@@ -95,3 +307,61 @@ components:
         email: { type: string, format: email }
         displayName: { type: string }
       required: [userId, email, displayName]
+    CompleteExternalRegistrationRequest:
+      type: object
+      properties:
+        dateOfBirth:
+          type: string
+          format: date
+          description: Same input-only, never-echoed-back handling as RegisterRequest.dateOfBirth.
+        displayName: { type: string, description: Used only if the provider didn't share a name. }
+        unitPreference: { type: string, enum: [Milliliters, Ounces, Centiliters] }
+        locale: { type: string }
+      required: [dateOfBirth, displayName]
+    LoginResult:
+      type: object
+      description: User fields are null when requiresMfa is true — see the login operation description.
+      properties:
+        requiresMfa: { type: boolean }
+        userId: { type: [string, "null"], format: uuid }
+        email: { type: [string, "null"], format: email }
+        displayName: { type: [string, "null"] }
+      required: [requiresMfa]
+    LoginMfaRequest:
+      type: object
+      properties:
+        code: { type: string, description: The current 6-digit TOTP code. }
+      required: [code]
+    RecoveryRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+      required: [email]
+    RecoveryConfirmRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        token: { type: string, description: The recovery code from the account-recovery email. }
+        newPassword: { type: string, format: password, minLength: 12 }
+      required: [email, token, newPassword]
+    MfaStatus:
+      type: object
+      properties:
+        enabled: { type: boolean }
+        method: { type: [string, "null"], enum: [totp, null] }
+      required: [enabled]
+    EnrollMfaRequest:
+      type: object
+      description: Omit code (or send an empty body) to start enrollment; include it to confirm.
+      properties:
+        code: { type: [string, "null"] }
+    MfaEnrollment:
+      type: object
+      description: >-
+        secret/otpAuthUri are populated only on the start-enrollment response (enabled=false) —
+        never re-shown once enabled=true.
+      properties:
+        enabled: { type: boolean }
+        secret: { type: [string, "null"] }
+        otpAuthUri: { type: [string, "null"] }
+      required: [enabled]

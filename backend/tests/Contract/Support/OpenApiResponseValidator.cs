@@ -82,8 +82,13 @@ public static partial class OpenApiResponseValidator
         var paths = document["paths"]?.AsObject()
             ?? throw new InvalidOperationException("Bundled OpenAPI document has no 'paths' object.");
 
-        var pathKey = paths.FirstOrDefault(kvp => PathTemplateMatches(kvp.Key, relativePath)).Key
-            ?? throw new InvalidOperationException($"No OpenAPI path entry matches '{relativePath}'.");
+        // Exact literal paths win over templated ones (e.g. '/auth/external/complete-registration'
+        // over '/auth/external/{provider}') — matching real ASP.NET Core route precedence,
+        // where a literal segment always beats a parameter for the same request.
+        var pathKey = paths.ContainsKey(relativePath)
+            ? relativePath
+            : paths.FirstOrDefault(kvp => PathTemplateMatches(kvp.Key, relativePath)).Key
+                ?? throw new InvalidOperationException($"No OpenAPI path entry matches '{relativePath}'.");
 
         var pathItem = paths[pathKey]!;
         var methodKey = method.ToLowerInvariant();

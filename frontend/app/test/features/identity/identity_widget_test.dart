@@ -221,7 +221,12 @@ class _FakeIdentityInterceptor extends Interceptor {
       return handler.resolve(Response(
         requestOptions: options,
         statusCode: 200,
-        data: {'userId': '11111111-1111-1111-1111-111111111111', 'email': 'existing-user@example.test', 'displayName': 'Existing User'},
+        data: {
+          'requiresMfa': false,
+          'userId': '11111111-1111-1111-1111-111111111111',
+          'email': 'existing-user@example.test',
+          'displayName': 'Existing User',
+        },
       ));
     }
 

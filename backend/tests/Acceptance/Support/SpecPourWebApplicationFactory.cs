@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Time;
+using SpecPour.Modules.Notifications.Contracts;
+using SpecPour.Modules.Notifications.Infrastructure;
 
 namespace SpecPour.Tests.Acceptance.Support;
 
@@ -49,6 +51,14 @@ public sealed class SpecPourWebApplicationFactory : WebApplicationFactory<Progra
         {
             services.RemoveAll<IClock>();
             services.AddSingleton<IClock>(Clock);
+
+            // T146: the shared acceptance host has no reachable SMTP server (no
+            // Testcontainers smtp4dev here — SmtpEmailChannelAdapterContractTests
+            // owns that verification in isolation) — swap back to the logging
+            // adapter so recovery/MFA-email scenarios (T050) don't fail on a
+            // connection error unrelated to what they're testing.
+            services.RemoveAll<IEmailChannelAdapter>();
+            services.AddScoped<IEmailChannelAdapter, LoggingEmailChannelAdapter>();
 
             // T155: the outbox dispatcher's production default (5s polling) would make
             // the rename-refresh acceptance scenario slow/flaky to poll against — fast

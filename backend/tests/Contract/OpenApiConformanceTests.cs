@@ -136,6 +136,95 @@ public sealed class OpenApiConformanceTests(ComposedHostFixture host)
         Assert.True(result.IsValid, DescribeErrors(result, body));
     }
 
+    [Fact]
+    public async Task PostAuthRecovery_conforms_to_its_202_schema()
+    {
+        // No-such-account case: still 202 (no account enumeration), same generic-failure
+        // rationale as PostAuthLogin_conforms_to_its_401_schema.
+        var payload = new { email = "no-such-user@example.test" };
+
+        var response = await host.Client.PostAsJsonAsync(new Uri("/api/v1/auth/recovery", UriKind.Relative), payload);
+
+        // No response body to validate against a schema (202 with no content, both in
+        // the contract and the implementation) — the status code itself is the contract.
+        Assert.Equal(System.Net.HttpStatusCode.Accepted, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PostAuthRecoveryConfirm_invalid_conforms_to_its_400_schema()
+    {
+        var payload = new { email = "no-such-user@example.test", token = "not-a-real-token", newPassword = "correct horse battery staple" };
+
+        var response = await host.Client.PostAsJsonAsync(new Uri("/api/v1/auth/recovery/confirm", UriKind.Relative), payload);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", "/api/v1/auth/recovery/confirm", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task PostAuthLoginMfa_without_a_pending_challenge_conforms_to_its_400_schema()
+    {
+        using var client = host.CreateFreshClient();
+        var response = await client.PostAsJsonAsync(new Uri("/api/v1/auth/login/mfa", UriKind.Relative), new { code = "000000" });
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", "/api/v1/auth/login/mfa", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task GetMeMfa_without_a_token_conforms_to_its_401_schema()
+    {
+        var response = await host.Client.GetAsync(new Uri("/api/v1/me/mfa", UriKind.Relative));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("GET", "/api/v1/me/mfa", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task GetAuthExternal_for_an_unconfigured_provider_conforms_to_its_400_schema()
+    {
+        // T049: no ExternalProviders:* credentials exist in any test environment (real
+        // Google/Apple/Microsoft app registrations aren't available here) — every
+        // provider is genuinely unconfigured, exercising the real "unknown provider"
+        // rejection path rather than a fake/mocked one.
+        var response = await host.Client.GetAsync(new Uri("/api/v1/auth/external/google?redirectUri=/", UriKind.Relative));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("GET", "/api/v1/auth/external/google", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task PostAuthExternalCompleteRegistration_without_a_pending_sign_in_conforms_to_its_400_schema()
+    {
+        var payload = new { dateOfBirth = "1990-01-01", displayName = "Someone" };
+
+        using var client = host.CreateFreshClient();
+        var response = await client.PostAsJsonAsync(new Uri("/api/v1/auth/external/complete-registration", UriKind.Relative), payload);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", "/api/v1/auth/external/complete-registration", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
     private static string DescribeErrors(Json.Schema.EvaluationResults result, string body)
     {
         var errors = (result.Details ?? [])

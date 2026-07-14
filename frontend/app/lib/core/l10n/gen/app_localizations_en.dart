@@ -256,4 +256,145 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signInRegisterInstead => 'Don\'t have an account? Create one';
+
+  @override
+  String get signInForgotPasswordLink => 'Forgot your password?';
+
+  @override
+  String get mfaChallengeTitle => 'Enter your code';
+
+  @override
+  String get mfaChallengeBody =>
+      'Enter the 6-digit code from your authenticator app.';
+
+  @override
+  String get mfaChallengeCodeLabel => 'Code';
+
+  @override
+  String get mfaChallengeSubmitButton => 'Verify';
+
+  @override
+  String get mfaChallengeMissingCodeError => 'Please enter your code.';
+
+  @override
+  String get mfaSettingsTitle => 'Two-factor authentication';
+
+  @override
+  String get mfaSettingsStatusEnabled => 'Two-factor authentication is on.';
+
+  @override
+  String get mfaSettingsStatusDisabled => 'Two-factor authentication is off.';
+
+  @override
+  String get mfaSettingsEnrollButton => 'Set up two-factor authentication';
+
+  @override
+  String get mfaSettingsSecretLabel =>
+      'Enter this key in your authenticator app:';
+
+  @override
+  String get mfaSettingsEnterCodeLabel => 'Enter the code it shows';
+
+  @override
+  String get mfaSettingsConfirmButton => 'Confirm';
+
+  @override
+  String get mfaSettingsDisableButton => 'Turn off two-factor authentication';
+
+  @override
+  String get mfaSettingsEnabledConfirmation =>
+      'Two-factor authentication is now on.';
+
+  @override
+  String get mfaSettingsDisabledConfirmation =>
+      'Two-factor authentication is now off.';
+
+  @override
+  String get mfaSettingsMissingCodeError => 'Please enter the code.';
+
+  @override
+  String get recoveryRequestTitle => 'Recover your account';
+
+  @override
+  String get recoveryRequestEmailLabel => 'Email';
+
+  @override
+  String get recoveryRequestSubmitButton => 'Send recovery code';
+
+  @override
+  String get recoveryRequestMissingFieldError => 'Please enter your email.';
+
+  @override
+  String get recoveryRequestSuccessMessage =>
+      'If that email has an account, a recovery code is on its way.';
+
+  @override
+  String get recoveryRequestGoToConfirmLink => 'Already have a code?';
+
+  @override
+  String get recoveryConfirmTitle => 'Reset your password';
+
+  @override
+  String get recoveryConfirmEmailLabel => 'Email';
+
+  @override
+  String get recoveryConfirmTokenLabel => 'Recovery code';
+
+  @override
+  String get recoveryConfirmNewPasswordLabel => 'New password';
+
+  @override
+  String get recoveryConfirmSubmitButton => 'Reset password';
+
+  @override
+  String get recoveryConfirmMissingFieldsError => 'Please fill in every field.';
+
+  @override
+  String get recoveryConfirmSuccessMessage =>
+      'Your password has been reset. You can sign in now.';
+
+  @override
+  String get socialSignInDivider => 'or';
+
+  @override
+  String get socialSignInGoogleButton => 'Continue with Google';
+
+  @override
+  String get socialSignInAppleButton => 'Continue with Apple';
+
+  @override
+  String get socialSignInMicrosoftButton => 'Continue with Microsoft';
+
+  @override
+  String get externalCallbackProcessingMessage => 'Finishing sign-in…';
+
+  @override
+  String get externalCallbackErrorMessage =>
+      'Sign-in with that provider didn\'t work. Please try again.';
+
+  @override
+  String get completeExternalRegistrationTitle =>
+      'Finish creating your account';
+
+  @override
+  String get completeExternalRegistrationBody =>
+      'We just need your date of birth to finish setting up your account.';
+
+  @override
+  String get completeExternalRegistrationDisplayNameLabel => 'Display name';
+
+  @override
+  String get completeExternalRegistrationDateOfBirthLabel => 'Date of birth';
+
+  @override
+  String get completeExternalRegistrationDateOfBirthHint =>
+      'Select your date of birth';
+
+  @override
+  String get completeExternalRegistrationSubmitButton =>
+      'Finish creating account';
+
+  @override
+  String get completeExternalRegistrationMissingFieldsError =>
+      'Please fill in every field.';
 }

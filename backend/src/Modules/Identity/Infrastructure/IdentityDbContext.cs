@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenIddict.EntityFrameworkCore;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
+using SpecPour.Modules.Identity.Domain;
 
 namespace SpecPour.Modules.Identity.Infrastructure;
 
@@ -22,11 +23,21 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
 {
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
+    public DbSet<MfaEnrollment> MfaEnrollments => Set<MfaEnrollment>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema(ModuleSchemas.Identity);
 
         base.OnModelCreating(builder);
+
+        builder.Entity<MfaEnrollment>(entity =>
+        {
+            entity.HasKey(m => m.Id);
+            // One enrollment per user in V1 (single "totp" method) — a fresh POST
+            // /me/mfa replaces the prior row rather than accumulating history.
+            entity.HasIndex(m => m.UserId).IsUnique();
+        });
 
         builder.ConfigureOutbox(ownsTable: false);
 

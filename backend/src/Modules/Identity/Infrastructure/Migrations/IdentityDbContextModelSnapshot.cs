@@ -354,6 +354,34 @@ namespace SpecPour.Modules.Identity.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SpecPour.Modules.Identity.Domain.MfaEnrollment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("EnabledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EncryptedSecret")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("MfaEnrollments", "identity");
+                });
+
             modelBuilder.Entity("SpecPour.Modules.Identity.Infrastructure.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")

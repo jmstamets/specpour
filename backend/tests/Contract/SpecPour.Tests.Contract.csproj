@@ -18,6 +18,10 @@
          not anticipate or duplicate that, it just needs a real Postgres to prove the
          tsvector/trigram mechanics actually work. -->
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.13.0" />
+    <!-- T146: generic container support for SmtpEmailChannelAdapterContractTests'
+         own Testcontainers-managed smtp4dev instance (no pre-built Testcontainers
+         module exists for it, unlike PostgreSql). -->
+    <PackageReference Include="Testcontainers" Version="4.13.0" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <!-- T027: OpenAPI contract-test harness. JsonSchema.Net validates a live
          response body against the schema fragment extracted from the bundled spec —

@@ -8,9 +8,13 @@ import 'package:specpour_app/core/routing/app_router.dart';
 
 import 'support/no_raw_l10n_keys.dart';
 
-/// T046: Flutter integration test for US2 (register/sign-in — MFA, sessions, and
-/// lifecycle land in later Phase 4 sub-checkpoints and get their own scenarios
-/// here then). Run on a real device/browser against a real backend, same
+/// T046: Flutter integration test for US2 (register/sign-in/MFA enrollment —
+/// sessions and lifecycle land in a later Phase 4 sub-checkpoint and get their
+/// own scenarios here then; login-requires-MFA and social sign-in aren't
+/// covered here — the former needs a sign-out affordance that doesn't exist
+/// yet (T051/T052 territory), the latter needs real Google/Apple/Microsoft
+/// app credentials this environment doesn't have, per ExternalAuthEndpoints'
+/// own doc comment). Run on a real device/browser against a real backend, same
 /// convention as integration_test/us01_discover_test.dart — see
 /// test/features/identity/identity_widget_test.dart for the sandbox-runnable
 /// twin (no device/emulator available in the dev sandbox). No gated action is
@@ -118,6 +122,49 @@ void main() {
 
       expect(find.byKey(const Key('registerErrorMessage')), findsOneWidget);
       expect(capturedRef.read(authTokenProvider), isNull);
+      expectNoRawLocalizationKeys(tester);
+    },
+  );
+
+  testWidgets(
+    '3: a signed-in user can enroll TOTP MFA',
+    (tester) async {
+      late WidgetRef capturedRef;
+      await tester.pumpWidget(
+        ProviderScope(
+          child: Consumer(
+            builder: (context, ref, _) {
+              capturedRef = ref;
+              return const SpecPourApp();
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      capturedRef.read(appRouterProvider).go('/register');
+      await tester.pumpAndSettle();
+
+      final email = 'integration-mfa-${DateTime.now().microsecondsSinceEpoch}@example.test';
+      await tester.enterText(find.byKey(const Key('registerEmailField')), email);
+      await tester.enterText(
+        find.byKey(const Key('registerPasswordField')),
+        'correct horse battery staple',
+      );
+      await tester.enterText(find.byKey(const Key('registerDisplayNameField')), 'MFA Test User');
+      await enterDateOfBirth(tester);
+      await tester.tap(find.byKey(const Key('registerSubmitButton')));
+      await tester.pumpAndSettle();
+
+      expect(capturedRef.read(authTokenProvider), isNotNull);
+
+      capturedRef.read(appRouterProvider).go('/account/mfa');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('mfaSettingsEnrollButton')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('mfaSettingsSecretText')), findsOneWidget);
       expectNoRawLocalizationKeys(tester);
     },
   );

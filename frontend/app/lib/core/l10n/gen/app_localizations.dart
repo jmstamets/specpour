@@ -567,6 +567,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Don\'t have an account? Create one'**
   String get signInRegisterInstead;
+
+  /// T050 sign-in screen: link to the account recovery request screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot your password?'**
+  String get signInForgotPasswordLink;
+
+  /// T050 MFA login-challenge screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your code'**
+  String get mfaChallengeTitle;
+
+  /// T050 MFA login-challenge screen: instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code from your authenticator app.'**
+  String get mfaChallengeBody;
+
+  /// T050 MFA login-challenge screen: code field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get mfaChallengeCodeLabel;
+
+  /// T050 MFA login-challenge screen: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get mfaChallengeSubmitButton;
+
+  /// T050 MFA login-challenge screen: client-side validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your code.'**
+  String get mfaChallengeMissingCodeError;
+
+  /// T050 MFA settings screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication'**
+  String get mfaSettingsTitle;
+
+  /// T050 MFA settings screen: status when enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication is on.'**
+  String get mfaSettingsStatusEnabled;
+
+  /// T050 MFA settings screen: status when disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication is off.'**
+  String get mfaSettingsStatusDisabled;
+
+  /// T050 MFA settings screen: start-enrollment button.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up two-factor authentication'**
+  String get mfaSettingsEnrollButton;
+
+  /// T050 MFA settings screen: label above the issued TOTP secret for manual entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter this key in your authenticator app:'**
+  String get mfaSettingsSecretLabel;
+
+  /// T050 MFA settings screen: label for the confirmation code field.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code it shows'**
+  String get mfaSettingsEnterCodeLabel;
+
+  /// T050 MFA settings screen: confirm-enrollment button.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get mfaSettingsConfirmButton;
+
+  /// T050 MFA settings screen: disable button.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off two-factor authentication'**
+  String get mfaSettingsDisableButton;
+
+  /// T050 MFA settings screen: confirmation message after enabling.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication is now on.'**
+  String get mfaSettingsEnabledConfirmation;
+
+  /// T050 MFA settings screen: confirmation message after disabling.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication is now off.'**
+  String get mfaSettingsDisabledConfirmation;
+
+  /// T050 MFA settings screen: client-side validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the code.'**
+  String get mfaSettingsMissingCodeError;
+
+  /// T050 account-recovery request screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover your account'**
+  String get recoveryRequestTitle;
+
+  /// T050 account-recovery request screen: email field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get recoveryRequestEmailLabel;
+
+  /// T050 account-recovery request screen: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Send recovery code'**
+  String get recoveryRequestSubmitButton;
+
+  /// T050 account-recovery request screen: client-side validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email.'**
+  String get recoveryRequestMissingFieldError;
+
+  /// T050 account-recovery request screen: confirmation shown regardless of whether the account exists (no enumeration).
+  ///
+  /// In en, this message translates to:
+  /// **'If that email has an account, a recovery code is on its way.'**
+  String get recoveryRequestSuccessMessage;
+
+  /// T050 account-recovery request screen: link to the confirm screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have a code?'**
+  String get recoveryRequestGoToConfirmLink;
+
+  /// T050 account-recovery confirm screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your password'**
+  String get recoveryConfirmTitle;
+
+  /// T050 account-recovery confirm screen: email field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get recoveryConfirmEmailLabel;
+
+  /// T050 account-recovery confirm screen: recovery-code field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code'**
+  String get recoveryConfirmTokenLabel;
+
+  /// T050 account-recovery confirm screen: new-password field label.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get recoveryConfirmNewPasswordLabel;
+
+  /// T050 account-recovery confirm screen: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get recoveryConfirmSubmitButton;
+
+  /// T050 account-recovery confirm screen: client-side validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in every field.'**
+  String get recoveryConfirmMissingFieldsError;
+
+  /// T050 account-recovery confirm screen: success message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been reset. You can sign in now.'**
+  String get recoveryConfirmSuccessMessage;
+
+  /// T049 sign-in/register screens: divider between the password form and social sign-in buttons.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get socialSignInDivider;
+
+  /// T049 social sign-in button.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get socialSignInGoogleButton;
+
+  /// T049 social sign-in button.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get socialSignInAppleButton;
+
+  /// T049 social sign-in button.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Microsoft'**
+  String get socialSignInMicrosoftButton;
+
+  /// T049 social sign-in callback screen: shown while the redirect result is being processed.
+  ///
+  /// In en, this message translates to:
+  /// **'Finishing sign-in…'**
+  String get externalCallbackProcessingMessage;
+
+  /// T049 social sign-in callback screen: shown when the provider redirected back with an error.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in with that provider didn\'t work. Please try again.'**
+  String get externalCallbackErrorMessage;
+
+  /// T049 social sign-in DOB-completion screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish creating your account'**
+  String get completeExternalRegistrationTitle;
+
+  /// T049 social sign-in DOB-completion screen: instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'We just need your date of birth to finish setting up your account.'**
+  String get completeExternalRegistrationBody;
+
+  /// T049 social sign-in DOB-completion screen: display-name field label (used only if the provider didn't share one).
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get completeExternalRegistrationDisplayNameLabel;
+
+  /// T049 social sign-in DOB-completion screen: date-of-birth field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth'**
+  String get completeExternalRegistrationDateOfBirthLabel;
+
+  /// T049 social sign-in DOB-completion screen: date-picker placeholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your date of birth'**
+  String get completeExternalRegistrationDateOfBirthHint;
+
+  /// T049 social sign-in DOB-completion screen: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish creating account'**
+  String get completeExternalRegistrationSubmitButton;
+
+  /// T049 social sign-in DOB-completion screen: client-side validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in every field.'**
+  String get completeExternalRegistrationMissingFieldsError;
 }
 
 class _AppLocalizationsDelegate

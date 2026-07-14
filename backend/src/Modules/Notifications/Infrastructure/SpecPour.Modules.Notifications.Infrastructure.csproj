@@ -14,6 +14,10 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="OpenIddict.Abstractions" Version="7.5.0" />
     <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.5.0" />
+    <!-- T146: MailKit, not System.Net.Mail.SmtpClient (obsolete/unsupported by
+         Microsoft for new development) — the modern, actively-maintained .NET SMTP
+         client. -->
+    <PackageReference Include="MailKit" Version="4.13.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

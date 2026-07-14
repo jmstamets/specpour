@@ -9,12 +9,304 @@ All URIs are relative to */api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**challengeExternalSignIn**](IdentityApi.md#challengeexternalsignin) | **GET** /auth/external/{provider} | Start social sign-in with a provider (T049)
+[**completeExternalRegistration**](IdentityApi.md#completeexternalregistration) | **POST** /auth/external/complete-registration | Finish a new account after social sign-in supplied no date of birth (T049)
+[**confirmAccountRecovery**](IdentityApi.md#confirmaccountrecovery) | **POST** /auth/recovery/confirm | Complete account recovery with the emailed code and a new password (T050)
+[**disableMfa**](IdentityApi.md#disablemfa) | **DELETE** /me/mfa | Disable TOTP MFA (T050)
+[**enrollOrConfirmMfa**](IdentityApi.md#enrollorconfirmmfa) | **POST** /me/mfa | Start or confirm TOTP MFA enrollment (T050)
+[**externalSignInCallback**](IdentityApi.md#externalsignincallback) | **GET** /auth/external/{provider}/callback | Provider redirect target — not called directly by clients (T049)
+[**getMfaStatus**](IdentityApi.md#getmfastatus) | **GET** /me/mfa | Get the caller&#39;s TOTP MFA enrollment status (T050)
 [**login**](IdentityApi.md#login) | **POST** /auth/login | Email/password sign-in, establishing the cookie session (T047)
+[**loginMfa**](IdentityApi.md#loginmfa) | **POST** /auth/login/mfa | Complete a sign-in that requiresMfa (T050)
 [**registerAccount**](IdentityApi.md#registeraccount) | **POST** /auth/register | Email/password registration with DOB capture and underage rejection (FR-001/FR-002/FR-002c, T047)
+[**requestAccountRecovery**](IdentityApi.md#requestaccountrecovery) | **POST** /auth/recovery | Request account recovery (T050, FR — lost-credential recovery)
 
+
+# **challengeExternalSignIn**
+> challengeExternalSignIn(provider, redirectUri)
+
+Start social sign-in with a provider (T049)
+
+Anonymous. A real browser-redirect OAuth handshake, not a \"submit a token you already have\" endpoint — redirects to the provider's own consent screen. The client opens this URL in a system browser/tab (not a WebView — providers discourage or block WebView-embedded sign-in) and waits for redirectUri to be hit. redirectUri receives requiresMfa=true|false on success, or needsDateOfBirth=true when this is a brand-new account (FR-002 requires a date of birth for every registration method — the caller must then call POST /auth/external/complete-registration), or error=external_auth_failed.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+final String provider = provider_example; // String | 
+final String redirectUri = redirectUri_example; // String | Where the browser ends up when the whole flow (including any DOB completion) is done.
+
+try {
+    api.challengeExternalSignIn(provider, redirectUri);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->challengeExternalSignIn: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **provider** | **String**|  | 
+ **redirectUri** | **String**| Where the browser ends up when the whole flow (including any DOB completion) is done. | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **completeExternalRegistration**
+> AuthAccount completeExternalRegistration(completeExternalRegistrationRequest)
+
+Finish a new account after social sign-in supplied no date of birth (T049)
+
+Anonymous — call this after the callback redirected with needsDateOfBirth=true. Reads the pending external identity from the short-lived cookie the callback step left in place; there is nothing else to authenticate this call with yet. Same FR-002c underage handling as POST /auth/register: nothing is persisted on rejection.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+final CompleteExternalRegistrationRequest completeExternalRegistrationRequest = ; // CompleteExternalRegistrationRequest | 
+
+try {
+    final response = api.completeExternalRegistration(completeExternalRegistrationRequest);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->completeExternalRegistration: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **completeExternalRegistrationRequest** | [**CompleteExternalRegistrationRequest**](CompleteExternalRegistrationRequest.md)|  | 
+
+### Return type
+
+[**AuthAccount**](AuthAccount.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **confirmAccountRecovery**
+> confirmAccountRecovery(recoveryConfirmRequest)
+
+Complete account recovery with the emailed code and a new password (T050)
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+final RecoveryConfirmRequest recoveryConfirmRequest = ; // RecoveryConfirmRequest | 
+
+try {
+    api.confirmAccountRecovery(recoveryConfirmRequest);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->confirmAccountRecovery: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **recoveryConfirmRequest** | [**RecoveryConfirmRequest**](RecoveryConfirmRequest.md)|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **disableMfa**
+> disableMfa()
+
+Disable TOTP MFA (T050)
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    api.disableMfa();
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->disableMfa: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **enrollOrConfirmMfa**
+> MfaEnrollment enrollOrConfirmMfa(enrollMfaRequest)
+
+Start or confirm TOTP MFA enrollment (T050)
+
+Two-phase over a single endpoint: an empty/no-code body starts enrollment (issues a new secret + otpauth:// URI for the caller's authenticator app); a body carrying the 6-digit code confirms the most recently issued secret and enables MFA. The secret/URI are returned only from the start-enrollment response, never again afterward.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+final EnrollMfaRequest enrollMfaRequest = ; // EnrollMfaRequest | 
+
+try {
+    final response = api.enrollOrConfirmMfa(enrollMfaRequest);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->enrollOrConfirmMfa: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **enrollMfaRequest** | [**EnrollMfaRequest**](EnrollMfaRequest.md)|  | [optional] 
+
+### Return type
+
+[**MfaEnrollment**](MfaEnrollment.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **externalSignInCallback**
+> externalSignInCallback(provider)
+
+Provider redirect target — not called directly by clients (T049)
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+final String provider = provider_example; // String | 
+
+try {
+    api.externalSignInCallback(provider);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->externalSignInCallback: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **provider** | **String**|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMfaStatus**
+> MfaStatus getMfaStatus()
+
+Get the caller's TOTP MFA enrollment status (T050)
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    final response = api.getMfaStatus();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->getMfaStatus: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**MfaStatus**](MfaStatus.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **login**
-> AuthAccount login(loginRequest)
+> LoginResult login(loginRequest)
 
 Email/password sign-in, establishing the cookie session (T047)
 
@@ -40,6 +332,49 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **loginRequest** | [**LoginRequest**](LoginRequest.md)|  | 
+
+### Return type
+
+[**LoginResult**](LoginResult.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **loginMfa**
+> AuthAccount loginMfa(loginMfaRequest)
+
+Complete a sign-in that requiresMfa (T050)
+
+Anonymous (the caller isn't authenticated yet — the interim state is carried by a short-lived cookie login set, not a bearer token). Call this after a login response with requiresMfa=true, submitting the current 6-digit code from the caller's authenticator app.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+final LoginMfaRequest loginMfaRequest = ; // LoginMfaRequest | 
+
+try {
+    final response = api.loginMfa(loginMfaRequest);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->loginMfa: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **loginMfaRequest** | [**LoginMfaRequest**](LoginMfaRequest.md)|  | 
 
 ### Return type
 
@@ -96,6 +431,48 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/json
  - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **requestAccountRecovery**
+> requestAccountRecovery(recoveryRequest)
+
+Request account recovery (T050, FR — lost-credential recovery)
+
+Anonymous. Always returns 202 regardless of whether the email matches an account, to avoid account enumeration. If it matches, an email with a recovery code is sent via the notifications email channel.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+final RecoveryRequest recoveryRequest = ; // RecoveryRequest | 
+
+try {
+    api.requestAccountRecovery(recoveryRequest);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->requestAccountRecovery: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **recoveryRequest** | [**RecoveryRequest**](RecoveryRequest.md)|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

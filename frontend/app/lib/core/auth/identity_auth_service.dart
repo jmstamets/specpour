@@ -26,11 +26,12 @@ const _clientId = 'specpour-app';
 const _scope = 'openid email profile offline_access';
 
 class IdentityAuthService {
-  IdentityAuthService(this._identityApi, this._authDio, this._authToken);
+  IdentityAuthService(this._identityApi, this._authDio, this._authToken, this._apiHostBaseUrl);
 
   final IdentityApi _identityApi;
   final Dio _authDio;
   final AuthToken _authToken;
+  final String _apiHostBaseUrl;
 
   Future<void> register({
     required String email,
@@ -52,11 +53,103 @@ class IdentityAuthService {
     await _completeTokenExchange();
   }
 
-  Future<void> signIn({required String email, required String password}) async {
-    await _identityApi.login(
+  /// T050: login is no longer always a straight sign-in — an MFA-enabled
+  /// account gets parked in a short-lived server-side cookie instead, and the
+  /// caller must submit a code via [completeMfaSignIn] to finish. The
+  /// returned bool is true when that second step is needed.
+  Future<bool> signIn({required String email, required String password}) async {
+    final response = await _identityApi.login(
       loginRequest: LoginRequest((b) => b
         ..email = email
         ..password = password),
+    );
+
+    if (response.data!.requiresMfa) {
+      return true;
+    }
+
+    await _completeTokenExchange();
+    return false;
+  }
+
+  /// Completes a sign-in that [signIn] (or a social sign-in's callback)
+  /// reported as requiring an MFA code.
+  Future<void> completeMfaSignIn({required String code}) async {
+    await _identityApi.loginMfa(loginMfaRequest: LoginMfaRequest((b) => b..code = code));
+    await _completeTokenExchange();
+  }
+
+  Future<MfaStatus> mfaStatus() async {
+    final response = await _identityApi.getMfaStatus();
+    return response.data!;
+  }
+
+  /// Issues a new TOTP secret (Enabled=false) — call [confirmMfaEnrollment]
+  /// with a code from the caller's authenticator app to actually enable it.
+  Future<MfaEnrollment> startMfaEnrollment() async {
+    final response = await _identityApi.enrollOrConfirmMfa();
+    return response.data!;
+  }
+
+  Future<MfaEnrollment> confirmMfaEnrollment({required String code}) async {
+    final response = await _identityApi.enrollOrConfirmMfa(
+      enrollMfaRequest: EnrollMfaRequest((b) => b..code = code),
+    );
+    return response.data!;
+  }
+
+  Future<void> disableMfa() async {
+    await _identityApi.disableMfa();
+  }
+
+  Future<void> requestRecovery({required String email}) async {
+    await _identityApi.requestAccountRecovery(
+      recoveryRequest: RecoveryRequest((b) => b..email = email),
+    );
+  }
+
+  Future<void> confirmRecovery({
+    required String email,
+    required String token,
+    required String newPassword,
+  }) async {
+    await _identityApi.confirmAccountRecovery(
+      recoveryConfirmRequest: RecoveryConfirmRequest((b) => b
+        ..email = email
+        ..token = token
+        ..newPassword = newPassword),
+    );
+  }
+
+  /// T049: the URL to navigate the WHOLE browser tab to (not a Dio call —
+  /// this is a real cross-origin OAuth redirect the app must leave itself for;
+  /// see the social sign-in button's use of url_launcher's webOnlyWindowName:
+  /// '_self'). [redirectUri] is where the provider's callback eventually
+  /// sends the browser back to — the app's own /auth/external/callback route.
+  String socialSignInUrl({required String provider, required String redirectUri}) {
+    final uri = Uri.parse('$_apiHostBaseUrl/api/v1/auth/external/$provider')
+        .replace(queryParameters: {'redirectUri': redirectUri});
+    return uri.toString();
+  }
+
+  /// The social callback route calls this once it sees requiresMfa=false and
+  /// no needsDateOfBirth flag: the backend already established the real
+  /// cookie session, so only the PKCE exchange itself remains.
+  Future<void> completeSocialSignIn() => _completeTokenExchange();
+
+  /// Finishes a brand-new social account after the callback reported
+  /// needsDateOfBirth=true — FR-002/FR-002c apply identically to social
+  /// registration (spec.md US2), and no provider reliably supplies a DOB.
+  Future<void> completeExternalRegistration({
+    required DateTime dateOfBirth,
+    required String displayName,
+    String? locale,
+  }) async {
+    await _identityApi.completeExternalRegistration(
+      completeExternalRegistrationRequest: CompleteExternalRegistrationRequest((b) => b
+        ..dateOfBirth = dateOfBirth.toDate()
+        ..displayName = displayName
+        ..locale = locale),
     );
     await _completeTokenExchange();
   }
@@ -131,6 +224,7 @@ final identityAuthServiceProvider = Provider<IdentityAuthService>(
     ref.watch(identityApiProvider),
     ref.watch(authDioProvider),
     ref.watch(authTokenProvider.notifier),
+    ref.watch(apiHostBaseUrlProvider),
   ),
 );
 

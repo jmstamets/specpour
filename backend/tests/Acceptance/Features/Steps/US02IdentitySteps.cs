@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll;
 using SpecPour.Modules.Authorization.Infrastructure;
+using SpecPour.Modules.Identity.Application.Mfa;
 using SpecPour.Modules.Identity.Contracts;
 using SpecPour.Modules.Identity.Infrastructure;
 using SpecPour.Tests.Acceptance.Support;
@@ -33,6 +34,8 @@ public sealed class US02IdentitySteps
     private string _registeredEmail = string.Empty;
     private Guid _registeredUserId;
     private HttpClient? _sessionClient;
+    private HttpClient? _loginClient;
+    private string _mfaSecret = string.Empty;
 
     [When(@"a visitor registers with a valid adult date of birth")]
     public async Task WhenAVisitorRegistersWithAValidAdultDateOfBirth() =>
@@ -102,8 +105,12 @@ public sealed class US02IdentitySteps
     [When(@"the user signs in with their password")]
     public async Task WhenTheUserSignsInWithTheirPassword()
     {
-        using var freshClient = NewClientWithoutRedirects();
-        _lastResponse = await freshClient.PostAsJsonAsync(
+        // Kept alive (not `using`) rather than disposed at the end of this step: T050's
+        // MFA-required scenario needs the same cookie jar for the follow-up
+        // POST /auth/login/mfa call, which reads the interim MfaPendingScheme cookie
+        // this request may set.
+        _loginClient = NewClientWithoutRedirects();
+        _lastResponse = await _loginClient.PostAsJsonAsync(
             new Uri("/api/v1/auth/login", UriKind.Relative),
             new { email = _registeredEmail, password = Password });
         await CaptureJsonAsync();
@@ -112,10 +119,99 @@ public sealed class US02IdentitySteps
     [Then(@"the sign-in succeeds")]
     public void ThenTheSignInSucceeds() => Assert.Equal(200, (int)_lastResponse.StatusCode);
 
+    [Then(@"the sign-in requires an MFA code")]
+    public void ThenTheSignInRequiresAnMfaCode()
+    {
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        Assert.True(_lastJson!.RootElement.GetProperty("requiresMfa").GetBoolean());
+    }
+
+    [When(@"the user completes sign-in with a valid MFA code")]
+    public async Task WhenTheUserCompletesSignInWithAValidMfaCode()
+    {
+        var client = _loginClient ?? throw new InvalidOperationException("No pending login session — sign in with a password first.");
+        var code = TotpCodeGenerator.ComputeCurrentCode(_mfaSecret);
+        _lastResponse = await client.PostAsJsonAsync(new Uri("/api/v1/auth/login/mfa", UriKind.Relative), new { code });
+        await CaptureJsonAsync();
+    }
+
+    [When(@"the user enrolls TOTP multi-factor authentication")]
+    public async Task WhenTheUserEnrollsTotpMultiFactorAuthentication()
+    {
+        var token = await AcquireAccessTokenAsync();
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var startResponse = await client.PostAsJsonAsync(new Uri("/api/v1/me/mfa", UriKind.Relative), new { });
+        using var startJson = JsonDocument.Parse(await startResponse.Content.ReadAsStringAsync());
+        _mfaSecret = startJson.RootElement.GetProperty("secret").GetString()!;
+
+        var code = TotpCodeGenerator.ComputeCurrentCode(_mfaSecret);
+        _lastResponse = await client.PostAsJsonAsync(new Uri("/api/v1/me/mfa", UriKind.Relative), new { code });
+        await CaptureJsonAsync();
+    }
+
+    [Then(@"MFA is enabled for the account")]
+    public void ThenMfaIsEnabledForTheAccount()
+    {
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        Assert.True(_lastJson!.RootElement.GetProperty("enabled").GetBoolean());
+    }
+
+    [Then(@"the enrollment secret is never shown again")]
+    public async Task ThenTheEnrollmentSecretIsNeverShownAgain()
+    {
+        // T162 security audit, item 7c (live-HTTP half — the schema-level half is
+        // MfaStatus/confirm-response simply having no populated secret field): the
+        // start-enrollment response is the ONE deliberate secret-bearing surface
+        // (inherent to TOTP — the authenticator app needs it once); after
+        // confirmation, neither the confirm response nor GET /me/mfa may ever carry
+        // the raw secret again.
+        Assert.False(string.IsNullOrEmpty(_mfaSecret), "Scenario ordering bug: no enrollment secret was captured.");
+        Assert.DoesNotContain(_mfaSecret, _lastResponseBody, StringComparison.Ordinal);
+
+        var token = await AcquireAccessTokenAsync();
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        var statusResponse = await client.GetAsync(new Uri("/api/v1/me/mfa", UriKind.Relative));
+        var statusBody = await statusResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(200, (int)statusResponse.StatusCode);
+        Assert.DoesNotContain(_mfaSecret, statusBody, StringComparison.Ordinal);
+    }
+
+    [Given(@"a registered adult user with MFA enabled")]
+    public async Task GivenARegisteredAdultUserWithMfaEnabled()
+    {
+        await RegisterAsync(DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-30)));
+        await WhenTheUserEnrollsTotpMultiFactorAuthentication();
+    }
+
+    [When(@"the user disables MFA")]
+    public async Task WhenTheUserDisablesMfa()
+    {
+        var token = await AcquireAccessTokenAsync();
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        _lastResponse = await client.DeleteAsync(new Uri("/api/v1/me/mfa", UriKind.Relative));
+    }
+
+    [Then(@"MFA is no longer enabled for the account")]
+    public async Task ThenMfaIsNoLongerEnabledForTheAccount()
+    {
+        Assert.Equal(204, (int)_lastResponse.StatusCode);
+
+        var token = await AcquireAccessTokenAsync();
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        var statusResponse = await client.GetAsync(new Uri("/api/v1/me/mfa", UriKind.Relative));
+        using var statusJson = JsonDocument.Parse(await statusResponse.Content.ReadAsStringAsync());
+        Assert.False(statusJson.RootElement.GetProperty("enabled").GetBoolean());
+    }
+
     [When(@"the user requests account recovery")]
     public async Task WhenTheUserRequestsAccountRecovery()
     {
-        // T050 (not yet built) — expected to 404 until recovery lands.
         using var client = AcceptanceHooks.Factory.CreateClient();
         _lastResponse = await client.PostAsJsonAsync(new Uri("/api/v1/auth/recovery", UriKind.Relative), new { email = _registeredEmail });
     }

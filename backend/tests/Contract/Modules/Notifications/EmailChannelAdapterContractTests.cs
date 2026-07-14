@@ -1,4 +1,4 @@
-using SpecPour.Modules.Notifications.Application.Ports;
+using SpecPour.Modules.Notifications.Contracts;
 
 namespace SpecPour.Tests.Contract.Modules.Notifications;
 

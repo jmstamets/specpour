@@ -48,3 +48,18 @@ Feature: US2 - Create an account and manage identity
     When a feature checks whether the user is of legal drinking age
     Then the predicate check succeeds without exposing the raw date of birth
     And the predicate check is audit-logged
+
+  Scenario: 9 - A user can enroll TOTP MFA and must use it to sign in afterward
+    Given a registered adult user
+    When the user enrolls TOTP multi-factor authentication
+    Then MFA is enabled for the account
+    And the enrollment secret is never shown again
+    When the user signs in with their password
+    Then the sign-in requires an MFA code
+    When the user completes sign-in with a valid MFA code
+    Then the sign-in succeeds
+
+  Scenario: 10 - A user can disable TOTP MFA
+    Given a registered adult user with MFA enabled
+    When the user disables MFA
+    Then MFA is no longer enabled for the account

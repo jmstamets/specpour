@@ -6,6 +6,13 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- T050: RFC 6238 TOTP generation/verification (Otp.NET) — a pure algorithm
+         library with no framework dependency, so it belongs alongside AgeCalculator's
+         other pure application logic rather than in Infrastructure. -->
+    <PackageReference Include="Otp.NET" Version="1.4.0" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

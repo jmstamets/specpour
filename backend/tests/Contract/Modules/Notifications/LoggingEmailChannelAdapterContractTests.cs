@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging.Abstractions;
-using SpecPour.Modules.Notifications.Application.Ports;
+using SpecPour.Modules.Notifications.Contracts;
 using SpecPour.Modules.Notifications.Infrastructure;
 
 namespace SpecPour.Tests.Contract.Modules.Notifications;

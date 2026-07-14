@@ -5,7 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
-using SpecPour.Modules.Notifications.Application.Ports;
+using SpecPour.Modules.Notifications.Contracts;
+using SpecPour.Modules.Notifications.Infrastructure.Email;
 
 namespace SpecPour.Modules.Notifications.Infrastructure;
 
@@ -31,7 +32,12 @@ public sealed class NotificationsModule : IModule
         });
         services.AddSpecPourOutboxWriter(Name);
 
-        services.AddScoped<IEmailChannelAdapter, LoggingEmailChannelAdapter>();
+        // T146: the real adapter — LoggingEmailChannelAdapter is now test-only
+        // (SpecPourWebApplicationFactory/ComposedHostFixture override back to it, the
+        // same way they swap IClock, so the shared acceptance/contract hosts don't
+        // need a reachable SMTP server just to boot).
+        services.Configure<SmtpEmailOptions>(configuration.GetSection("Email:Smtp"));
+        services.AddScoped<IEmailChannelAdapter, SmtpEmailChannelAdapter>();
 
         // Open-generic registration: resolves for any concrete TEvent that satisfies
         // NotificationEventConsumer<TEvent>'s "where TEvent : INotificationEvent"

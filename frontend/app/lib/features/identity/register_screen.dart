@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/guest_gate/guest_gate.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import 'social_sign_in_buttons.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -156,6 +157,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               onPressed: () => context.push('/sign-in'),
               child: Text(l10n.registerSignInInstead),
             ),
+            const SocialSignInButtons(),
           ],
         ),
       ),

@@ -16,11 +16,21 @@
          Authorization's shared audit writer. -->
     <ProjectReference Include="..\..\Compliance\Contracts\SpecPour.Modules.Compliance.Contracts.csproj" />
     <ProjectReference Include="..\..\Authorization\Contracts\SpecPour.Modules.Authorization.Contracts.csproj" />
+    <!-- T050: account recovery sends its token via IEmailChannelAdapter, the same
+         cross-module port pattern as the two references above. -->
+    <ProjectReference Include="..\..\Notifications\Contracts\SpecPour.Modules.Notifications.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.9" />
+    <!-- T049: social sign-in. Google/Microsoft are first-party ASP.NET Core handlers;
+         Apple has no first-party one, so this uses the well-established aspnet-contrib
+         package (same OSS ecosystem/author community as OpenIddict) rather than
+         hand-rolling Apple's JWT-client-secret + JWKS validation dance (R6). -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="10.0.9" />
+    <PackageReference Include="AspNet.Security.OAuth.Apple" Version="10.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="OpenIddict.AspNetCore" Version="7.5.0" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="7.5.0" />

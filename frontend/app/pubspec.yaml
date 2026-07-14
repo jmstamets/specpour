@@ -58,6 +58,12 @@ dependencies:
   dio_cookie_manager: ^3.2.0
   crypto: ^3.0.6
 
+  # T049: social sign-in is a real browser-redirect OAuth handshake, not a
+  # Dio call — the app must navigate the whole tab to the provider's own
+  # consent screen (webOnlyWindowName: '_self' on web; a system browser tab
+  # on native, never a WebView, which providers discourage/block for sign-in).
+  url_launcher: ^6.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

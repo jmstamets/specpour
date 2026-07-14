@@ -1,13 +1,17 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using SpecPour.BuildingBlocks.Http;
 using SpecPour.BuildingBlocks.Identifiers;
 using SpecPour.BuildingBlocks.Time;
 using SpecPour.Modules.Compliance.Contracts;
 using SpecPour.Modules.Identity.Application;
+using SpecPour.Modules.Identity.Application.Mfa;
 using SpecPour.Modules.Identity.Application.Ports;
 using SpecPour.Modules.Identity.Domain;
 
@@ -30,6 +34,7 @@ public static class AuthEndpoints
         var group = endpoints.MapApiV1Group();
         group.MapPost("/auth/register", RegisterAsync);
         group.MapPost("/auth/login", LoginAsync);
+        group.MapPost("/auth/login/mfa", LoginMfaAsync);
     }
 
     private static async Task<Results<Created<AuthAccountResponse>, ProblemHttpResult>> RegisterAsync(
@@ -92,10 +97,12 @@ public static class AuthEndpoints
             new AuthAccountResponse(user.Id, user.Email!, user.DisplayName));
     }
 
-    private static async Task<Results<Ok<AuthAccountResponse>, ProblemHttpResult>> LoginAsync(
+    private static async Task<Results<Ok<LoginResponse>, ProblemHttpResult>> LoginAsync(
         LoginRequest request,
+        HttpContext httpContext,
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
+        IdentityDbContext db,
         CancellationToken cancellationToken)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
@@ -109,8 +116,11 @@ public static class AuthEndpoints
                 statusCode: StatusCodes.Status401Unauthorized);
         }
 
-        var result = await signInManager.PasswordSignInAsync(user, request.Password, isPersistent: true, lockoutOnFailure: true);
-        if (!result.Succeeded)
+        // T050: CheckPasswordSignInAsync (not PasswordSignInAsync) — it validates the
+        // password and lockout state without establishing any cookie, so an MFA-enabled
+        // account never gets a full session before the code is verified.
+        var checkResult = await signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+        if (!checkResult.Succeeded)
         {
             return TypedResults.Problem(
                 title: "Sign-in failed",
@@ -118,10 +128,81 @@ public static class AuthEndpoints
                 statusCode: StatusCodes.Status401Unauthorized);
         }
 
+        return TypedResults.Ok(await SignInOrChallengeMfaAsync(user, httpContext, signInManager, db, cancellationToken));
+    }
+
+    /// <summary>
+    /// Shared by the password login path above and T049's external-provider callback:
+    /// establishes the real session directly, or parks the caller in MfaPendingScheme
+    /// and reports requiresMfa=true, depending on whether MfaEnrollment is enabled —
+    /// so a user can't bypass their own MFA just by signing in via a social provider.
+    /// </summary>
+    internal static async Task<LoginResponse> SignInOrChallengeMfaAsync(
+        ApplicationUser user,
+        HttpContext httpContext,
+        SignInManager<ApplicationUser> signInManager,
+        IdentityDbContext db,
+        CancellationToken cancellationToken)
+    {
+        var mfaEnabled = await db.MfaEnrollments.AnyAsync(m => m.UserId == user.Id && m.EnabledAt != null, cancellationToken);
+        if (mfaEnabled)
+        {
+            var pendingPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
+                [new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())],
+                IdentityModule.MfaPendingScheme));
+            await httpContext.SignInAsync(IdentityModule.MfaPendingScheme, pendingPrincipal);
+
+            return new LoginResponse(RequiresMfa: true, UserId: null, Email: null, DisplayName: null);
+        }
+
+        await signInManager.SignInAsync(user, isPersistent: true);
+        return new LoginResponse(RequiresMfa: false, user.Id, user.Email!, user.DisplayName);
+    }
+
+    /// <summary>Completes a sign-in that LoginAsync parked in the MfaPendingScheme cookie (T050).</summary>
+    private static async Task<Results<Ok<AuthAccountResponse>, ProblemHttpResult>> LoginMfaAsync(
+        LoginMfaRequest request,
+        HttpContext httpContext,
+        SignInManager<ApplicationUser> signInManager,
+        UserManager<ApplicationUser> userManager,
+        IdentityDbContext db,
+        IMfaSecretCipher cipher,
+        CancellationToken cancellationToken)
+    {
+        var pendingAuth = await httpContext.AuthenticateAsync(IdentityModule.MfaPendingScheme);
+        var pendingUserId = pendingAuth.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!pendingAuth.Succeeded || pendingUserId is null)
+        {
+            return TypedResults.Problem(
+                title: "No pending MFA challenge",
+                detail: "Sign in with a password first.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var userId = Guid.Parse(pendingUserId);
+        var enrollment = await db.MfaEnrollments.SingleOrDefaultAsync(m => m.UserId == userId && m.EnabledAt != null, cancellationToken);
+        var user = enrollment is null ? null : await userManager.FindByIdAsync(userId.ToString());
+        // This per-login decrypt is deliberately NOT audit-logged (T162 security
+        // audit): the append-only audit log records administrative/staff actions and
+        // account-security state changes (constitution Principle XIV, FR-065), and a
+        // row per sign-in would turn it into a login-activity ledger — that visibility
+        // belongs to T051's session/device management and OTel, not the admin audit
+        // table. The state transitions (enable/disable) ARE audited in MfaEndpoints.
+        if (enrollment is null || user is null || !TotpCodeGenerator.VerifyCode(cipher.Decrypt(userId, enrollment.EncryptedSecret), request.Code))
+        {
+            return TypedResults.Problem(
+                title: "Sign-in failed",
+                detail: "Invalid MFA code.",
+                statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        await httpContext.SignOutAsync(IdentityModule.MfaPendingScheme);
+        await signInManager.SignInAsync(user, isPersistent: true);
+
         return TypedResults.Ok(new AuthAccountResponse(user.Id, user.Email!, user.DisplayName));
     }
 
-    private static UnitPreference ParseUnitPreference(string? value) =>
+    internal static UnitPreference ParseUnitPreference(string? value) =>
         Enum.TryParse<UnitPreference>(value, ignoreCase: true, out var parsed) ? parsed : UnitPreference.Milliliters;
 }
 
@@ -134,5 +215,13 @@ public sealed record RegisterRequest(
     string? Locale);
 
 public sealed record LoginRequest(string Email, string Password);
+
+public sealed record LoginMfaRequest(string Code);
+
+/// <summary>
+/// User fields are null when RequiresMfa is true (the caller isn't signed in yet) —
+/// call POST /auth/login/mfa with a TOTP code to complete sign-in.
+/// </summary>
+public sealed record LoginResponse(bool RequiresMfa, Guid? UserId, string? Email, string? DisplayName);
 
 public sealed record AuthAccountResponse(Guid UserId, string Email, string DisplayName);

@@ -111,7 +111,7 @@ namespace SpecPour.Tests.Acceptance.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US02_Identity.feature.ndjson", 10);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US02_Identity.feature.ndjson", 12);
         }
         
         async global::System.Threading.Tasks.Task global::Xunit.IAsyncLifetime.InitializeAsync()
@@ -412,6 +412,89 @@ namespace SpecPour.Tests.Acceptance.Features
 #line hidden
 #line 50
     await testRunner.AndAsync("the predicate check is audit-logged", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="9 - A user can enroll TOTP MFA and must use it to sign in afterward")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "9 - A user can enroll TOTP MFA and must use it to sign in afterward")]
+        public async global::System.Threading.Tasks.Task _9_AUserCanEnrollTOTPMFAAndMustUseItToSignInAfterward()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "8";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("9 - A user can enroll TOTP MFA and must use it to sign in afterward", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 52
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 53
+    await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 54
+    await testRunner.WhenAsync("the user enrolls TOTP multi-factor authentication", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 55
+    await testRunner.ThenAsync("MFA is enabled for the account", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 56
+    await testRunner.AndAsync("the enrollment secret is never shown again", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 57
+    await testRunner.WhenAsync("the user signs in with their password", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 58
+    await testRunner.ThenAsync("the sign-in requires an MFA code", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 59
+    await testRunner.WhenAsync("the user completes sign-in with a valid MFA code", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 60
+    await testRunner.ThenAsync("the sign-in succeeds", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="10 - A user can disable TOTP MFA")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "10 - A user can disable TOTP MFA")]
+        public async global::System.Threading.Tasks.Task _10_AUserCanDisableTOTPMFA()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "9";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("10 - A user can disable TOTP MFA", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 62
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 63
+    await testRunner.GivenAsync("a registered adult user with MFA enabled", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 64
+    await testRunner.WhenAsync("the user disables MFA", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 65
+    await testRunner.ThenAsync("MFA is no longer enabled for the account", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

@@ -1,5 +1,10 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using SpecPour.Modules.Notifications.Contracts;
+using SpecPour.Modules.Notifications.Infrastructure;
 using Testcontainers.PostgreSql;
 
 namespace SpecPour.Tests.Contract.Support;
@@ -49,7 +54,16 @@ public sealed class ComposedHostFixture : IAsyncLifetime
         Environment.SetEnvironmentVariable("ObjectStorage__SecretKey", "contract-test");
         Environment.SetEnvironmentVariable("ObjectStorage__BucketName", "specpour-media-test");
 
-        _factory = new WebApplicationFactory<Program>();
+        // T146: no reachable SMTP server here (no Testcontainers smtp4dev — that's
+        // SmtpEmailChannelAdapterContractTests' own isolated concern) — swap back to
+        // the logging adapter so nothing in this shared host fails on a connection
+        // error unrelated to what it's testing.
+        _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+            builder.ConfigureTestServices(services =>
+            {
+                services.RemoveAll<IEmailChannelAdapter>();
+                services.AddScoped<IEmailChannelAdapter, LoggingEmailChannelAdapter>();
+            }));
         Client = _factory.CreateClient();
     }
 

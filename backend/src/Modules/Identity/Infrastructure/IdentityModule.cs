@@ -1,4 +1,7 @@
+using AspNet.Security.OAuth.Apple;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
@@ -13,6 +16,7 @@ using OpenIddict.Validation.AspNetCore;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Identity.Application.Ports;
+using SpecPour.Modules.Identity.Infrastructure.ExternalProviders;
 using SpecPour.Modules.Identity.Infrastructure.OpenIddict;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -28,6 +32,15 @@ public sealed class IdentityModule : IModule
 {
     public string Name => "Identity";
     public string? SchemaName => ModuleSchemas.Identity;
+
+    /// <summary>
+    /// T050: the interim cookie scheme LoginAsync signs into when a password check
+    /// succeeds but MfaEnrollment gates full sign-in — carries only a "who is this"
+    /// claim, never grants API access itself. POST /auth/login/mfa reads it, verifies
+    /// a TOTP code, then signs the caller into IdentityConstants.ApplicationScheme
+    /// (the real session) and signs this one out.
+    /// </summary>
+    public const string MfaPendingScheme = "SpecPour.MfaPending";
 
     public void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
@@ -59,6 +72,7 @@ public sealed class IdentityModule : IModule
             });
 
         services.AddScoped<IDateOfBirthCipher, DataProtectionDateOfBirthCipher>();
+        services.AddScoped<IMfaSecretCipher, DataProtectionMfaSecretCipher>();
         services.AddScoped<Contracts.IAgePredicatePort, AgePredicateAdapter>();
 
         services.AddIdentityCore<ApplicationUser>(options =>
@@ -107,7 +121,7 @@ public sealed class IdentityModule : IModule
         // first real end-to-end bearer token this codebase ever minted, checked
         // against GET /me/entitlements, resolved as "guest" despite a valid token.
         const string HybridSchemeName = "SpecPour.CookieOrBearer";
-        services.AddAuthentication(options =>
+        var authenticationBuilder = services.AddAuthentication(options =>
             {
                 options.DefaultScheme = HybridSchemeName;
                 options.DefaultChallengeScheme = HybridSchemeName;
@@ -120,7 +134,60 @@ public sealed class IdentityModule : IModule
                         ? OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
                         : IdentityConstants.ApplicationScheme;
             })
-            .AddCookie(IdentityConstants.ApplicationScheme);
+            .AddCookie(IdentityConstants.ApplicationScheme)
+            // T050: short-lived, purpose-narrow cookie for the password-verified-but-
+            // MFA-pending interim state (see MfaPendingScheme's own doc comment).
+            .AddCookie(MfaPendingScheme, options => options.ExpireTimeSpan = TimeSpan.FromMinutes(5))
+            // T049: ASP.NET Core Identity's own convention for the interim principal
+            // between "provider redirected back" and "we decided what to do with this
+            // identity" (SignInManager.GetExternalLoginInfoAsync reads it by hardcoded
+            // scheme name, same as ApplicationScheme's convention above). AddIdentityCore
+            // doesn't auto-register it the way the full AddIdentity() would.
+            .AddCookie(IdentityConstants.ExternalScheme, options => options.ExpireTimeSpan = TimeSpan.FromMinutes(15));
+
+        // T049: each provider is registered only if actually configured. Remote OAuth
+        // handlers validate their options (non-empty ClientId) EAGERLY, on every
+        // request — not just when challenged — because the auth middleware asks every
+        // registered scheme whether the current path is its OAuth callback path.
+        // Registering all three unconditionally with empty config would 500 every
+        // single request in any environment (dev, CI, a self-hosted deploy) that
+        // hasn't set up all three providers. A provider genuinely being absent is a
+        // legitimate deployment choice, not a misconfiguration to paper over.
+        if (!string.IsNullOrWhiteSpace(configuration["ExternalProviders:Google:ClientId"]))
+        {
+            authenticationBuilder.AddGoogle(options =>
+            {
+                configuration.GetSection("ExternalProviders:Google").Bind(options);
+                options.SignInScheme = IdentityConstants.ExternalScheme;
+            });
+            services.AddSingleton<IExternalIdentityProviderPort, GoogleExternalIdentityProviderAdapter>();
+        }
+
+        if (!string.IsNullOrWhiteSpace(configuration["ExternalProviders:Microsoft:ClientId"]))
+        {
+            authenticationBuilder.AddMicrosoftAccount(options =>
+            {
+                configuration.GetSection("ExternalProviders:Microsoft").Bind(options);
+                options.SignInScheme = IdentityConstants.ExternalScheme;
+            });
+            services.AddSingleton<IExternalIdentityProviderPort, MicrosoftExternalIdentityProviderAdapter>();
+        }
+
+        if (!string.IsNullOrWhiteSpace(configuration["ExternalProviders:Apple:ClientId"]))
+        {
+            authenticationBuilder.AddApple(options =>
+            {
+                configuration.GetSection("ExternalProviders:Apple").Bind(options);
+                options.SignInScheme = IdentityConstants.ExternalScheme;
+                // Apple's client secret is a JWT the caller signs with their private
+                // key, not a static value (R6: let the library do this rather than
+                // hand-rolling the signing) — TeamId/KeyId/PrivateKey configure it.
+                options.GenerateClientSecret = true;
+                var privateKeyPem = configuration["ExternalProviders:Apple:PrivateKey"] ?? string.Empty;
+                options.PrivateKey = (_, _) => Task.FromResult<ReadOnlyMemory<char>>(privateKeyPem.AsMemory());
+            });
+            services.AddSingleton<IExternalIdentityProviderPort, AppleExternalIdentityProviderAdapter>();
+        }
 
         services.AddOpenIddict()
             .AddCore(options => options.UseEntityFrameworkCore().UseDbContext<IdentityDbContext>())
@@ -166,7 +233,10 @@ public sealed class IdentityModule : IModule
     {
         TokenEndpoints.Map(endpoints);
         Endpoints.AuthEndpoints.Map(endpoints);
+        Endpoints.MfaEndpoints.Map(endpoints);
+        Endpoints.RecoveryEndpoints.Map(endpoints);
+        Endpoints.ExternalAuthEndpoints.Map(endpoints);
 
-        // MFA, session, and lifecycle endpoints land in T049-T054.
+        // Session and lifecycle endpoints (T051-T054) land next.
     }
 }

@@ -296,5 +296,177 @@
   "signInRegisterInstead": "Don't have an account? Create one",
   "@signInRegisterInstead": {
     "description": "T055 sign-in screen: link to the registration screen."
+  },
+  "signInForgotPasswordLink": "Forgot your password?",
+  "@signInForgotPasswordLink": {
+    "description": "T050 sign-in screen: link to the account recovery request screen."
+  },
+  "mfaChallengeTitle": "Enter your code",
+  "@mfaChallengeTitle": {
+    "description": "T050 MFA login-challenge screen title."
+  },
+  "mfaChallengeBody": "Enter the 6-digit code from your authenticator app.",
+  "@mfaChallengeBody": {
+    "description": "T050 MFA login-challenge screen: instructions."
+  },
+  "mfaChallengeCodeLabel": "Code",
+  "@mfaChallengeCodeLabel": {
+    "description": "T050 MFA login-challenge screen: code field label."
+  },
+  "mfaChallengeSubmitButton": "Verify",
+  "@mfaChallengeSubmitButton": {
+    "description": "T050 MFA login-challenge screen: submit button."
+  },
+  "mfaChallengeMissingCodeError": "Please enter your code.",
+  "@mfaChallengeMissingCodeError": {
+    "description": "T050 MFA login-challenge screen: client-side validation message."
+  },
+  "mfaSettingsTitle": "Two-factor authentication",
+  "@mfaSettingsTitle": {
+    "description": "T050 MFA settings screen title."
+  },
+  "mfaSettingsStatusEnabled": "Two-factor authentication is on.",
+  "@mfaSettingsStatusEnabled": {
+    "description": "T050 MFA settings screen: status when enabled."
+  },
+  "mfaSettingsStatusDisabled": "Two-factor authentication is off.",
+  "@mfaSettingsStatusDisabled": {
+    "description": "T050 MFA settings screen: status when disabled."
+  },
+  "mfaSettingsEnrollButton": "Set up two-factor authentication",
+  "@mfaSettingsEnrollButton": {
+    "description": "T050 MFA settings screen: start-enrollment button."
+  },
+  "mfaSettingsSecretLabel": "Enter this key in your authenticator app:",
+  "@mfaSettingsSecretLabel": {
+    "description": "T050 MFA settings screen: label above the issued TOTP secret for manual entry."
+  },
+  "mfaSettingsEnterCodeLabel": "Enter the code it shows",
+  "@mfaSettingsEnterCodeLabel": {
+    "description": "T050 MFA settings screen: label for the confirmation code field."
+  },
+  "mfaSettingsConfirmButton": "Confirm",
+  "@mfaSettingsConfirmButton": {
+    "description": "T050 MFA settings screen: confirm-enrollment button."
+  },
+  "mfaSettingsDisableButton": "Turn off two-factor authentication",
+  "@mfaSettingsDisableButton": {
+    "description": "T050 MFA settings screen: disable button."
+  },
+  "mfaSettingsEnabledConfirmation": "Two-factor authentication is now on.",
+  "@mfaSettingsEnabledConfirmation": {
+    "description": "T050 MFA settings screen: confirmation message after enabling."
+  },
+  "mfaSettingsDisabledConfirmation": "Two-factor authentication is now off.",
+  "@mfaSettingsDisabledConfirmation": {
+    "description": "T050 MFA settings screen: confirmation message after disabling."
+  },
+  "mfaSettingsMissingCodeError": "Please enter the code.",
+  "@mfaSettingsMissingCodeError": {
+    "description": "T050 MFA settings screen: client-side validation message."
+  },
+  "recoveryRequestTitle": "Recover your account",
+  "@recoveryRequestTitle": {
+    "description": "T050 account-recovery request screen title."
+  },
+  "recoveryRequestEmailLabel": "Email",
+  "@recoveryRequestEmailLabel": {
+    "description": "T050 account-recovery request screen: email field label."
+  },
+  "recoveryRequestSubmitButton": "Send recovery code",
+  "@recoveryRequestSubmitButton": {
+    "description": "T050 account-recovery request screen: submit button."
+  },
+  "recoveryRequestMissingFieldError": "Please enter your email.",
+  "@recoveryRequestMissingFieldError": {
+    "description": "T050 account-recovery request screen: client-side validation message."
+  },
+  "recoveryRequestSuccessMessage": "If that email has an account, a recovery code is on its way.",
+  "@recoveryRequestSuccessMessage": {
+    "description": "T050 account-recovery request screen: confirmation shown regardless of whether the account exists (no enumeration)."
+  },
+  "recoveryRequestGoToConfirmLink": "Already have a code?",
+  "@recoveryRequestGoToConfirmLink": {
+    "description": "T050 account-recovery request screen: link to the confirm screen."
+  },
+  "recoveryConfirmTitle": "Reset your password",
+  "@recoveryConfirmTitle": {
+    "description": "T050 account-recovery confirm screen title."
+  },
+  "recoveryConfirmEmailLabel": "Email",
+  "@recoveryConfirmEmailLabel": {
+    "description": "T050 account-recovery confirm screen: email field label."
+  },
+  "recoveryConfirmTokenLabel": "Recovery code",
+  "@recoveryConfirmTokenLabel": {
+    "description": "T050 account-recovery confirm screen: recovery-code field label."
+  },
+  "recoveryConfirmNewPasswordLabel": "New password",
+  "@recoveryConfirmNewPasswordLabel": {
+    "description": "T050 account-recovery confirm screen: new-password field label."
+  },
+  "recoveryConfirmSubmitButton": "Reset password",
+  "@recoveryConfirmSubmitButton": {
+    "description": "T050 account-recovery confirm screen: submit button."
+  },
+  "recoveryConfirmMissingFieldsError": "Please fill in every field.",
+  "@recoveryConfirmMissingFieldsError": {
+    "description": "T050 account-recovery confirm screen: client-side validation message."
+  },
+  "recoveryConfirmSuccessMessage": "Your password has been reset. You can sign in now.",
+  "@recoveryConfirmSuccessMessage": {
+    "description": "T050 account-recovery confirm screen: success message."
+  },
+  "socialSignInDivider": "or",
+  "@socialSignInDivider": {
+    "description": "T049 sign-in/register screens: divider between the password form and social sign-in buttons."
+  },
+  "socialSignInGoogleButton": "Continue with Google",
+  "@socialSignInGoogleButton": {
+    "description": "T049 social sign-in button."
+  },
+  "socialSignInAppleButton": "Continue with Apple",
+  "@socialSignInAppleButton": {
+    "description": "T049 social sign-in button."
+  },
+  "socialSignInMicrosoftButton": "Continue with Microsoft",
+  "@socialSignInMicrosoftButton": {
+    "description": "T049 social sign-in button."
+  },
+  "externalCallbackProcessingMessage": "Finishing sign-in…",
+  "@externalCallbackProcessingMessage": {
+    "description": "T049 social sign-in callback screen: shown while the redirect result is being processed."
+  },
+  "externalCallbackErrorMessage": "Sign-in with that provider didn't work. Please try again.",
+  "@externalCallbackErrorMessage": {
+    "description": "T049 social sign-in callback screen: shown when the provider redirected back with an error."
+  },
+  "completeExternalRegistrationTitle": "Finish creating your account",
+  "@completeExternalRegistrationTitle": {
+    "description": "T049 social sign-in DOB-completion screen title."
+  },
+  "completeExternalRegistrationBody": "We just need your date of birth to finish setting up your account.",
+  "@completeExternalRegistrationBody": {
+    "description": "T049 social sign-in DOB-completion screen: instructions."
+  },
+  "completeExternalRegistrationDisplayNameLabel": "Display name",
+  "@completeExternalRegistrationDisplayNameLabel": {
+    "description": "T049 social sign-in DOB-completion screen: display-name field label (used only if the provider didn't share one)."
+  },
+  "completeExternalRegistrationDateOfBirthLabel": "Date of birth",
+  "@completeExternalRegistrationDateOfBirthLabel": {
+    "description": "T049 social sign-in DOB-completion screen: date-of-birth field label."
+  },
+  "completeExternalRegistrationDateOfBirthHint": "Select your date of birth",
+  "@completeExternalRegistrationDateOfBirthHint": {
+    "description": "T049 social sign-in DOB-completion screen: date-picker placeholder."
+  },
+  "completeExternalRegistrationSubmitButton": "Finish creating account",
+  "@completeExternalRegistrationSubmitButton": {
+    "description": "T049 social sign-in DOB-completion screen: submit button."
+  },
+  "completeExternalRegistrationMissingFieldsError": "Please fill in every field.",
+  "@completeExternalRegistrationMissingFieldsError": {
+    "description": "T049 social sign-in DOB-completion screen: client-side validation message."
   }
 }

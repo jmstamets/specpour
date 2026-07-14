@@ -14,13 +14,14 @@ namespace SpecPour.Tests.Contract;
 public sealed class SensitivePiiInvariantTests
 {
     // MeExport (T053, not yet built): the sole RESPONSE surface allowed to return a
-    // raw dateOfBirth (FR-002b/SC-017). RegisterRequest: accepts dateOfBirth as
-    // INPUT only — it's a request body, never returned; OpenApiConformanceTests'
+    // raw dateOfBirth (FR-002b/SC-017). RegisterRequest/CompleteExternalRegistrationRequest
+    // (T049, social sign-in's own DOB-completion step): accept dateOfBirth as INPUT
+    // only — it's a request body, never returned; OpenApiConformanceTests'
     // PostAuthRegister_conforms_to_its_schema separately asserts the actual response
     // body never contains the string "dateOfBirth", covering what this schema-only
     // scan can't (a request schema having the property is fine; a response schema
     // having it is the violation).
-    private static readonly HashSet<string> AllowedSchemaNames = ["MeExport", "RegisterRequest"];
+    private static readonly HashSet<string> AllowedSchemaNames = ["MeExport", "RegisterRequest", "CompleteExternalRegistrationRequest"];
 
     [Fact]
     public async Task No_schema_other_than_the_allowed_ones_carries_a_raw_dateOfBirth_property()

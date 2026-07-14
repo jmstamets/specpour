@@ -57,6 +57,20 @@ paths:
     $ref: './paths/identity.yaml#/register'
   /auth/login:
     $ref: './paths/identity.yaml#/login'
+  /auth/login/mfa:
+    $ref: './paths/identity.yaml#/loginMfa'
+  /auth/recovery:
+    $ref: './paths/identity.yaml#/recoveryRequest'
+  /auth/recovery/confirm:
+    $ref: './paths/identity.yaml#/recoveryConfirm'
+  /me/mfa:
+    $ref: './paths/identity.yaml#/meMfa'
+  /auth/external/{provider}:
+    $ref: './paths/identity.yaml#/externalChallenge'
+  /auth/external/{provider}/callback:
+    $ref: './paths/identity.yaml#/externalCallback'
+  /auth/external/complete-registration:
+    $ref: './paths/identity.yaml#/externalCompleteRegistration'
   /me/entitlements:
     $ref: './paths/authorization.yaml#/meEntitlements'
   /compliance/age-gate:

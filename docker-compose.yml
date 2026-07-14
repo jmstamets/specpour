@@ -1,7 +1,8 @@
 # Local development stack for SpecPour: PostgreSQL+PostGIS, MinIO (S3-compatible
-# object storage), an OpenTelemetry collector, and the API host itself.
-# Cloud-agnostic per constitution Technology & Standards — nothing here binds to a
-# specific cloud provider; production swaps compose for the target orchestrator.
+# object storage), an OpenTelemetry collector, a dev SMTP mail-catcher, and the API
+# host itself. Cloud-agnostic per constitution Technology & Standards — nothing here
+# binds to a specific cloud provider; production swaps compose for the target
+# orchestrator (and swaps smtp4dev for a real SMTP-speaking provider via config, T146).
 
 services:
   postgres:
@@ -52,6 +53,19 @@ services:
       - "4317:4317"   # OTLP gRPC
       - "4318:4318"   # OTLP HTTP
 
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    container_name: specpour-smtp4dev
+    restart: unless-stopped
+    ports:
+      - "2525:25"   # SMTP — T146's IEmailChannelAdapter dev target
+      - "5080:80"   # Web UI: view caught mail at http://localhost:5080
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:80"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   migration-runner:
     build:
       context: ./backend
@@ -77,6 +91,8 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
+      smtp4dev:
+        condition: service_healthy
       migration-runner:
         condition: service_completed_successfully
     environment:
@@ -88,6 +104,9 @@ services:
       ObjectStorage__SecretKey: specpour_dev_only
       ObjectStorage__BucketName: specpour-media
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      Email__Smtp__Host: smtp4dev
+      Email__Smtp__Port: "25"
+      Email__Smtp__FromAddress: "noreply@specpour.local"
     ports:
       - "5001:8080"
 
