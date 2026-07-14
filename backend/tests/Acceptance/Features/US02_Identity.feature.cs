@@ -111,7 +111,7 @@ namespace SpecPour.Tests.Acceptance.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US02_Identity.feature.ndjson", 12);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US02_Identity.feature.ndjson", 16);
         }
         
         async global::System.Threading.Tasks.Task global::Xunit.IAsyncLifetime.InitializeAsync()
@@ -495,6 +495,175 @@ namespace SpecPour.Tests.Acceptance.Features
 #line hidden
 #line 65
     await testRunner.ThenAsync("MFA is no longer enabled for the account", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="11 - A user who loses their MFA device can sign in with a backup code (T163, spec" +
+            ".md scenario 10)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "11 - A user who loses their MFA device can sign in with a backup code (T163, spec" +
+            ".md scenario 10)")]
+        public async global::System.Threading.Tasks.Task _11_AUserWhoLosesTheirMFADeviceCanSignInWithABackupCodeT163Spec_MdScenario10()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "10";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("11 - A user who loses their MFA device can sign in with a backup code (T163, spec" +
+                    ".md scenario 10)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 67
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 68
+    await testRunner.GivenAsync("a registered adult user with MFA enabled", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 69
+    await testRunner.WhenAsync("the user signs in with their password", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 70
+    await testRunner.AndAsync("the user completes sign-in with a valid backup code", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 71
+    await testRunner.ThenAsync("the sign-in succeeds", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="12 - A used backup code cannot be reused (T163)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "12 - A used backup code cannot be reused (T163)")]
+        public async global::System.Threading.Tasks.Task _12_AUsedBackupCodeCannotBeReusedT163()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "11";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("12 - A used backup code cannot be reused (T163)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 73
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 74
+    await testRunner.GivenAsync("a registered adult user with MFA enabled", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 75
+    await testRunner.WhenAsync("the user signs in with their password", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 76
+    await testRunner.AndAsync("the user completes sign-in with a valid backup code", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 77
+    await testRunner.ThenAsync("the sign-in succeeds", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 78
+    await testRunner.WhenAsync("the user signs in with their password", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 79
+    await testRunner.AndAsync("the user completes sign-in with the same backup code again", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 80
+    await testRunner.ThenAsync("the sign-in is rejected", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="13 - Regenerating backup codes invalidates the prior set (T163)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "13 - Regenerating backup codes invalidates the prior set (T163)")]
+        public async global::System.Threading.Tasks.Task _13_RegeneratingBackupCodesInvalidatesThePriorSetT163()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "12";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("13 - Regenerating backup codes invalidates the prior set (T163)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 82
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 83
+    await testRunner.GivenAsync("a registered adult user with MFA enabled", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 84
+    await testRunner.WhenAsync("the user regenerates their backup codes", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 85
+    await testRunner.ThenAsync("a fresh set of backup codes is issued", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 86
+    await testRunner.WhenAsync("the user signs in with their password", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 87
+    await testRunner.AndAsync("the user completes sign-in with the original backup code", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 88
+    await testRunner.ThenAsync("the sign-in is rejected", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="14 - Password recovery never bypasses an enabled MFA gate (T163, FR-001a, spec.md" +
+            " scenario 9)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "14 - Password recovery never bypasses an enabled MFA gate (T163, FR-001a, spec.md" +
+            " scenario 9)")]
+        public async global::System.Threading.Tasks.Task _14_PasswordRecoveryNeverBypassesAnEnabledMFAGateT163FR_001ASpec_MdScenario9()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "13";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("14 - Password recovery never bypasses an enabled MFA gate (T163, FR-001a, spec.md" +
+                    " scenario 9)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 90
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 91
+    await testRunner.GivenAsync("a registered adult user with MFA enabled", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 92
+    await testRunner.WhenAsync("the user resets their password via account recovery", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 93
+    await testRunner.AndAsync("the user signs in with their new password", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 94
+    await testRunner.ThenAsync("the sign-in requires an MFA code", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

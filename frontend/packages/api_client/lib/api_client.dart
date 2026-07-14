@@ -24,6 +24,7 @@ export 'package:api_client/src/model/age_gate_response.dart';
 export 'package:api_client/src/model/auth_account.dart';
 export 'package:api_client/src/model/auto_link_match.dart';
 export 'package:api_client/src/model/auto_link_response.dart';
+export 'package:api_client/src/model/backup_codes.dart';
 export 'package:api_client/src/model/complete_external_registration_request.dart';
 export 'package:api_client/src/model/concept_detail.dart';
 export 'package:api_client/src/model/concept_page.dart';

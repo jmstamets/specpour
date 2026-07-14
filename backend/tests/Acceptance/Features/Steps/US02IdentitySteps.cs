@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,10 @@ public sealed class US02IdentitySteps
     private HttpClient? _sessionClient;
     private HttpClient? _loginClient;
     private string _mfaSecret = string.Empty;
+    private string _currentPassword = Password;
+    private List<string> _backupCodes = [];
+    private List<string> _originalBackupCodes = [];
+    private string? _lastConsumedBackupCode;
 
     [When(@"a visitor registers with a valid adult date of birth")]
     public async Task WhenAVisitorRegistersWithAValidAdultDateOfBirth() =>
@@ -48,6 +53,7 @@ public sealed class US02IdentitySteps
     private async Task RegisterAsync(DateOnly dateOfBirth)
     {
         _registeredEmail = $"us02-{Guid.NewGuid():N}@example.test";
+        _currentPassword = Password;
         _sessionClient = NewClientWithoutRedirects();
 
         _lastResponse = await _sessionClient.PostAsJsonAsync(
@@ -55,7 +61,7 @@ public sealed class US02IdentitySteps
             new
             {
                 email = _registeredEmail,
-                password = Password,
+                password = _currentPassword,
                 displayName = "US2 Test User",
                 dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
             });
@@ -103,16 +109,18 @@ public sealed class US02IdentitySteps
         await RegisterAsync(DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-30)));
 
     [When(@"the user signs in with their password")]
+    [When(@"the user signs in with their new password")]
     public async Task WhenTheUserSignsInWithTheirPassword()
     {
         // Kept alive (not `using`) rather than disposed at the end of this step: T050's
         // MFA-required scenario needs the same cookie jar for the follow-up
         // POST /auth/login/mfa call, which reads the interim MfaPendingScheme cookie
-        // this request may set.
+        // this request may set. _currentPassword tracks the live password across a
+        // T163 recovery-confirm reset (see WhenTheUserResetsTheirPasswordViaAccountRecovery).
         _loginClient = NewClientWithoutRedirects();
         _lastResponse = await _loginClient.PostAsJsonAsync(
             new Uri("/api/v1/auth/login", UriKind.Relative),
-            new { email = _registeredEmail, password = Password });
+            new { email = _registeredEmail, password = _currentPassword });
         await CaptureJsonAsync();
     }
 
@@ -149,6 +157,14 @@ public sealed class US02IdentitySteps
         var code = TotpCodeGenerator.ComputeCurrentCode(_mfaSecret);
         _lastResponse = await client.PostAsJsonAsync(new Uri("/api/v1/me/mfa", UriKind.Relative), new { code });
         await CaptureJsonAsync();
+
+        // T163: the confirm-that-enables response carries the initial backup-code set.
+        if (_lastResponse.IsSuccessStatusCode
+            && _lastJson!.RootElement.TryGetProperty("backupCodes", out var backupCodesElement)
+            && backupCodesElement.ValueKind == JsonValueKind.Array)
+        {
+            _backupCodes = [.. backupCodesElement.EnumerateArray().Select(e => e.GetString()!)];
+        }
     }
 
     [Then(@"MFA is enabled for the account")]
@@ -207,6 +223,88 @@ public sealed class US02IdentitySteps
         var statusResponse = await client.GetAsync(new Uri("/api/v1/me/mfa", UriKind.Relative));
         using var statusJson = JsonDocument.Parse(await statusResponse.Content.ReadAsStringAsync());
         Assert.False(statusJson.RootElement.GetProperty("enabled").GetBoolean());
+    }
+
+    [When(@"the user completes sign-in with a valid backup code")]
+    public async Task WhenTheUserCompletesSignInWithAValidBackupCode()
+    {
+        var client = _loginClient ?? throw new InvalidOperationException("No pending login session — sign in with a password first.");
+        var code = _backupCodes[0];
+        _backupCodes.RemoveAt(0);
+        _lastConsumedBackupCode = code;
+
+        _lastResponse = await client.PostAsJsonAsync(new Uri("/api/v1/auth/login/mfa", UriKind.Relative), new { code });
+        await CaptureJsonAsync();
+    }
+
+    [When(@"the user completes sign-in with the same backup code again")]
+    public async Task WhenTheUserCompletesSignInWithTheSameBackupCodeAgain()
+    {
+        var client = _loginClient ?? throw new InvalidOperationException("No pending login session — sign in with a password first.");
+        var code = _lastConsumedBackupCode ?? throw new InvalidOperationException("No backup code was consumed yet.");
+
+        _lastResponse = await client.PostAsJsonAsync(new Uri("/api/v1/auth/login/mfa", UriKind.Relative), new { code });
+        await CaptureJsonAsync();
+    }
+
+    [When(@"the user completes sign-in with the original backup code")]
+    public async Task WhenTheUserCompletesSignInWithTheOriginalBackupCode()
+    {
+        var client = _loginClient ?? throw new InvalidOperationException("No pending login session — sign in with a password first.");
+        var code = _originalBackupCodes[0];
+
+        _lastResponse = await client.PostAsJsonAsync(new Uri("/api/v1/auth/login/mfa", UriKind.Relative), new { code });
+        await CaptureJsonAsync();
+    }
+
+    [Then(@"the sign-in is rejected")]
+    public void ThenTheSignInIsRejected() => Assert.Equal(401, (int)_lastResponse.StatusCode);
+
+    [When(@"the user regenerates their backup codes")]
+    public async Task WhenTheUserRegeneratesTheirBackupCodes()
+    {
+        _originalBackupCodes = [.. _backupCodes];
+
+        var token = await AcquireAccessTokenAsync();
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        _lastResponse = await client.PostAsync(new Uri("/api/v1/me/mfa/backup-codes", UriKind.Relative), content: null);
+        await CaptureJsonAsync();
+
+        if (_lastResponse.IsSuccessStatusCode)
+        {
+            _backupCodes = [.. _lastJson!.RootElement.GetProperty("backupCodes").EnumerateArray().Select(e => e.GetString()!)];
+        }
+    }
+
+    [Then(@"a fresh set of backup codes is issued")]
+    public void ThenAFreshSetOfBackupCodesIsIssued()
+    {
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        Assert.Equal(BackupCodeGenerator.CodeCount, _backupCodes.Count);
+        Assert.Empty(_backupCodes.Intersect(_originalBackupCodes));
+    }
+
+    [When(@"the user resets their password via account recovery")]
+    public async Task WhenTheUserResetsTheirPasswordViaAccountRecovery()
+    {
+        // No email-capture infrastructure exists in this test host (T146's real SMTP
+        // adapter is swapped back to LoggingEmailChannelAdapter here) — generating the
+        // reset token directly via the same UserManager method the real
+        // /auth/recovery endpoint calls internally exercises the identical
+        // ResetPasswordAsync code path POST /auth/recovery/confirm runs, just
+        // skipping the email-transport hop this harness can't observe.
+        using var scope = AcceptanceHooks.Factory.Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var user = await userManager.FindByEmailAsync(_registeredEmail);
+        var token = await userManager.GeneratePasswordResetTokenAsync(user!);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+        _currentPassword = "a brand new recovery passphrase";
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        _lastResponse = await client.PostAsJsonAsync(
+            new Uri("/api/v1/auth/recovery/confirm", UriKind.Relative),
+            new { email = _registeredEmail, token = encodedToken, newPassword = _currentPassword });
     }
 
     [When(@"the user requests account recovery")]

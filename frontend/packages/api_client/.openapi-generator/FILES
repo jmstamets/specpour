@@ -7,6 +7,7 @@ doc/AuthAccount.md
 doc/AuthorizationApi.md
 doc/AutoLinkMatch.md
 doc/AutoLinkResponse.md
+doc/BackupCodes.md
 doc/CatalogApi.md
 doc/CompleteExternalRegistrationRequest.md
 doc/ComplianceApi.md
@@ -81,6 +82,7 @@ lib/src/model/age_gate_response.dart
 lib/src/model/auth_account.dart
 lib/src/model/auto_link_match.dart
 lib/src/model/auto_link_response.dart
+lib/src/model/backup_codes.dart
 lib/src/model/complete_external_registration_request.dart
 lib/src/model/concept_detail.dart
 lib/src/model/concept_page.dart
@@ -133,6 +135,7 @@ test/auth_account_test.dart
 test/authorization_api_test.dart
 test/auto_link_match_test.dart
 test/auto_link_response_test.dart
+test/backup_codes_test.dart
 test/catalog_api_test.dart
 test/complete_external_registration_request_test.dart
 test/compliance_api_test.dart

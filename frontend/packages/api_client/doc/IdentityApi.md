@@ -18,6 +18,7 @@ Method | HTTP request | Description
 [**getMfaStatus**](IdentityApi.md#getmfastatus) | **GET** /me/mfa | Get the caller&#39;s TOTP MFA enrollment status (T050)
 [**login**](IdentityApi.md#login) | **POST** /auth/login | Email/password sign-in, establishing the cookie session (T047)
 [**loginMfa**](IdentityApi.md#loginmfa) | **POST** /auth/login/mfa | Complete a sign-in that requiresMfa (T050)
+[**regenerateMfaBackupCodes**](IdentityApi.md#regeneratemfabackupcodes) | **POST** /me/mfa/backup-codes | Regenerate the caller&#39;s MFA backup codes (T163)
 [**registerAccount**](IdentityApi.md#registeraccount) | **POST** /auth/register | Email/password registration with DOB capture and underage rejection (FR-001/FR-002/FR-002c, T047)
 [**requestAccountRecovery**](IdentityApi.md#requestaccountrecovery) | **POST** /auth/recovery | Request account recovery (T050, FR — lost-credential recovery)
 
@@ -154,6 +155,8 @@ void (empty response body)
 
 Disable TOTP MFA (T050)
 
+Also clears any backup codes (T163) — they're meaningless without an active enrollment.
+
 ### Example
 ```dart
 import 'package:api_client/api.dart';
@@ -190,7 +193,7 @@ void (empty response body)
 
 Start or confirm TOTP MFA enrollment (T050)
 
-Two-phase over a single endpoint: an empty/no-code body starts enrollment (issues a new secret + otpauth:// URI for the caller's authenticator app); a body carrying the 6-digit code confirms the most recently issued secret and enables MFA. The secret/URI are returned only from the start-enrollment response, never again afterward.
+Two-phase over a single endpoint: an empty/no-code body starts enrollment (issues a new secret + otpauth:// URI for the caller's authenticator app); a body carrying the 6-digit code confirms the most recently issued secret and enables MFA. The secret/URI are returned only from the start-enrollment response; the one-time backup-code set (T163) is returned only from the response that actually enables MFA. Neither is ever shown again afterward — POST /me/mfa/backup-codes issues a fresh set if the caller needs one later.
 
 ### Example
 ```dart
@@ -387,6 +390,45 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **regenerateMfaBackupCodes**
+> BackupCodes regenerateMfaBackupCodes()
+
+Regenerate the caller's MFA backup codes (T163)
+
+Invalidates every prior backup code (used or not) and issues a fresh set of 10. Requires MFA to already be enabled — there is nothing to recover into otherwise. Codes are shown exactly once, in this response.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    final response = api.regenerateMfaBackupCodes();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->regenerateMfaBackupCodes: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BackupCodes**](BackupCodes.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json, application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

@@ -245,6 +245,14 @@ account — all without any other feature present.
    identity capability, **When** it needs age information, **Then** it receives only a
    derived predicate (or age band for analytics) — never the raw DOB — and each access
    to the stored value is audit-logged.
+9. **Given** a user with MFA enabled who resets their password via account recovery,
+   **When** they sign in with the new password, **Then** they are still required to
+   complete the MFA challenge — password recovery never bypasses an enabled MFA gate.
+10. **Given** a user who has lost their MFA factor (e.g., a replaced phone), **When**
+    they use a self-service recovery path (e.g., a backup code generated at
+    enrollment), **Then** they regain access without permanent lockout and without
+    requiring support intervention for this common case; a staff-assisted, audited
+    reset remains available when self-service recovery is also unavailable.
 
 ---
 
@@ -719,6 +727,13 @@ action, target, timestamp, and before/after state.
 - **FR-001**: System MUST support email/password registration with modern credential
   handling, social sign-in via established external identity providers, optional
   multi-factor authentication, secure account recovery, and session/device management.
+- **FR-001a**: Password recovery MUST NOT bypass an enabled MFA gate — a user who
+  resets their password via account recovery still MUST complete the MFA challenge
+  to sign in, the same as any other sign-in method. Loss of the MFA factor itself
+  MUST NOT result in permanent account lockout: the system MUST provide a
+  self-service recovery path (e.g., one-time backup codes issued at enrollment) not
+  contingent on possessing the lost factor, escalating to a staff-assisted,
+  audit-logged reset (FR-065) when self-service recovery is also unavailable.
 - **FR-002**: System MUST capture and store date of birth at registration; V1 enforces
   no mandatory age gating on its informational surfaces (per-surface configuration per
   FR-002a), but the data must exist for future age-gated features without

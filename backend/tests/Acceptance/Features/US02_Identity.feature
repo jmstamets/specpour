@@ -63,3 +63,32 @@ Feature: US2 - Create an account and manage identity
     Given a registered adult user with MFA enabled
     When the user disables MFA
     Then MFA is no longer enabled for the account
+
+  Scenario: 11 - A user who loses their MFA device can sign in with a backup code (T163, spec.md scenario 10)
+    Given a registered adult user with MFA enabled
+    When the user signs in with their password
+    And the user completes sign-in with a valid backup code
+    Then the sign-in succeeds
+
+  Scenario: 12 - A used backup code cannot be reused (T163)
+    Given a registered adult user with MFA enabled
+    When the user signs in with their password
+    And the user completes sign-in with a valid backup code
+    Then the sign-in succeeds
+    When the user signs in with their password
+    And the user completes sign-in with the same backup code again
+    Then the sign-in is rejected
+
+  Scenario: 13 - Regenerating backup codes invalidates the prior set (T163)
+    Given a registered adult user with MFA enabled
+    When the user regenerates their backup codes
+    Then a fresh set of backup codes is issued
+    When the user signs in with their password
+    And the user completes sign-in with the original backup code
+    Then the sign-in is rejected
+
+  Scenario: 14 - Password recovery never bypasses an enabled MFA gate (T163, FR-001a, spec.md scenario 9)
+    Given a registered adult user with MFA enabled
+    When the user resets their password via account recovery
+    And the user signs in with their new password
+    Then the sign-in requires an MFA code

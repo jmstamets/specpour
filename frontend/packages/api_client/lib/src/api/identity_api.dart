@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 
 import 'package:api_client/src/api_util.dart';
 import 'package:api_client/src/model/auth_account.dart';
+import 'package:api_client/src/model/backup_codes.dart';
 import 'package:api_client/src/model/complete_external_registration_request.dart';
 import 'package:api_client/src/model/enroll_mfa_request.dart';
 import 'package:api_client/src/model/login_mfa_request.dart';
@@ -265,7 +266,7 @@ class IdentityApi {
   }
 
   /// Disable TOTP MFA (T050)
-  /// 
+  /// Also clears any backup codes (T163) — they&#39;re meaningless without an active enrollment.
   ///
   /// Parameters:
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -316,7 +317,7 @@ class IdentityApi {
   }
 
   /// Start or confirm TOTP MFA enrollment (T050)
-  /// Two-phase over a single endpoint: an empty/no-code body starts enrollment (issues a new secret + otpauth:// URI for the caller&#39;s authenticator app); a body carrying the 6-digit code confirms the most recently issued secret and enables MFA. The secret/URI are returned only from the start-enrollment response, never again afterward.
+  /// Two-phase over a single endpoint: an empty/no-code body starts enrollment (issues a new secret + otpauth:// URI for the caller&#39;s authenticator app); a body carrying the 6-digit code confirms the most recently issued secret and enables MFA. The secret/URI are returned only from the start-enrollment response; the one-time backup-code set (T163) is returned only from the response that actually enables MFA. Neither is ever shown again afterward — POST /me/mfa/backup-codes issues a fresh set if the caller needs one later.
   ///
   /// Parameters:
   /// * [enrollMfaRequest] 
@@ -739,6 +740,85 @@ class IdentityApi {
     }
 
     return Response<AuthAccount>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// Regenerate the caller&#39;s MFA backup codes (T163)
+  /// Invalidates every prior backup code (used or not) and issues a fresh set of 10. Requires MFA to already be enabled — there is nothing to recover into otherwise. Codes are shown exactly once, in this response.
+  ///
+  /// Parameters:
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [BackupCodes] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<BackupCodes>> regenerateMfaBackupCodes({ 
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/me/mfa/backup-codes';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    BackupCodes? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(BackupCodes),
+      ) as BackupCodes;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<BackupCodes>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

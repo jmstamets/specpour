@@ -48,7 +48,7 @@ public sealed class AgePredicateAdapter(
             return null;
         }
 
-        var dateOfBirth = cipher.Decrypt(user.EncryptedDateOfBirth);
+        var dateOfBirth = cipher.Decrypt(user.Id, user.EncryptedDateOfBirth);
 
         await auditWriter.WriteAsync(
             new AuditEntry(userId, actionKey, "User", userId),

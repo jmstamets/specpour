@@ -13,11 +13,14 @@ class _$MfaEnrollment extends MfaEnrollment {
   final String? secret;
   @override
   final String? otpAuthUri;
+  @override
+  final BuiltList<String>? backupCodes;
 
   factory _$MfaEnrollment([void Function(MfaEnrollmentBuilder)? updates]) =>
       (MfaEnrollmentBuilder()..update(updates))._build();
 
-  _$MfaEnrollment._({required this.enabled, this.secret, this.otpAuthUri})
+  _$MfaEnrollment._(
+      {required this.enabled, this.secret, this.otpAuthUri, this.backupCodes})
       : super._();
   @override
   MfaEnrollment rebuild(void Function(MfaEnrollmentBuilder) updates) =>
@@ -32,7 +35,8 @@ class _$MfaEnrollment extends MfaEnrollment {
     return other is MfaEnrollment &&
         enabled == other.enabled &&
         secret == other.secret &&
-        otpAuthUri == other.otpAuthUri;
+        otpAuthUri == other.otpAuthUri &&
+        backupCodes == other.backupCodes;
   }
 
   @override
@@ -41,6 +45,7 @@ class _$MfaEnrollment extends MfaEnrollment {
     _$hash = $jc(_$hash, enabled.hashCode);
     _$hash = $jc(_$hash, secret.hashCode);
     _$hash = $jc(_$hash, otpAuthUri.hashCode);
+    _$hash = $jc(_$hash, backupCodes.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -50,7 +55,8 @@ class _$MfaEnrollment extends MfaEnrollment {
     return (newBuiltValueToStringHelper(r'MfaEnrollment')
           ..add('enabled', enabled)
           ..add('secret', secret)
-          ..add('otpAuthUri', otpAuthUri))
+          ..add('otpAuthUri', otpAuthUri)
+          ..add('backupCodes', backupCodes))
         .toString();
   }
 }
@@ -71,6 +77,12 @@ class MfaEnrollmentBuilder
   String? get otpAuthUri => _$this._otpAuthUri;
   set otpAuthUri(String? otpAuthUri) => _$this._otpAuthUri = otpAuthUri;
 
+  ListBuilder<String>? _backupCodes;
+  ListBuilder<String> get backupCodes =>
+      _$this._backupCodes ??= ListBuilder<String>();
+  set backupCodes(ListBuilder<String>? backupCodes) =>
+      _$this._backupCodes = backupCodes;
+
   MfaEnrollmentBuilder() {
     MfaEnrollment._defaults(this);
   }
@@ -81,6 +93,7 @@ class MfaEnrollmentBuilder
       _enabled = $v.enabled;
       _secret = $v.secret;
       _otpAuthUri = $v.otpAuthUri;
+      _backupCodes = $v.backupCodes?.toBuilder();
       _$v = null;
     }
     return this;
@@ -100,13 +113,27 @@ class MfaEnrollmentBuilder
   MfaEnrollment build() => _build();
 
   _$MfaEnrollment _build() {
-    final _$result = _$v ??
-        _$MfaEnrollment._(
-          enabled: BuiltValueNullFieldError.checkNotNull(
-              enabled, r'MfaEnrollment', 'enabled'),
-          secret: secret,
-          otpAuthUri: otpAuthUri,
-        );
+    _$MfaEnrollment _$result;
+    try {
+      _$result = _$v ??
+          _$MfaEnrollment._(
+            enabled: BuiltValueNullFieldError.checkNotNull(
+                enabled, r'MfaEnrollment', 'enabled'),
+            secret: secret,
+            otpAuthUri: otpAuthUri,
+            backupCodes: _backupCodes?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'backupCodes';
+        _backupCodes?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'MfaEnrollment', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

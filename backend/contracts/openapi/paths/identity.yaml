@@ -242,7 +242,9 @@ meMfa:
       (issues a new secret + otpauth:// URI for the caller's authenticator app); a
       body carrying the 6-digit code confirms the most recently issued secret and
       enables MFA. The secret/URI are returned only from the start-enrollment
-      response, never again afterward.
+      response; the one-time backup-code set (T163) is returned only from the
+      response that actually enables MFA. Neither is ever shown again afterward —
+      POST /me/mfa/backup-codes issues a fresh set if the caller needs one later.
     security:
       - bearerAuth: []
     requestBody:
@@ -265,11 +267,37 @@ meMfa:
     operationId: disableMfa
     tags: [identity]
     summary: Disable TOTP MFA (T050)
+    description: >-
+      Also clears any backup codes (T163) — they're meaningless without an active
+      enrollment.
     security:
       - bearerAuth: []
     responses:
       '204':
         description: MFA disabled (idempotent — also 204 if it was never enabled).
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+meMfaBackupCodes:
+  post:
+    operationId: regenerateMfaBackupCodes
+    tags: [identity]
+    summary: Regenerate the caller's MFA backup codes (T163)
+    description: >-
+      Invalidates every prior backup code (used or not) and issues a fresh set of
+      10. Requires MFA to already be enabled — there is nothing to recover into
+      otherwise. Codes are shown exactly once, in this response.
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: A fresh set of one-time backup codes.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackupCodes'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
       '401':
         $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
 
@@ -358,10 +386,21 @@ components:
     MfaEnrollment:
       type: object
       description: >-
-        secret/otpAuthUri are populated only on the start-enrollment response (enabled=false) —
-        never re-shown once enabled=true.
+        secret/otpAuthUri are populated only on the start-enrollment response
+        (enabled=false); backupCodes only on the confirm response that actually sets
+        enabled=true (T163) — none of the three is ever shown again afterward.
       properties:
         enabled: { type: boolean }
         secret: { type: [string, "null"] }
         otpAuthUri: { type: [string, "null"] }
+        backupCodes:
+          type: [array, "null"]
+          items: { type: string }
       required: [enabled]
+    BackupCodes:
+      type: object
+      properties:
+        backupCodes:
+          type: array
+          items: { type: string }
+      required: [backupCodes]

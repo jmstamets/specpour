@@ -193,6 +193,19 @@ public sealed class OpenApiConformanceTests(ComposedHostFixture host)
     }
 
     [Fact]
+    public async Task PostMeMfaBackupCodes_without_a_token_conforms_to_its_401_schema()
+    {
+        var response = await host.Client.PostAsync(new Uri("/api/v1/me/mfa/backup-codes", UriKind.Relative), content: null);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", "/api/v1/me/mfa/backup-codes", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
     public async Task GetAuthExternal_for_an_unconfigured_provider_conforms_to_its_400_schema()
     {
         // T049: no ExternalProviders:* credentials exist in any test environment (real

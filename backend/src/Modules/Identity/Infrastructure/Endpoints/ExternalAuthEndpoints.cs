@@ -155,15 +155,18 @@ public static class ExternalAuthEndpoints
                 statusCode: StatusCodes.Status403Forbidden);
         }
 
+        // Generated before the object initializer (T164): the AAD-bound DOB cipher
+        // needs the id, but the object doesn't exist yet inside its own initializer.
+        var newUserId = uuidGenerator.NewId();
         var user = new ApplicationUser
         {
-            Id = uuidGenerator.NewId(),
+            Id = newUserId,
             UserName = identity.Email,
             Email = identity.Email,
             EmailConfirmed = true,
             DisplayName = !string.IsNullOrWhiteSpace(identity.DisplayName) ? identity.DisplayName : request.DisplayName,
             // No password (data-model.md User: "password hash (nullable when social-only)").
-            EncryptedDateOfBirth = cipher.Encrypt(request.DateOfBirth),
+            EncryptedDateOfBirth = cipher.Encrypt(newUserId, request.DateOfBirth),
             UnitPreference = AuthEndpoints.ParseUnitPreference(request.UnitPreference),
             Locale = string.IsNullOrWhiteSpace(request.Locale) ? "en-US" : request.Locale,
             CreatedAt = clock.UtcNow,

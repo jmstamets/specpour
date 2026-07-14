@@ -18,6 +18,7 @@ import 'package:api_client/src/model/age_gate_response.dart';
 import 'package:api_client/src/model/auth_account.dart';
 import 'package:api_client/src/model/auto_link_match.dart';
 import 'package:api_client/src/model/auto_link_response.dart';
+import 'package:api_client/src/model/backup_codes.dart';
 import 'package:api_client/src/model/complete_external_registration_request.dart';
 import 'package:api_client/src/model/concept_detail.dart';
 import 'package:api_client/src/model/concept_page.dart';
@@ -70,6 +71,7 @@ part 'serializers.g.dart';
   AuthAccount,
   AutoLinkMatch,
   AutoLinkResponse,
+  BackupCodes,
   CompleteExternalRegistrationRequest,
   ConceptDetail,
   ConceptPage,

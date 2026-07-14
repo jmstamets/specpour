@@ -1,4 +1,4 @@
-# api_client.model.MfaEnrollment
+# api_client.model.BackupCodes
 
 ## Load the model package
 ```dart
@@ -8,10 +8,7 @@ import 'package:api_client/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**enabled** | **bool** |  | 
-**secret** | **String** |  | [optional] 
-**otpAuthUri** | **String** |  | [optional] 
-**backupCodes** | **BuiltList&lt;String&gt;** |  | [optional] 
+**backupCodes** | **BuiltList&lt;String&gt;** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

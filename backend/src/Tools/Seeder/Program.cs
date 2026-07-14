@@ -131,14 +131,17 @@ static async Task BootstrapSuperAdminAsync(IServiceProvider services, IConfigura
     var authzDb = services.GetRequiredService<AuthorizationDbContext>();
     var auditWriter = services.GetRequiredService<IAuditWriter>();
 
+    // Generated before the object initializer (T164): the AAD-bound DOB cipher needs
+    // the id, but the object doesn't exist yet inside its own initializer.
+    var superAdminUserId = uuidGenerator.NewId();
     var user = new ApplicationUser
     {
-        Id = uuidGenerator.NewId(),
+        Id = superAdminUserId,
         UserName = email,
         Email = email,
         EmailConfirmed = true, // Deployment-time bootstrap: no email-confirmation flow to run yet.
         DisplayName = "Super Admin",
-        EncryptedDateOfBirth = cipher.Encrypt(DateOnly.Parse(dateOfBirthRaw, System.Globalization.CultureInfo.InvariantCulture)),
+        EncryptedDateOfBirth = cipher.Encrypt(superAdminUserId, DateOnly.Parse(dateOfBirthRaw, System.Globalization.CultureInfo.InvariantCulture)),
         Locale = "en-US",
         CreatedAt = DateTimeOffset.UtcNow,
     };

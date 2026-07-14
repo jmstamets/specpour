@@ -12,6 +12,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AuthAccount.serializer)
       ..add(AutoLinkMatch.serializer)
       ..add(AutoLinkResponse.serializer)
+      ..add(BackupCodes.serializer)
       ..add(CompleteExternalRegistrationRequest.serializer)
       ..add(CompleteExternalRegistrationRequestUnitPreferenceEnum.serializer)
       ..add(ConceptDetail.serializer)
@@ -98,6 +99,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(SearchResult)]),
           () => ListBuilder<SearchResult>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

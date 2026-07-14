@@ -3,17 +3,19 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
 part 'mfa_enrollment.g.dart';
 
-/// secret/otpAuthUri are populated only on the start-enrollment response (enabled=false) — never re-shown once enabled=true.
+/// secret/otpAuthUri are populated only on the start-enrollment response (enabled=false); backupCodes only on the confirm response that actually sets enabled=true (T163) — none of the three is ever shown again afterward.
 ///
 /// Properties:
 /// * [enabled] 
 /// * [secret] 
 /// * [otpAuthUri] 
+/// * [backupCodes] 
 @BuiltValue()
 abstract class MfaEnrollment implements Built<MfaEnrollment, MfaEnrollmentBuilder> {
   @BuiltValueField(wireName: r'enabled')
@@ -24,6 +26,9 @@ abstract class MfaEnrollment implements Built<MfaEnrollment, MfaEnrollmentBuilde
 
   @BuiltValueField(wireName: r'otpAuthUri')
   String? get otpAuthUri;
+
+  @BuiltValueField(wireName: r'backupCodes')
+  BuiltList<String>? get backupCodes;
 
   MfaEnrollment._();
 
@@ -65,6 +70,13 @@ class _$MfaEnrollmentSerializer implements PrimitiveSerializer<MfaEnrollment> {
       yield serializers.serialize(
         object.otpAuthUri,
         specifiedType: const FullType.nullable(String),
+      );
+    }
+    if (object.backupCodes != null) {
+      yield r'backupCodes';
+      yield serializers.serialize(
+        object.backupCodes,
+        specifiedType: const FullType.nullable(BuiltList, [FullType(String)]),
       );
     }
   }
@@ -112,6 +124,14 @@ class _$MfaEnrollmentSerializer implements PrimitiveSerializer<MfaEnrollment> {
           ) as String?;
           if (valueDes == null) continue;
           result.otpAuthUri = valueDes;
+          break;
+        case r'backupCodes':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(BuiltList, [FullType(String)]),
+          ) as BuiltList<String>?;
+          if (valueDes == null) continue;
+          result.backupCodes.replace(valueDes);
           break;
         default:
           unhandled.add(key);

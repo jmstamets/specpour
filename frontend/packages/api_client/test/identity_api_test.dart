@@ -34,6 +34,8 @@ void main() {
 
     // Disable TOTP MFA (T050)
     //
+    // Also clears any backup codes (T163) — they're meaningless without an active enrollment.
+    //
     //Future disableMfa() async
     test('test disableMfa', () async {
       // TODO
@@ -41,7 +43,7 @@ void main() {
 
     // Start or confirm TOTP MFA enrollment (T050)
     //
-    // Two-phase over a single endpoint: an empty/no-code body starts enrollment (issues a new secret + otpauth:// URI for the caller's authenticator app); a body carrying the 6-digit code confirms the most recently issued secret and enables MFA. The secret/URI are returned only from the start-enrollment response, never again afterward.
+    // Two-phase over a single endpoint: an empty/no-code body starts enrollment (issues a new secret + otpauth:// URI for the caller's authenticator app); a body carrying the 6-digit code confirms the most recently issued secret and enables MFA. The secret/URI are returned only from the start-enrollment response; the one-time backup-code set (T163) is returned only from the response that actually enables MFA. Neither is ever shown again afterward — POST /me/mfa/backup-codes issues a fresh set if the caller needs one later.
     //
     //Future<MfaEnrollment> enrollOrConfirmMfa({ EnrollMfaRequest enrollMfaRequest }) async
     test('test enrollOrConfirmMfa', () async {
@@ -77,6 +79,15 @@ void main() {
     //
     //Future<AuthAccount> loginMfa(LoginMfaRequest loginMfaRequest) async
     test('test loginMfa', () async {
+      // TODO
+    });
+
+    // Regenerate the caller's MFA backup codes (T163)
+    //
+    // Invalidates every prior backup code (used or not) and issues a fresh set of 10. Requires MFA to already be enabled — there is nothing to recover into otherwise. Codes are shown exactly once, in this response.
+    //
+    //Future<BackupCodes> regenerateMfaBackupCodes() async
+    test('test regenerateMfaBackupCodes', () async {
       // TODO
     });
 

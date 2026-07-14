@@ -39,6 +39,7 @@ public static class MfaEndpoints
         group.MapGet("/me/mfa", GetStatusAsync).RequireAuthorization(bearerOnly);
         group.MapPost("/me/mfa", EnrollOrConfirmAsync).RequireAuthorization(bearerOnly);
         group.MapDelete("/me/mfa", DisableAsync).RequireAuthorization(bearerOnly);
+        group.MapPost("/me/mfa/backup-codes", RegenerateBackupCodesAsync).RequireAuthorization(bearerOnly);
     }
 
     private static async Task<Ok<MfaStatusResponse>> GetStatusAsync(
@@ -57,6 +58,7 @@ public static class MfaEndpoints
         UserManager<ApplicationUser> userManager,
         IdentityDbContext db,
         IMfaSecretCipher cipher,
+        IPasswordHasher<ApplicationUser> hasher,
         IAuditWriter auditWriter,
         IUuidGenerator uuidGenerator,
         IClock clock,
@@ -106,6 +108,13 @@ public static class MfaEndpoints
         }
 
         enrollment.EnabledAt = clock.UtcNow;
+
+        // T163: the initial backup-code set is issued the moment MFA actually
+        // becomes enabled — shown exactly once, here, same as the TOTP secret is
+        // shown exactly once on the start-enrollment response.
+        var confirmedUser = await userManager.FindByIdAsync(userId.ToString());
+        var backupCodes = BackupCodeStore.Regenerate(confirmedUser!, db, [], hasher, uuidGenerator, clock);
+
         await db.SaveChangesAsync(cancellationToken);
 
         // T162 security audit: enabling MFA is an account-security state change —
@@ -116,8 +125,50 @@ public static class MfaEndpoints
         await auditWriter.WriteAsync(
             new AuditEntry(userId, "identity.mfa_enabled", "MfaEnrollment", enrollment.Id),
             cancellationToken);
+        await auditWriter.WriteAsync(
+            new AuditEntry(userId, "identity.mfa_backup_codes_generated", "User", userId),
+            cancellationToken);
 
-        return TypedResults.Ok(new MfaEnrollmentResponse(Enabled: true, Secret: null, OtpAuthUri: null));
+        return TypedResults.Ok(new MfaEnrollmentResponse(Enabled: true, Secret: null, OtpAuthUri: null, backupCodes));
+    }
+
+    /// <summary>
+    /// T163: regenerates the backup-code set on demand (e.g. the user used most of
+    /// them, or suspects the printed/saved copy was exposed). Invalidates every prior
+    /// code, used or not. Requires MFA to already be enabled — there is nothing to
+    /// recover into otherwise.
+    /// </summary>
+    private static async Task<Results<Ok<BackupCodesResponse>, ProblemHttpResult>> RegenerateBackupCodesAsync(
+        ClaimsPrincipal user,
+        UserManager<ApplicationUser> userManager,
+        IdentityDbContext db,
+        IPasswordHasher<ApplicationUser> hasher,
+        IAuditWriter auditWriter,
+        IUuidGenerator uuidGenerator,
+        IClock clock,
+        CancellationToken cancellationToken)
+    {
+        var userId = CurrentUserId(user);
+        var enrollment = await db.MfaEnrollments
+            .SingleOrDefaultAsync(m => m.UserId == userId && m.EnabledAt != null, cancellationToken);
+        if (enrollment is null)
+        {
+            return TypedResults.Problem(
+                title: "MFA is not enabled",
+                detail: "Enable MFA (POST /me/mfa) before generating backup codes.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var account = await userManager.FindByIdAsync(userId.ToString());
+        var existing = await db.MfaBackupCodes.Where(c => c.UserId == userId).ToListAsync(cancellationToken);
+        var codes = BackupCodeStore.Regenerate(account!, db, existing, hasher, uuidGenerator, clock);
+        await db.SaveChangesAsync(cancellationToken);
+
+        await auditWriter.WriteAsync(
+            new AuditEntry(userId, "identity.mfa_backup_codes_generated", "User", userId),
+            cancellationToken);
+
+        return TypedResults.Ok(new BackupCodesResponse(codes));
     }
 
     private static async Task<NoContent> DisableAsync(
@@ -129,6 +180,12 @@ public static class MfaEndpoints
         var userId = CurrentUserId(user);
         var enrollments = await db.MfaEnrollments.Where(m => m.UserId == userId).ToListAsync(cancellationToken);
         db.MfaEnrollments.RemoveRange(enrollments);
+
+        // Backup codes are meaningless without an active enrollment (T163) — clear
+        // them alongside disabling, same as the enrollment row itself.
+        var backupCodes = await db.MfaBackupCodes.Where(c => c.UserId == userId).ToListAsync(cancellationToken);
+        db.MfaBackupCodes.RemoveRange(backupCodes);
+
         await db.SaveChangesAsync(cancellationToken);
 
         // Audit only a real state change — the idempotent "was never enabled" 204
@@ -150,5 +207,12 @@ public sealed record EnrollMfaRequest(string? Code);
 
 public sealed record MfaStatusResponse(bool Enabled, string? Method);
 
-/// <summary>Secret/OtpAuthUri are populated only on the start-enrollment response — never re-shown after confirmation.</summary>
-public sealed record MfaEnrollmentResponse(bool Enabled, string? Secret, string? OtpAuthUri);
+/// <summary>
+/// Secret/OtpAuthUri are populated only on the start-enrollment response; BackupCodes
+/// only on the confirm response that actually enables MFA — none of the three is
+/// ever shown again afterward (T050/T163).
+/// </summary>
+public sealed record MfaEnrollmentResponse(bool Enabled, string? Secret, string? OtpAuthUri, IReadOnlyList<string>? BackupCodes = null);
+
+/// <summary>The plaintext codes — shown exactly once, in this response, never retrievable again.</summary>
+public sealed record BackupCodesResponse(IReadOnlyList<string> BackupCodes);

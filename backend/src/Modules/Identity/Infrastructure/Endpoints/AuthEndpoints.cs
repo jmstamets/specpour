@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using SpecPour.BuildingBlocks.Http;
 using SpecPour.BuildingBlocks.Identifiers;
 using SpecPour.BuildingBlocks.Time;
+using SpecPour.Modules.Authorization.Contracts.Audit;
 using SpecPour.Modules.Compliance.Contracts;
 using SpecPour.Modules.Identity.Application;
 using SpecPour.Modules.Identity.Application.Mfa;
@@ -64,9 +65,13 @@ public static class AuthEndpoints
                 statusCode: StatusCodes.Status403Forbidden);
         }
 
+        // Generated before the object initializer (not user.Id) because T164's AAD
+        // binding needs the id to encrypt the DOB with — the object doesn't exist yet
+        // inside its own initializer.
+        var newUserId = uuidGenerator.NewId();
         var user = new ApplicationUser
         {
-            Id = uuidGenerator.NewId(),
+            Id = newUserId,
             UserName = request.Email,
             Email = request.Email,
             // T160 (deferred, gap review 2026-07-13): no email-verification flow is
@@ -75,7 +80,7 @@ public static class AuthEndpoints
             // for V1, same as the Super Admin bootstrap already does — revisit when T160 lands.
             EmailConfirmed = true,
             DisplayName = request.DisplayName,
-            EncryptedDateOfBirth = cipher.Encrypt(request.DateOfBirth),
+            EncryptedDateOfBirth = cipher.Encrypt(newUserId, request.DateOfBirth),
             UnitPreference = ParseUnitPreference(request.UnitPreference),
             Locale = string.IsNullOrWhiteSpace(request.Locale) ? "en-US" : request.Locale,
             CreatedAt = clock.UtcNow,
@@ -159,7 +164,12 @@ public static class AuthEndpoints
         return new LoginResponse(RequiresMfa: false, user.Id, user.Email!, user.DisplayName);
     }
 
-    /// <summary>Completes a sign-in that LoginAsync parked in the MfaPendingScheme cookie (T050).</summary>
+    /// <summary>
+    /// Completes a sign-in that LoginAsync parked in the MfaPendingScheme cookie
+    /// (T050). Accepts either the current TOTP code or, per T163 (FR-001a — password
+    /// recovery must not bypass MFA, and MFA loss must not be permanent lockout), a
+    /// single-use backup code as a fallback when the TOTP code doesn't verify.
+    /// </summary>
     private static async Task<Results<Ok<AuthAccountResponse>, ProblemHttpResult>> LoginMfaAsync(
         LoginMfaRequest request,
         HttpContext httpContext,
@@ -167,6 +177,9 @@ public static class AuthEndpoints
         UserManager<ApplicationUser> userManager,
         IdentityDbContext db,
         IMfaSecretCipher cipher,
+        IPasswordHasher<ApplicationUser> hasher,
+        IAuditWriter auditWriter,
+        IClock clock,
         CancellationToken cancellationToken)
     {
         var pendingAuth = await httpContext.AuthenticateAsync(IdentityModule.MfaPendingScheme);
@@ -182,18 +195,40 @@ public static class AuthEndpoints
         var userId = Guid.Parse(pendingUserId);
         var enrollment = await db.MfaEnrollments.SingleOrDefaultAsync(m => m.UserId == userId && m.EnabledAt != null, cancellationToken);
         var user = enrollment is null ? null : await userManager.FindByIdAsync(userId.ToString());
-        // This per-login decrypt is deliberately NOT audit-logged (T162 security
-        // audit): the append-only audit log records administrative/staff actions and
-        // account-security state changes (constitution Principle XIV, FR-065), and a
-        // row per sign-in would turn it into a login-activity ledger — that visibility
-        // belongs to T051's session/device management and OTel, not the admin audit
-        // table. The state transitions (enable/disable) ARE audited in MfaEndpoints.
-        if (enrollment is null || user is null || !TotpCodeGenerator.VerifyCode(cipher.Decrypt(userId, enrollment.EncryptedSecret), request.Code))
+        if (enrollment is null || user is null)
         {
             return TypedResults.Problem(
                 title: "Sign-in failed",
                 detail: "Invalid MFA code.",
                 statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        // This per-login TOTP decrypt is deliberately NOT audit-logged (T162 security
+        // audit): the append-only audit log records administrative/staff actions and
+        // account-security state changes (constitution Principle XIV, FR-065), and a
+        // row per sign-in would turn it into a login-activity ledger — that visibility
+        // belongs to T051's session/device management and OTel, not the admin audit
+        // table. The state transitions (enable/disable/backup-code-consumed) ARE
+        // audited — the last one because a consumed recovery code is exactly the kind
+        // of "was this factor lost" signal an operator investigating a takeover wants.
+        var totpValid = TotpCodeGenerator.VerifyCode(cipher.Decrypt(userId, enrollment.EncryptedSecret), request.Code);
+        var backupCodeConsumed = !totpValid
+            && await BackupCodeStore.TryConsumeAsync(user, request.Code, db, hasher, clock, cancellationToken);
+
+        if (!totpValid && !backupCodeConsumed)
+        {
+            return TypedResults.Problem(
+                title: "Sign-in failed",
+                detail: "Invalid MFA code.",
+                statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        if (backupCodeConsumed)
+        {
+            await db.SaveChangesAsync(cancellationToken);
+            await auditWriter.WriteAsync(
+                new AuditEntry(userId, "identity.mfa_backup_code_consumed", "User", userId),
+                cancellationToken);
         }
 
         await httpContext.SignOutAsync(IdentityModule.MfaPendingScheme);

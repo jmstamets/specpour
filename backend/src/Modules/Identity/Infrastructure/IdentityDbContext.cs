@@ -25,6 +25,8 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
 
     public DbSet<MfaEnrollment> MfaEnrollments => Set<MfaEnrollment>();
 
+    public DbSet<MfaBackupCode> MfaBackupCodes => Set<MfaBackupCode>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema(ModuleSchemas.Identity);
@@ -37,6 +39,14 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
             // One enrollment per user in V1 (single "totp" method) — a fresh POST
             // /me/mfa replaces the prior row rather than accumulating history.
             entity.HasIndex(m => m.UserId).IsUnique();
+        });
+
+        builder.Entity<MfaBackupCode>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            // Not unique — a user has up to BackupCodeGenerator.CodeCount live rows
+            // at once (T163). UsedAt filters an unused set at query time.
+            entity.HasIndex(c => c.UserId);
         });
 
         builder.ConfigureOutbox(ownsTable: false);
