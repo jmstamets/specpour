@@ -26,11 +26,18 @@ const _clientId = 'specpour-app';
 const _scope = 'openid email profile offline_access';
 
 class IdentityAuthService {
-  IdentityAuthService(this._identityApi, this._authDio, this._authToken, this._apiHostBaseUrl);
+  IdentityAuthService(
+    this._identityApi,
+    this._authDio,
+    this._authToken,
+    this._refreshToken,
+    this._apiHostBaseUrl,
+  );
 
   final IdentityApi _identityApi;
   final Dio _authDio;
   final AuthToken _authToken;
+  final RefreshToken _refreshToken;
   final String _apiHostBaseUrl;
 
   Future<void> register({
@@ -155,11 +162,12 @@ class IdentityAuthService {
   }
 
   Future<void> _completeTokenExchange() async {
-    final accessToken = await _acquireAccessToken();
-    _authToken.set(accessToken);
+    final tokens = await _acquireTokens();
+    _authToken.set(tokens.accessToken);
+    _refreshToken.set(tokens.refreshToken);
   }
 
-  Future<String> _acquireAccessToken() async {
+  Future<({String accessToken, String? refreshToken})> _acquireTokens() async {
     final codeVerifier = _generateCodeVerifier();
     final codeChallenge = _codeChallengeFor(codeVerifier);
 
@@ -204,7 +212,10 @@ class IdentityAuthService {
       options: Options(contentType: Headers.formUrlEncodedContentType),
     );
 
-    return tokenResponse.data!['access_token'] as String;
+    return (
+      accessToken: tokenResponse.data!['access_token'] as String,
+      refreshToken: tokenResponse.data!['refresh_token'] as String?,
+    );
   }
 
   static String _generateCodeVerifier() {
@@ -224,6 +235,7 @@ final identityAuthServiceProvider = Provider<IdentityAuthService>(
     ref.watch(identityApiProvider),
     ref.watch(authDioProvider),
     ref.watch(authTokenProvider.notifier),
+    ref.watch(refreshTokenProvider.notifier),
     ref.watch(apiHostBaseUrlProvider),
   ),
 );

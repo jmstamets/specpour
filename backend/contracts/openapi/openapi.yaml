@@ -73,6 +73,18 @@ paths:
     $ref: './paths/identity.yaml#/externalCallback'
   /auth/external/complete-registration:
     $ref: './paths/identity.yaml#/externalCompleteRegistration'
+  /me/sessions:
+    $ref: './paths/identity.yaml#/meSessions'
+  /me/sessions/{id}:
+    $ref: './paths/identity.yaml#/meSessionById'
+  /me/export:
+    $ref: './paths/identity.yaml#/meExport'
+  /me:
+    $ref: './paths/identity.yaml#/meById'
+  /me/deactivate:
+    $ref: './paths/identity.yaml#/meDeactivate'
+  /me/reactivate:
+    $ref: './paths/identity.yaml#/meReactivate'
   /me/entitlements:
     $ref: './paths/authorization.yaml#/meEntitlements'
   /compliance/age-gate:

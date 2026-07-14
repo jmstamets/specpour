@@ -7,10 +7,13 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Reqnroll;
 using SpecPour.Modules.Authorization.Infrastructure;
+using SpecPour.Modules.Identity.Application.Lifecycle;
 using SpecPour.Modules.Identity.Application.Mfa;
 using SpecPour.Modules.Identity.Contracts;
+using SpecPour.Modules.Identity.Domain;
 using SpecPour.Modules.Identity.Infrastructure;
 using SpecPour.Tests.Acceptance.Support;
 
@@ -38,9 +41,14 @@ public sealed class US02IdentitySteps
     private HttpClient? _loginClient;
     private string _mfaSecret = string.Empty;
     private string _currentPassword = Password;
+    private readonly List<Guid> _sessionIds = [];
+    private readonly List<string> _deviceTokens = [];
     private List<string> _backupCodes = [];
     private List<string> _originalBackupCodes = [];
     private string? _lastConsumedBackupCode;
+    private string? _deactivationToken;
+    private string? _deactivationRefreshToken;
+    private readonly List<string> _deviceRefreshTokens = [];
 
     [When(@"a visitor registers with a valid adult date of birth")]
     public async Task WhenAVisitorRegistersWithAValidAdultDateOfBirth() =>
@@ -307,6 +315,215 @@ public sealed class US02IdentitySteps
             new { email = _registeredEmail, token = encodedToken, newPassword = _currentPassword });
     }
 
+    [When(@"the user signs in from two devices")]
+    public async Task WhenTheUserSignsInFromTwoDevices()
+    {
+        // Each AcquireAccessTokenAsync() call drives its own full /connect/authorize +
+        // /connect/token exchange against the same already-cookie-authenticated
+        // session — a real, independent OpenIddict authorization (and therefore
+        // SessionDevice row, per TokenEndpoints.HandleTokenAsync) per call, which is
+        // what actually makes these "two devices" rather than two HTTP clients.
+        _deviceTokens.Clear();
+        _deviceRefreshTokens.Clear();
+        foreach (var _ in new[] { 0, 1 })
+        {
+            var (accessToken, refreshToken) = await AcquireTokenPairAsync();
+            _deviceTokens.Add(accessToken);
+            _deviceRefreshTokens.Add(refreshToken);
+        }
+    }
+
+    [Then(@"both sessions appear in the session list")]
+    public async Task ThenBothSessionsAppearInTheSessionList()
+    {
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _deviceTokens[0]);
+        _lastResponse = await client.GetAsync(new Uri("/api/v1/me/sessions", UriKind.Relative));
+        await CaptureJsonAsync();
+
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        var sessions = _lastJson!.RootElement.GetProperty("sessions").EnumerateArray().ToList();
+        Assert.Equal(2, sessions.Count);
+
+        _sessionIds.Clear();
+        _sessionIds.AddRange(sessions.Select(s => s.GetProperty("id").GetGuid()));
+    }
+
+    [When(@"the user revokes the first session")]
+    public async Task WhenTheUserRevokesTheFirstSession()
+    {
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _deviceTokens[0]);
+        _lastResponse = await client.DeleteAsync(new Uri($"/api/v1/me/sessions/{_sessionIds[0]}", UriKind.Relative));
+    }
+
+    [Then(@"only the second session remains active")]
+    public async Task ThenOnlyTheSecondSessionRemainsActive()
+    {
+        Assert.Equal(204, (int)_lastResponse.StatusCode);
+
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _deviceTokens[1]);
+        var listResponse = await client.GetAsync(new Uri("/api/v1/me/sessions", UriKind.Relative));
+        using var listJson = JsonDocument.Parse(await listResponse.Content.ReadAsStringAsync());
+        var remaining = listJson.RootElement.GetProperty("sessions").EnumerateArray().ToList();
+
+        Assert.Single(remaining);
+        Assert.Equal(_sessionIds[1], remaining[0].GetProperty("id").GetGuid());
+    }
+
+    [Then(@"the first device's session can no longer be refreshed")]
+    public async Task ThenTheFirstDevicesSessionCanNoLongerBeRefreshed()
+    {
+        // Honest revocation semantics (John's ruling, 2026-07-14, applied retroactively
+        // to this already-merged T051 scenario for one consistent story with T052's):
+        // DELETE /me/sessions/{id} revokes the underlying OpenIddict authorization,
+        // which blocks this refresh_token grant — that's the real, immediate effect.
+        // It does not retroactively invalidate the first device's already-issued access
+        // token, which stays valid until its own short (10-minute) natural expiry.
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        var response = await client.PostAsync(
+            new Uri("/connect/token", UriKind.Relative),
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["grant_type"] = "refresh_token",
+                ["refresh_token"] = _deviceRefreshTokens[0],
+                ["client_id"] = "specpour-app",
+            }));
+
+        Assert.False(response.IsSuccessStatusCode, "A revoked session's refresh token must be rejected.");
+    }
+
+    [When(@"the user deactivates their account")]
+    public async Task WhenTheUserDeactivatesTheirAccount()
+    {
+        (_deactivationToken, _deactivationRefreshToken) = await AcquireTokenPairAsync();
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _deactivationToken);
+        _lastResponse = await client.PostAsync(new Uri("/api/v1/me/deactivate", UriKind.Relative), content: null);
+    }
+
+    [Then(@"the account is deactivated")]
+    public async Task ThenTheAccountIsDeactivated()
+    {
+        Assert.Equal(204, (int)_lastResponse.StatusCode);
+
+        using var scope = AcceptanceHooks.Factory.Services.CreateScope();
+        var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        var user = await identityDb.Users.SingleAsync(u => u.Id == _registeredUserId);
+        Assert.Equal(UserLifecycleState.Deactivated, user.LifecycleState);
+        Assert.NotNull(user.DeactivatedAt);
+    }
+
+    [Then(@"the session can no longer be refreshed")]
+    public async Task ThenTheSessionCanNoLongerBeRefreshed()
+    {
+        // Honest revocation semantics (John's ruling, 2026-07-14): POST /me/deactivate
+        // revokes the underlying OpenIddict authorization, which OpenIddict enforces on
+        // the refresh_token grant — proven here directly. It does NOT retroactively
+        // invalidate an already-issued access token (self-contained/stateless, no
+        // per-request DB check); that token remains valid until its own short
+        // (10-minute, IdentityModule.cs SetAccessTokenLifetime) natural expiry. Asserting
+        // an immediate 401 on the still-live access token would be testing behavior that
+        // doesn't exist.
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        var response = await client.PostAsync(
+            new Uri("/connect/token", UriKind.Relative),
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["grant_type"] = "refresh_token",
+                ["refresh_token"] = _deactivationRefreshToken!,
+                ["client_id"] = "specpour-app",
+            }));
+
+        Assert.False(response.IsSuccessStatusCode, "A revoked authorization must reject a refresh_token grant.");
+    }
+
+    [When(@"the user reactivates their account")]
+    public async Task WhenTheUserReactivatesTheirAccount()
+    {
+        // The cookie session from registration is untouched by deactivation (only the
+        // bearer/OpenIddict authorization was revoked) — a fresh authorization-code
+        // exchange against it stands in for "the user signs back in", same shorthand
+        // WhenTheUserRequestsTheirDataExport already uses.
+        var token = await AcquireAccessTokenAsync();
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        _lastResponse = await client.PostAsync(new Uri("/api/v1/me/reactivate", UriKind.Relative), content: null);
+    }
+
+    [Then(@"the account is active again")]
+    public async Task ThenTheAccountIsActiveAgain()
+    {
+        Assert.Equal(204, (int)_lastResponse.StatusCode);
+
+        using var scope = AcceptanceHooks.Factory.Services.CreateScope();
+        var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        var user = await identityDb.Users.SingleAsync(u => u.Id == _registeredUserId);
+        Assert.Equal(UserLifecycleState.Active, user.LifecycleState);
+        Assert.Null(user.DeactivatedAt);
+    }
+
+    [When(@"time passes to the deactivation warning window")]
+    public static void WhenTimePassesToTheDeactivationWarningWindow()
+    {
+        var lifecycleOptions = AcceptanceHooks.Factory.Services.GetRequiredService<IOptions<LifecycleOptions>>().Value;
+        var advanceBy = TimeSpan.FromDays(lifecycleOptions.GracePeriodDays - lifecycleOptions.WarningDaysBeforeExpiry + 1);
+        AcceptanceHooks.Factory.Clock.Advance(advanceBy);
+    }
+
+    [Then(@"the user receives a deactivation-expiry-warning notification")]
+    public async Task ThenTheUserReceivesADeactivationExpiryWarningNotification() =>
+        await PollUntilAsync(async () =>
+        {
+            var token = await AcquireAccessTokenAsync();
+            using var client = AcceptanceHooks.Factory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await client.GetAsync(new Uri("/api/v1/inbox", UriKind.Relative));
+            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+
+            return json.RootElement.GetProperty("items").EnumerateArray()
+                .Any(item => item.GetProperty("type").GetString() == "account_deactivation_warning");
+        });
+
+    [When(@"time passes past the deactivation grace period")]
+    public static void WhenTimePassesPastTheDeactivationGracePeriod()
+    {
+        var lifecycleOptions = AcceptanceHooks.Factory.Services.GetRequiredService<IOptions<LifecycleOptions>>().Value;
+        var advanceBy = TimeSpan.FromDays(lifecycleOptions.WarningDaysBeforeExpiry + 1);
+        AcceptanceHooks.Factory.Clock.Advance(advanceBy);
+    }
+
+    [Then(@"the account no longer exists")]
+    public async Task ThenTheAccountNoLongerExists() =>
+        await PollUntilAsync(async () =>
+        {
+            using var scope = AcceptanceHooks.Factory.Services.CreateScope();
+            var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+            return !await identityDb.Users.AnyAsync(u => u.Id == _registeredUserId);
+        });
+
+    /// <summary>
+    /// Bounded poll for AccountLifecycleBackgroundService's fast test-only polling
+    /// interval (SpecPourWebApplicationFactory), matching
+    /// US01SearchReconciliationSteps' identical pattern for the outbox pipeline.
+    /// </summary>
+    private static async Task PollUntilAsync(Func<Task<bool>> conditionAsync)
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            if (await conditionAsync())
+            {
+                return;
+            }
+
+            await Task.Delay(250);
+        }
+
+        Assert.True(await conditionAsync(), "Condition did not become true within the 10s poll window.");
+    }
+
     [When(@"the user requests account recovery")]
     public async Task WhenTheUserRequestsAccountRecovery()
     {
@@ -320,7 +537,6 @@ public sealed class US02IdentitySteps
     [When(@"the user requests their data export")]
     public async Task WhenTheUserRequestsTheirDataExport()
     {
-        // T053 (not yet built) — expected to 404 until export lands.
         var token = await AcquireAccessTokenAsync();
         using var client = AcceptanceHooks.Factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -338,7 +554,6 @@ public sealed class US02IdentitySteps
     [When(@"the user requests account deletion")]
     public async Task WhenTheUserRequestsAccountDeletion()
     {
-        // T053 (not yet built) — expected to 404 until deletion lands.
         var token = await AcquireAccessTokenAsync();
         using var client = AcceptanceHooks.Factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -395,7 +610,17 @@ public sealed class US02IdentitySteps
     /// already-cookie-authenticated <see cref="_sessionClient"/> from registration,
     /// standing in for the PKCE logic the Flutter client (T055) will implement.
     /// </summary>
-    private async Task<string> AcquireAccessTokenAsync()
+    private async Task<string> AcquireAccessTokenAsync() => (await AcquireTokenPairAsync()).AccessToken;
+
+    /// <summary>
+    /// Same PKCE exchange as <see cref="AcquireAccessTokenAsync"/>, but also returns the
+    /// refresh token — needed by the T051/T052 revocation scenarios, which assert
+    /// against the real, honest revocation semantics (future refresh blocked
+    /// immediately) rather than an already-issued access token dying instantly (see
+    /// SetAccessTokenLifetime's doc comment in IdentityModule.cs for why that isn't
+    /// true of a self-contained/stateless access token).
+    /// </summary>
+    private async Task<(string AccessToken, string RefreshToken)> AcquireTokenPairAsync()
     {
         var client = _sessionClient ?? throw new InvalidOperationException("No signed-in session — register or sign in first.");
 
@@ -440,7 +665,9 @@ public sealed class US02IdentitySteps
         }
 
         using var tokenJson = JsonDocument.Parse(tokenBody);
-        return tokenJson.RootElement.GetProperty("access_token").GetString()!;
+        return (
+            tokenJson.RootElement.GetProperty("access_token").GetString()!,
+            tokenJson.RootElement.GetProperty("refresh_token").GetString()!);
     }
 
     private static HttpClient NewClientWithoutRedirects() =>

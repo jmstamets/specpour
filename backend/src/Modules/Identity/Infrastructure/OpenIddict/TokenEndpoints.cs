@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using SpecPour.BuildingBlocks.Identifiers;
+using SpecPour.BuildingBlocks.Time;
+using SpecPour.Modules.Identity.Domain;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace SpecPour.Modules.Identity.Infrastructure.OpenIddict;
@@ -48,7 +52,12 @@ public static class TokenEndpoints
         return Results.SignIn(principal, authenticationScheme: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
-    private static async Task<IResult> HandleTokenAsync(HttpContext httpContext, UserManager<ApplicationUser> userManager)
+    private static async Task<IResult> HandleTokenAsync(
+        HttpContext httpContext,
+        UserManager<ApplicationUser> userManager,
+        IdentityDbContext db,
+        IUuidGenerator uuidGenerator,
+        IClock clock)
     {
         var request = httpContext.GetOpenIddictServerRequest()
             ?? throw new InvalidOperationException("The OpenIddict token request cannot be retrieved.");
@@ -77,6 +86,41 @@ public static class TokenEndpoints
         if (user is null)
         {
             return Results.Forbid(authenticationSchemes: [OpenIddictServerAspNetCoreDefaults.AuthenticationScheme]);
+        }
+
+        // T051: SessionDevice tracking. The authorization code/refresh token's
+        // principal already carries OpenIddict's own internal authorization id (set
+        // when the authorization was first created during /connect/authorize) — the
+        // SAME id for every token minted off that authorization, code exchange or
+        // any later refresh. A brand-new authorization_code grant means a brand-new
+        // session; a refresh_token grant just means an existing one is still alive.
+        var authorizationId = authenticateResult.Principal.GetAuthorizationId();
+        if (authorizationId is not null)
+        {
+            if (request.IsAuthorizationCodeGrantType())
+            {
+                db.SessionDevices.Add(new SessionDevice
+                {
+                    Id = uuidGenerator.NewId(),
+                    UserId = user.Id,
+                    AuthorizationId = authorizationId,
+                    DeviceDescription = httpContext.Request.Headers.UserAgent.ToString() is { Length: > 0 } userAgent
+                        ? userAgent
+                        : "Unknown device",
+                    CreatedAt = clock.UtcNow,
+                    LastSeenAt = clock.UtcNow,
+                });
+            }
+            else
+            {
+                var existing = await db.SessionDevices.SingleOrDefaultAsync(s => s.AuthorizationId == authorizationId, httpContext.RequestAborted);
+                if (existing is not null)
+                {
+                    existing.LastSeenAt = clock.UtcNow;
+                }
+            }
+
+            await db.SaveChangesAsync(httpContext.RequestAborted);
         }
 
         // Re-issue fresh claims on every token/refresh, rather than trusting the

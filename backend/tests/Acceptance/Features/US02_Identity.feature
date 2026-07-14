@@ -92,3 +92,27 @@ Feature: US2 - Create an account and manage identity
     When the user resets their password via account recovery
     And the user signs in with their new password
     Then the sign-in requires an MFA code
+
+  Scenario: 15 - A user can list and revoke active sessions (T051, spec.md scenario 3)
+    Given a registered adult user
+    When the user signs in from two devices
+    Then both sessions appear in the session list
+    When the user revokes the first session
+    Then only the second session remains active
+    And the first device's session can no longer be refreshed
+
+  Scenario: 16 - A user can deactivate and reactivate their account (T052, FR-003)
+    Given a registered adult user
+    When the user deactivates their account
+    Then the account is deactivated
+    And the session can no longer be refreshed
+    When the user reactivates their account
+    Then the account is active again
+
+  Scenario: 17 - A deactivated account is warned before its grace period expires, then automatically deleted (T052, FR-003)
+    Given a registered adult user
+    When the user deactivates their account
+    And time passes to the deactivation warning window
+    Then the user receives a deactivation-expiry-warning notification
+    When time passes past the deactivation grace period
+    Then the account no longer exists

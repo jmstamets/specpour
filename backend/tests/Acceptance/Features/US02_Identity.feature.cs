@@ -111,7 +111,7 @@ namespace SpecPour.Tests.Acceptance.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US02_Identity.feature.ndjson", 16);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US02_Identity.feature.ndjson", 19);
         }
         
         async global::System.Threading.Tasks.Task global::Xunit.IAsyncLifetime.InitializeAsync()
@@ -664,6 +664,138 @@ namespace SpecPour.Tests.Acceptance.Features
 #line hidden
 #line 94
     await testRunner.ThenAsync("the sign-in requires an MFA code", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="15 - A user can list and revoke active sessions (T051, spec.md scenario 3)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "15 - A user can list and revoke active sessions (T051, spec.md scenario 3)")]
+        public async global::System.Threading.Tasks.Task _15_AUserCanListAndRevokeActiveSessionsT051Spec_MdScenario3()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "14";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("15 - A user can list and revoke active sessions (T051, spec.md scenario 3)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 96
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 97
+    await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 98
+    await testRunner.WhenAsync("the user signs in from two devices", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 99
+    await testRunner.ThenAsync("both sessions appear in the session list", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 100
+    await testRunner.WhenAsync("the user revokes the first session", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 101
+    await testRunner.ThenAsync("only the second session remains active", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 102
+    await testRunner.AndAsync("the first device\'s session can no longer be refreshed", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="16 - A user can deactivate and reactivate their account (T052, FR-003)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "16 - A user can deactivate and reactivate their account (T052, FR-003)")]
+        public async global::System.Threading.Tasks.Task _16_AUserCanDeactivateAndReactivateTheirAccountT052FR_003()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "15";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("16 - A user can deactivate and reactivate their account (T052, FR-003)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 104
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 105
+    await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 106
+    await testRunner.WhenAsync("the user deactivates their account", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 107
+    await testRunner.ThenAsync("the account is deactivated", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 108
+    await testRunner.AndAsync("the session can no longer be refreshed", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 109
+    await testRunner.WhenAsync("the user reactivates their account", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 110
+    await testRunner.ThenAsync("the account is active again", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="17 - A deactivated account is warned before its grace period expires, then automa" +
+            "tically deleted (T052, FR-003)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "17 - A deactivated account is warned before its grace period expires, then automa" +
+            "tically deleted (T052, FR-003)")]
+        public async global::System.Threading.Tasks.Task _17_ADeactivatedAccountIsWarnedBeforeItsGracePeriodExpiresThenAutomaticallyDeletedT052FR_003()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "16";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("17 - A deactivated account is warned before its grace period expires, then automa" +
+                    "tically deleted (T052, FR-003)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 112
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 113
+    await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 114
+    await testRunner.WhenAsync("the user deactivates their account", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 115
+    await testRunner.AndAsync("time passes to the deactivation warning window", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 116
+    await testRunner.ThenAsync("the user receives a deactivation-expiry-warning notification", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 117
+    await testRunner.WhenAsync("time passes past the deactivation grace period", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 118
+    await testRunner.ThenAsync("the account no longer exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

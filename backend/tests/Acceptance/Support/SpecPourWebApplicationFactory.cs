@@ -1,11 +1,15 @@
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Time;
+using SpecPour.Modules.Identity.Application.Lifecycle;
 using SpecPour.Modules.Notifications.Contracts;
 using SpecPour.Modules.Notifications.Infrastructure;
 
@@ -22,8 +26,22 @@ public sealed class SpecPourWebApplicationFactory : WebApplicationFactory<Progra
 {
     public TestClock Clock { get; } = new();
 
-    public SpecPourWebApplicationFactory(string connectionString)
+    private readonly bool _enableRateLimiting;
+
+    /// <param name="connectionString">Postgres connection string (Testcontainers-managed).</param>
+    /// <param name="enableRateLimiting">
+    /// Defaults to <see langword="false"/>: the shared <see cref="AcceptanceHooks.Factory"/>
+    /// instance runs every feature file's scenarios in one process against one
+    /// "unknown"/loopback IP partition, so the anonymous limiter (100/min,
+    /// AnonymousRateLimiterExtensions) would spuriously 429 unrelated scenarios once
+    /// the suite's combined anonymous request volume crosses that budget — a
+    /// test-environment artifact, not a real limit breach. <see cref="RateLimitingTests"/>
+    /// passes <see langword="true"/> on its own separately-constructed instance
+    /// specifically to observe the real 429 behavior in isolation.
+    /// </param>
+    public SpecPourWebApplicationFactory(string connectionString, bool enableRateLimiting = false)
     {
+        _enableRateLimiting = enableRateLimiting;
         // Program.cs reads ConnectionStrings:Postgres synchronously via
         // builder.Configuration before WebApplicationFactory's ConfigureAppConfiguration
         // layer is composed onto the host — an in-memory config source added there
@@ -67,6 +85,31 @@ public sealed class SpecPourWebApplicationFactory : WebApplicationFactory<Progra
             // window) is unaffected since this only applies to the test host.
             services.Configure<OutboxDispatcherOptions>(options =>
                 options.PollingInterval = TimeSpan.FromMilliseconds(200));
+
+            // T052: same rationale as the outbox override above — the production
+            // default (hourly) would make the deactivation-warning/grace-period-expiry
+            // acceptance scenarios impractically slow to poll against.
+            services.Configure<LifecycleOptions>(options =>
+                options.PollingInterval = TimeSpan.FromMilliseconds(200));
+
+            // T051 gap review, 2026-07-14: the anonymous rate limiter (100/min per IP,
+            // AnonymousRateLimiterExtensions) correctly-but-unhelpfully 429s legitimate
+            // traffic once run against the WHOLE acceptance suite in one process — every
+            // TestServer request shares one "unknown"/loopback IP partition, so running
+            // every feature file's scenarios together in a short window comfortably
+            // exceeds 100 anonymous requests (each PKCE dance alone hits /connect/token
+            // pre-bearer-auth, counted as anonymous). Disabled here (the shared-host
+            // default, enableRateLimiting: false) — same "test-only override of a
+            // production concern" pattern as IClock/IEmailChannelAdapter/the outbox
+            // polling interval above, not a change to the real limiter's production
+            // config. RateLimitingTests.cs opts back in (enableRateLimiting: true) on
+            // its own separately-constructed instance to exercise real 429 behavior.
+            if (!_enableRateLimiting)
+            {
+                services.Configure<RateLimiterOptions>(options =>
+                    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(
+                        _ => RateLimitPartition.GetNoLimiter("acceptance-tests")));
+            }
         });
     }
 }

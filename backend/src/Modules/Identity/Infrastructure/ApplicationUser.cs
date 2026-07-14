@@ -31,4 +31,10 @@ public sealed class ApplicationUser : IdentityUser<Guid>
     public UserLifecycleState LifecycleState { get; set; } = UserLifecycleState.Active;
 
     public required DateTimeOffset CreatedAt { get; init; }
+
+    /// <summary>T052: set on POST /me/deactivate, cleared on POST /me/reactivate. Drives the grace-period-expiry background job.</summary>
+    public DateTimeOffset? DeactivatedAt { get; set; }
+
+    /// <summary>T052: set once the expiry-approaching warning has been sent, so the background job doesn't resend it every poll cycle. Cleared on reactivation.</summary>
+    public DateTimeOffset? DeactivationWarningSentAt { get; set; }
 }

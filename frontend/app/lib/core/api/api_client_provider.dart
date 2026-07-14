@@ -47,8 +47,7 @@ final apiBaseUrlProvider = Provider<String>(
 final cookieJarProvider = Provider<CookieJar>((ref) => CookieJar());
 
 /// The signed-in user's bearer access token, or null for a guest/signed-out session.
-/// Populated by the sign-in flow (T055) and the token-refresh logic it wires up;
-/// nothing writes to this yet.
+/// Populated by the sign-in flow (T055) and [TokenRefreshInterceptor] below.
 class AuthToken extends Notifier<String?> {
   @override
   String? build() => null;
@@ -58,11 +57,87 @@ class AuthToken extends Notifier<String?> {
 
 final authTokenProvider = NotifierProvider<AuthToken, String?>(AuthToken.new);
 
+/// Mirrors [AuthToken] for the refresh token (T047's `offline_access` scope
+/// always returns one). [TokenRefreshInterceptor] needs it to silently mint a
+/// new access token on a 401 rather than forcing a full re-sign-in. Rotates on
+/// every refresh — OpenIddict's default is rolling/rotating refresh tokens —
+/// so this always holds the latest valid one.
+class RefreshToken extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? token) => state = token;
+}
+
+final refreshTokenProvider = NotifierProvider<RefreshToken, String?>(RefreshToken.new);
+
 const _bearerSchemeName = 'bearerAuth';
+
+/// Must match the OpenIddict client registration (OpenIddictClientSeedingHostedService)
+/// — same value identity_auth_service.dart's `_clientId` names for the same reason.
+const _refreshClientId = 'specpour-app';
+
+/// T052 follow-on (2026-07-14): the backend's access-token lifetime was
+/// shortened to 10 minutes to bound the post-revocation exposure window (see
+/// IdentityModule.cs's SetAccessTokenLifetime comment), which makes refresh a
+/// hot path. Catches a 401, silently exchanges the stored refresh_token for a
+/// new access/refresh token pair via /connect/token, and retries the original
+/// request — the caller never sees the 401. Extends QueuedInterceptor so
+/// concurrent requests that all 401 at once share a single in-flight refresh
+/// instead of racing to refresh independently. Refresh failure (revoked or
+/// expired refresh token) clears both tokens, which the app's routing treats
+/// as a hard sign-out (guest gate) — the same outcome a fully expired session
+/// already produces today, just reached less often.
+class TokenRefreshInterceptor extends QueuedInterceptor {
+  TokenRefreshInterceptor(this._ref, this._apiDio);
+
+  final Ref _ref;
+  final Dio _apiDio;
+
+  @override
+  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+    final alreadyRetried = err.requestOptions.extra['tokenRefreshRetried'] == true;
+    final refreshToken = _ref.read(refreshTokenProvider);
+    if (err.response?.statusCode != 401 || alreadyRetried || refreshToken == null) {
+      handler.next(err);
+      return;
+    }
+
+    try {
+      final authDio = _ref.read(authDioProvider);
+      final response = await authDio.post<Map<String, dynamic>>(
+        '/connect/token',
+        data: {
+          'grant_type': 'refresh_token',
+          'refresh_token': refreshToken,
+          'client_id': _refreshClientId,
+        },
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      );
+
+      final newAccessToken = response.data!['access_token'] as String;
+      final newRefreshToken = response.data!['refresh_token'] as String?;
+      _ref.read(authTokenProvider.notifier).set(newAccessToken);
+      _ref.read(refreshTokenProvider.notifier).set(newRefreshToken ?? refreshToken);
+
+      final retryOptions = err.requestOptions;
+      retryOptions.extra['tokenRefreshRetried'] = true;
+      retryOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+
+      final retryResponse = await _apiDio.fetch<dynamic>(retryOptions);
+      handler.resolve(retryResponse);
+    } on Object {
+      _ref.read(authTokenProvider.notifier).set(null);
+      _ref.read(refreshTokenProvider.notifier).set(null);
+      handler.next(err);
+    }
+  }
+}
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   final client = ApiClient(basePathOverride: ref.watch(apiBaseUrlProvider));
   _wireCookieSupport(client.dio, ref.watch(cookieJarProvider));
+  client.dio.interceptors.add(TokenRefreshInterceptor(ref, client.dio));
 
   void syncToken(String? token) {
     final bearerInterceptor = client.dio.interceptors

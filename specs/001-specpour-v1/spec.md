@@ -146,6 +146,15 @@ and technique conforming to professional craft-cocktail standards."
   ≤ 300 ms reads, ≤ 500 ms search, ≤ 600 ms writes; error rate < 0.1%; no degradation
   trend; AI endpoints excluded and measured separately with graceful degradation
   asserted.
+- Q: (/speckit-analyze I2, 2026-07-14) FR-001a (MFA-loss recovery: password reset
+  must never bypass an MFA gate, MFA loss must never be permanent lockout) was added
+  directly to spec.md during T163 because docs/specification-statement.md §1 didn't
+  yet carry the wording — breaking the canonical-source chain every other
+  clarification in this list follows. → A: Resolved by source revision
+  (docs/specification-statement.md §1): the statement doc now states the same
+  substance in the canonical location (one-time salted-hash backup codes as the
+  self-service path, an audited staff MFA-reset as the assisted path). FR-001a's
+  provenance is intact; no further spec.md change needed.
 
 ## User Scenarios & Testing _(mandatory)_
 

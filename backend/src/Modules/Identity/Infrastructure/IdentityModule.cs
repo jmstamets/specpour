@@ -13,10 +13,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using OpenIddict.Validation.AspNetCore;
+using SpecPour.BuildingBlocks.Events;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
+using SpecPour.Modules.Identity.Application.Lifecycle;
 using SpecPour.Modules.Identity.Application.Ports;
 using SpecPour.Modules.Identity.Infrastructure.ExternalProviders;
+using SpecPour.Modules.Identity.Infrastructure.Lifecycle;
 using SpecPour.Modules.Identity.Infrastructure.OpenIddict;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -74,6 +77,12 @@ public sealed class IdentityModule : IModule
         services.AddScoped<IDateOfBirthCipher, DataProtectionDateOfBirthCipher>();
         services.AddScoped<IMfaSecretCipher, DataProtectionMfaSecretCipher>();
         services.AddScoped<Contracts.IAgePredicatePort, AgePredicateAdapter>();
+        services.AddScoped<AccountDeletionService>();
+
+        // FR-003: "operator-configurable grace period" — config-bound (falls back to
+        // LifecycleOptions' in-class defaults, same style as SmtpEmailOptions).
+        services.Configure<LifecycleOptions>(configuration.GetSection("Identity:Lifecycle"));
+        services.AddHostedService<AccountLifecycleBackgroundService>();
 
         services.AddIdentityCore<ApplicationUser>(options =>
             {
@@ -202,6 +211,19 @@ public sealed class IdentityModule : IModule
 
                 options.RegisterScopes(Scopes.OpenId, Scopes.Email, Scopes.Profile, Scopes.OfflineAccess);
 
+                // T051/T052 session-revocation gap (John's ruling, 2026-07-14): access
+                // tokens here are self-contained/stateless (no reference-token DB check
+                // per request), so TryRevokeAsync on a SessionDevice's authorization only
+                // blocks future refresh grants — it cannot kill an already-issued access
+                // token. OpenIddict's own default (1 hour) left too wide a live-token
+                // window after a user believes they've revoked/deactivated. 10 minutes
+                // bounds that exposure while keeping the stateless validation path (no
+                // platform-wide per-request DB cost — rejected as the wrong tradeoff for
+                // what's a low-severity window). True immediate invalidation for the
+                // high-severity cases (deactivation, staff suspension, sign-out-everywhere)
+                // is tracked separately as T166, launch-gated alongside T139.
+                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(10));
+
                 // Ephemeral dev keys: containers have no durable certificate store.
                 // Production deployments must configure real signing/encryption
                 // certificates via AddSigningCertificate()/AddEncryptionCertificate()
@@ -227,6 +249,7 @@ public sealed class IdentityModule : IModule
             });
 
         services.AddHostedService<OpenIddictClientSeedingHostedService>();
+        services.AddHostedService<IdentityEventRegistrationHostedService>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
@@ -236,7 +259,33 @@ public sealed class IdentityModule : IModule
         Endpoints.MfaEndpoints.Map(endpoints);
         Endpoints.RecoveryEndpoints.Map(endpoints);
         Endpoints.ExternalAuthEndpoints.Map(endpoints);
-
-        // Session and lifecycle endpoints (T051-T054) land next.
+        Endpoints.SessionsEndpoints.Map(endpoints);
+        Endpoints.ExportEndpoints.Map(endpoints);
+        Endpoints.LifecycleEndpoints.Map(endpoints);
     }
+}
+
+/// <summary>
+/// Registers this module's outbox-producing event types with the process-wide
+/// IEventTypeCatalog (same pattern/rationale as IngredientsEventRegistrationHostedService
+/// — must be a hosted service, not inline RegisterServices code, so it runs after the
+/// full DI container is built). Missing this meant AccountDeactivated/
+/// DeactivationExpiryApproaching/AccountDeleted outbox rows were dispatched to zero
+/// handlers forever (OutboxDispatcherBackgroundService.Log.UnknownEventType, message
+/// left permanently pending) — found while writing T052's grace-period acceptance
+/// scenario, whose warning-notification assertion never completed within its poll
+/// window until this was added.
+/// </summary>
+public sealed class IdentityEventRegistrationHostedService(IEventTypeCatalog eventTypeCatalog)
+    : Microsoft.Extensions.Hosting.IHostedService
+{
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        eventTypeCatalog.Register<Contracts.Events.AccountDeactivated>();
+        eventTypeCatalog.Register<Contracts.Events.DeactivationExpiryApproaching>();
+        eventTypeCatalog.Register<Contracts.Events.AccountDeleted>();
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

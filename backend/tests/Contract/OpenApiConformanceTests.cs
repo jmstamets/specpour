@@ -206,6 +206,59 @@ public sealed class OpenApiConformanceTests(ComposedHostFixture host)
     }
 
     [Fact]
+    public async Task GetMeSessions_without_a_token_conforms_to_its_401_schema()
+    {
+        var response = await host.Client.GetAsync(new Uri("/api/v1/me/sessions", UriKind.Relative));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("GET", "/api/v1/me/sessions", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task DeleteMeSessionById_without_a_token_conforms_to_its_401_schema()
+    {
+        var requestPath = $"/api/v1/me/sessions/{Guid.NewGuid()}";
+        var response = await host.Client.DeleteAsync(new Uri(requestPath, UriKind.Relative));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("DELETE", requestPath, (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task GetMeExport_without_a_token_conforms_to_its_401_schema()
+    {
+        var response = await host.Client.GetAsync(new Uri("/api/v1/me/export", UriKind.Relative));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("GET", "/api/v1/me/export", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task DeleteMe_without_a_token_conforms_to_its_401_schema()
+    {
+        var response = await host.Client.DeleteAsync(new Uri("/api/v1/me", UriKind.Relative));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("DELETE", "/api/v1/me", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
     public async Task GetAuthExternal_for_an_unconfigured_provider_conforms_to_its_400_schema()
     {
         // T049: no ExternalProviders:* credentials exist in any test environment (real

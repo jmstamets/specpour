@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- T052: AccountDeactivated/DeactivationExpiryApproaching/AccountDeleted extend
+         DomainEvent (and the first two implement Notifications.Contracts'
+         INotificationEvent, per data-model.md's own note naming them as the first
+         real producer for that marker) so other modules can subscribe without
+         depending on Identity's Domain/Infrastructure — same reasoning as
+         Ingredients.Contracts' IngredientRenamed reference. -->
+    <ProjectReference Include="..\..\..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\..\Notifications\Contracts\SpecPour.Modules.Notifications.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -301,6 +301,129 @@ meMfaBackupCodes:
       '401':
         $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
 
+meSessions:
+  get:
+    operationId: listMySessions
+    tags: [identity]
+    summary: List the caller's active sessions/devices (T051)
+    description: >-
+      A "session" is one OpenIddict authorization — created the first time a device
+      completes the PKCE exchange, refreshed on every subsequent token refresh.
+      Revoked sessions are omitted (not just flagged) since there is nothing further
+      the caller can do with one.
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: The caller's active sessions, most recently active first.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionList'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+meSessionById:
+  delete:
+    operationId: revokeMySession
+    tags: [identity]
+    summary: Revoke a session/device (T051)
+    description: >-
+      Revokes the underlying OpenIddict authorization directly — the whole
+      refresh-token family for that device stops working immediately, not just this
+      one call's session-list visibility.
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '204':
+        description: Session revoked.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+meExport:
+  get:
+    operationId: exportMyAccount
+    tags: [identity]
+    summary: Export the caller's account data (T053)
+    description: >-
+      The sole surface anywhere in the platform that returns the raw date of birth
+      (FR-002b/SC-017) — every call is audit-logged (identity.dob_exported).
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: The caller's full account export.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeExport'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+meById:
+  delete:
+    operationId: deleteMyAccount
+    tags: [identity]
+    summary: Delete the caller's account (T053)
+    description: >-
+      Hard-deletes the account immediately (self-service path) — the same
+      AccountDeletionService used by T052's grace-period-expiry background job.
+      Cascades to MFA enrollment/backup codes/sessions via real foreign keys;
+      publishes AccountDeleted for the future Community module's public-attribution
+      anonymization.
+    security:
+      - bearerAuth: []
+    responses:
+      '204':
+        description: Account deleted.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+meDeactivate:
+  post:
+    operationId: deactivateMyAccount
+    tags: [identity]
+    summary: Deactivate the caller's account (T052)
+    description: >-
+      Signs the account out of every active session/device immediately. Retained for
+      an operator-configurable grace period (default 12 months, FR-003) during which
+      the caller can reactivate; a warning is sent before expiry, after which the
+      account is automatically deleted via the same path as DELETE /me.
+    security:
+      - bearerAuth: []
+    responses:
+      '204':
+        description: Account deactivated.
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+meReactivate:
+  post:
+    operationId: reactivateMyAccount
+    tags: [identity]
+    summary: Reactivate the caller's deactivated account (T052)
+    description: >-
+      Only meaningful once the caller has a fresh, valid bearer token — deactivation
+      revokes every prior session, so reactivating requires signing in again first.
+    security:
+      - bearerAuth: []
+    responses:
+      '204':
+        description: Account reactivated.
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
 components:
   schemas:
     RegisterRequest:
@@ -404,3 +527,54 @@ components:
           type: array
           items: { type: string }
       required: [backupCodes]
+    Session:
+      type: object
+      description: >-
+        deviceDescription is the raw User-Agent header captured at token issuance —
+        best-effort, not a parsed device/OS model.
+      properties:
+        id: { type: string, format: uuid }
+        deviceDescription: { type: string }
+        createdAt: { type: string, format: date-time }
+        lastSeenAt: { type: string, format: date-time }
+      required: [id, deviceDescription, createdAt, lastSeenAt]
+    SessionList:
+      type: object
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Session'
+      required: [sessions]
+    MeExport:
+      type: object
+      description: >-
+        The sole schema in this document allowed a raw dateOfBirth field (see this
+        document's top-level description and SensitivePiiInvariantTests's allowlist).
+      properties:
+        userId: { type: string, format: uuid }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        dateOfBirth: { type: string, format: date }
+        unitPreference: { type: string, enum: [Milliliters, Ounces, Centiliters] }
+        locale: { type: string }
+        createdAt: { type: string, format: date-time }
+        mfaEnabled: { type: boolean }
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Session'
+        externalLoginProviders:
+          type: array
+          items: { type: string }
+      required:
+        - userId
+        - email
+        - displayName
+        - dateOfBirth
+        - unitPreference
+        - locale
+        - createdAt
+        - mfaEnabled
+        - sessions
+        - externalLoginProviders
