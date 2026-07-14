@@ -19,6 +19,10 @@ import 'package:api_client/src/model/auth_account.dart';
 import 'package:api_client/src/model/auto_link_match.dart';
 import 'package:api_client/src/model/auto_link_response.dart';
 import 'package:api_client/src/model/backup_codes.dart';
+import 'package:api_client/src/model/channel_preference.dart';
+import 'package:api_client/src/model/channel_preferences.dart';
+import 'package:api_client/src/model/channel_preferences_update.dart';
+import 'package:api_client/src/model/channel_preferences_update_channels_inner.dart';
 import 'package:api_client/src/model/complete_external_registration_request.dart';
 import 'package:api_client/src/model/concept_detail.dart';
 import 'package:api_client/src/model/concept_page.dart';
@@ -47,6 +51,7 @@ import 'package:api_client/src/model/ingredient_summary.dart';
 import 'package:api_client/src/model/login_mfa_request.dart';
 import 'package:api_client/src/model/login_request.dart';
 import 'package:api_client/src/model/login_result.dart';
+import 'package:api_client/src/model/me_export.dart';
 import 'package:api_client/src/model/mfa_enrollment.dart';
 import 'package:api_client/src/model/mfa_status.dart';
 import 'package:api_client/src/model/problem_details.dart';
@@ -61,6 +66,8 @@ import 'package:api_client/src/model/responsible_consumption_message_response.da
 import 'package:api_client/src/model/role_grant_summary.dart';
 import 'package:api_client/src/model/search_result.dart';
 import 'package:api_client/src/model/search_result_page.dart';
+import 'package:api_client/src/model/session.dart';
+import 'package:api_client/src/model/session_list.dart';
 import 'package:api_client/src/model/support_resource_response.dart';
 import 'package:api_client/src/model/support_resources_response.dart';
 
@@ -72,6 +79,10 @@ part 'serializers.g.dart';
   AutoLinkMatch,
   AutoLinkResponse,
   BackupCodes,
+  ChannelPreference,
+  ChannelPreferences,
+  ChannelPreferencesUpdate,
+  ChannelPreferencesUpdateChannelsInner,
   CompleteExternalRegistrationRequest,
   ConceptDetail,
   ConceptPage,
@@ -100,6 +111,7 @@ part 'serializers.g.dart';
   LoginMfaRequest,
   LoginRequest,
   LoginResult,
+  MeExport,
   MfaEnrollment,
   MfaStatus,
   ProblemDetails,
@@ -114,6 +126,8 @@ part 'serializers.g.dart';
   RoleGrantSummary,
   SearchResult,
   SearchResultPage,
+  Session,
+  SessionList,
   SupportResourceResponse,
   SupportResourcesResponse,
 ])

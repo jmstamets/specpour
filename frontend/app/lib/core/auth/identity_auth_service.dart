@@ -109,6 +109,55 @@ class IdentityAuthService {
     await _identityApi.disableMfa();
   }
 
+  /// T163: invalidates every prior backup code and issues a fresh set of 10,
+  /// shown exactly once in this response — same "shown once" handling the
+  /// initial TOTP secret gets.
+  Future<BackupCodes> regenerateBackupCodes() async {
+    final response = await _identityApi.regenerateMfaBackupCodes();
+    return response.data!;
+  }
+
+  /// T051: active sessions/devices, most recently active first.
+  Future<List<Session>> listSessions() async {
+    final response = await _identityApi.listMySessions();
+    return response.data!.sessions.toList();
+  }
+
+  /// T051: revokes the underlying OpenIddict authorization for [sessionId] —
+  /// that device's refresh capability stops working immediately (see
+  /// IdentityModule.cs's SetAccessTokenLifetime doc comment for what "revoke"
+  /// does and doesn't guarantee about an already-issued access token).
+  Future<void> revokeSession({required String sessionId}) async {
+    await _identityApi.revokeMySession(id: sessionId);
+  }
+
+  /// T052: signs the account out of every active session/device immediately;
+  /// retained for an operator-configurable grace period before deletion.
+  Future<void> deactivateAccount() async {
+    await _identityApi.deactivateMyAccount();
+  }
+
+  /// T052: only meaningful with a fresh bearer token — deactivation revoked
+  /// every prior session, so the caller must have signed in again first.
+  Future<void> reactivateAccount() async {
+    await _identityApi.reactivateMyAccount();
+  }
+
+  /// T053: the sole surface anywhere in the platform that returns the raw
+  /// date of birth.
+  Future<MeExport> exportAccountData() async {
+    final response = await _identityApi.exportMyAccount();
+    return response.data!;
+  }
+
+  /// T053: hard-deletes the account immediately. Callers should confirm with
+  /// the user before invoking this — there is no undo.
+  Future<void> deleteAccount() async {
+    await _identityApi.deleteMyAccount();
+    _authToken.set(null);
+    _refreshToken.set(null);
+  }
+
   Future<void> requestRecovery({required String email}) async {
     await _identityApi.requestAccountRecovery(
       recoveryRequest: RecoveryRequest((b) => b..email = email),

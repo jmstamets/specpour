@@ -825,6 +825,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please fill in every field.'**
   String get completeExternalRegistrationMissingFieldsError;
+
+  /// T051 sessions screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Active sessions'**
+  String get sessionsTitle;
+
+  /// T051 sessions screen: shown when the list is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No active sessions.'**
+  String get sessionsEmpty;
+
+  /// T051 sessions screen: per-session last-active timestamp, pre-formatted by the caller.
+  ///
+  /// In en, this message translates to:
+  /// **'Last active {when}'**
+  String sessionsLastActive(String when);
+
+  /// T051 sessions screen: per-session revoke button.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke'**
+  String get sessionsRevokeButton;
+
+  /// T052 account lifecycle screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate account'**
+  String get accountLifecycleTitle;
+
+  /// T052 account lifecycle screen: explanation of the grace-period behavior (FR-003).
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivating your account signs you out of every device. You can reactivate any time by signing back in — after the grace period ends, your account and its data are permanently deleted.'**
+  String get accountLifecycleGracePeriodExplanation;
+
+  /// T052 account lifecycle screen: deactivate button.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate my account'**
+  String get accountLifecycleDeactivateButton;
+
+  /// T052 account lifecycle screen: deactivate confirmation dialog title.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate your account?'**
+  String get accountLifecycleDeactivateConfirmTitle;
+
+  /// T052 account lifecycle screen: deactivate confirmation dialog message.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll be signed out of every device. You can reactivate any time before the grace period ends.'**
+  String get accountLifecycleDeactivateConfirmMessage;
+
+  /// T052/T053 confirmation dialogs: cancel button.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get accountLifecycleCancelButton;
+
+  /// T052 account lifecycle screen: confirmation message after deactivating.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is now deactivated.'**
+  String get accountLifecycleDeactivatedConfirmation;
+
+  /// T052 account lifecycle screen: reactivate button.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate my account'**
+  String get accountLifecycleReactivateButton;
+
+  /// T052 account lifecycle screen: confirmation message after reactivating.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is active again.'**
+  String get accountLifecycleReactivatedConfirmation;
+
+  /// T053 account data (export/delete) screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data'**
+  String get accountDataTitle;
+
+  /// T053 account data screen: export button.
+  ///
+  /// In en, this message translates to:
+  /// **'Export my data'**
+  String get accountDataExportButton;
+
+  /// T053 account data screen: the sole surface anywhere in the app that displays the raw date of birth.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth: {dateOfBirth}'**
+  String accountDataExportDateOfBirth(String dateOfBirth);
+
+  /// T053 account data screen: exported email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email: {email}'**
+  String accountDataExportEmail(String email);
+
+  /// T053 account data screen: explanation above the delete button.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your account is permanent and cannot be undone. Export your data first if you want to keep a copy.'**
+  String get accountDataDeleteExplanation;
+
+  /// T053 account data screen: delete button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get accountDataDeleteButton;
+
+  /// T053 account data screen: delete confirmation dialog title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get accountDataDeleteConfirmTitle;
+
+  /// T053 account data screen: delete confirmation dialog message.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes your account and all its data. This cannot be undone.'**
+  String get accountDataDeleteConfirmMessage;
 }
 
 class _AppLocalizationsDelegate

@@ -86,19 +86,28 @@ Class | Method | HTTP request | Description
 [*IdentityApi*](doc/IdentityApi.md) | [**challengeExternalSignIn**](doc/IdentityApi.md#challengeexternalsignin) | **GET** /auth/external/{provider} | Start social sign-in with a provider (T049)
 [*IdentityApi*](doc/IdentityApi.md) | [**completeExternalRegistration**](doc/IdentityApi.md#completeexternalregistration) | **POST** /auth/external/complete-registration | Finish a new account after social sign-in supplied no date of birth (T049)
 [*IdentityApi*](doc/IdentityApi.md) | [**confirmAccountRecovery**](doc/IdentityApi.md#confirmaccountrecovery) | **POST** /auth/recovery/confirm | Complete account recovery with the emailed code and a new password (T050)
+[*IdentityApi*](doc/IdentityApi.md) | [**deactivateMyAccount**](doc/IdentityApi.md#deactivatemyaccount) | **POST** /me/deactivate | Deactivate the caller&#39;s account (T052)
+[*IdentityApi*](doc/IdentityApi.md) | [**deleteMyAccount**](doc/IdentityApi.md#deletemyaccount) | **DELETE** /me | Delete the caller&#39;s account (T053)
 [*IdentityApi*](doc/IdentityApi.md) | [**disableMfa**](doc/IdentityApi.md#disablemfa) | **DELETE** /me/mfa | Disable TOTP MFA (T050)
 [*IdentityApi*](doc/IdentityApi.md) | [**enrollOrConfirmMfa**](doc/IdentityApi.md#enrollorconfirmmfa) | **POST** /me/mfa | Start or confirm TOTP MFA enrollment (T050)
+[*IdentityApi*](doc/IdentityApi.md) | [**exportMyAccount**](doc/IdentityApi.md#exportmyaccount) | **GET** /me/export | Export the caller&#39;s account data (T053)
 [*IdentityApi*](doc/IdentityApi.md) | [**externalSignInCallback**](doc/IdentityApi.md#externalsignincallback) | **GET** /auth/external/{provider}/callback | Provider redirect target — not called directly by clients (T049)
 [*IdentityApi*](doc/IdentityApi.md) | [**getMfaStatus**](doc/IdentityApi.md#getmfastatus) | **GET** /me/mfa | Get the caller&#39;s TOTP MFA enrollment status (T050)
+[*IdentityApi*](doc/IdentityApi.md) | [**listMySessions**](doc/IdentityApi.md#listmysessions) | **GET** /me/sessions | List the caller&#39;s active sessions/devices (T051)
 [*IdentityApi*](doc/IdentityApi.md) | [**login**](doc/IdentityApi.md#login) | **POST** /auth/login | Email/password sign-in, establishing the cookie session (T047)
 [*IdentityApi*](doc/IdentityApi.md) | [**loginMfa**](doc/IdentityApi.md#loginmfa) | **POST** /auth/login/mfa | Complete a sign-in that requiresMfa (T050)
+[*IdentityApi*](doc/IdentityApi.md) | [**reactivateMyAccount**](doc/IdentityApi.md#reactivatemyaccount) | **POST** /me/reactivate | Reactivate the caller&#39;s deactivated account (T052)
 [*IdentityApi*](doc/IdentityApi.md) | [**regenerateMfaBackupCodes**](doc/IdentityApi.md#regeneratemfabackupcodes) | **POST** /me/mfa/backup-codes | Regenerate the caller&#39;s MFA backup codes (T163)
 [*IdentityApi*](doc/IdentityApi.md) | [**registerAccount**](doc/IdentityApi.md#registeraccount) | **POST** /auth/register | Email/password registration with DOB capture and underage rejection (FR-001/FR-002/FR-002c, T047)
 [*IdentityApi*](doc/IdentityApi.md) | [**requestAccountRecovery**](doc/IdentityApi.md#requestaccountrecovery) | **POST** /auth/recovery | Request account recovery (T050, FR — lost-credential recovery)
+[*IdentityApi*](doc/IdentityApi.md) | [**revokeMySession**](doc/IdentityApi.md#revokemysession) | **DELETE** /me/sessions/{id} | Revoke a session/device (T051)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**getIngredient**](doc/IngredientsApi.md#getingredient) | **GET** /ingredients/{id} | Get an ingredient&#39;s full detail, including allergen attributes (FR-016)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**getIngredientRecipes**](doc/IngredientsApi.md#getingredientrecipes) | **GET** /ingredients/{id}/recipes | Recipes using this ingredient, hierarchy-aware (T155, FR-014a)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**listIngredients**](doc/IngredientsApi.md#listingredients) | **GET** /ingredients | Browse ingredients (FR-014)
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getInbox**](doc/NotificationsApi.md#getinbox) | **GET** /inbox | Get the caller&#39;s inbox messages
+[*NotificationsApi*](doc/NotificationsApi.md) | [**getMyChannelPreferences**](doc/NotificationsApi.md#getmychannelpreferences) | **GET** /me/channels | Get the caller&#39;s notification channel opt-in preferences
+[*NotificationsApi*](doc/NotificationsApi.md) | [**markInboxMessageRead**](doc/NotificationsApi.md#markinboxmessageread) | **POST** /inbox/{id}/read | Mark an inbox message as read
+[*NotificationsApi*](doc/NotificationsApi.md) | [**updateMyChannelPreferences**](doc/NotificationsApi.md#updatemychannelpreferences) | **PUT** /me/channels | Update the caller&#39;s notification channel opt-in preferences
 [*SearchApi*](doc/SearchApi.md) | [**search**](doc/SearchApi.md#search) | **GET** /search | Full-text search across recipes, ingredients, equipment, glossary terms, and articles (FR-049)
 
 
@@ -109,6 +118,10 @@ Class | Method | HTTP request | Description
  - [AutoLinkMatch](doc/AutoLinkMatch.md)
  - [AutoLinkResponse](doc/AutoLinkResponse.md)
  - [BackupCodes](doc/BackupCodes.md)
+ - [ChannelPreference](doc/ChannelPreference.md)
+ - [ChannelPreferences](doc/ChannelPreferences.md)
+ - [ChannelPreferencesUpdate](doc/ChannelPreferencesUpdate.md)
+ - [ChannelPreferencesUpdateChannelsInner](doc/ChannelPreferencesUpdateChannelsInner.md)
  - [CompleteExternalRegistrationRequest](doc/CompleteExternalRegistrationRequest.md)
  - [ConceptDetail](doc/ConceptDetail.md)
  - [ConceptPage](doc/ConceptPage.md)
@@ -137,6 +150,7 @@ Class | Method | HTTP request | Description
  - [LoginMfaRequest](doc/LoginMfaRequest.md)
  - [LoginRequest](doc/LoginRequest.md)
  - [LoginResult](doc/LoginResult.md)
+ - [MeExport](doc/MeExport.md)
  - [MfaEnrollment](doc/MfaEnrollment.md)
  - [MfaStatus](doc/MfaStatus.md)
  - [ProblemDetails](doc/ProblemDetails.md)
@@ -151,6 +165,8 @@ Class | Method | HTTP request | Description
  - [RoleGrantSummary](doc/RoleGrantSummary.md)
  - [SearchResult](doc/SearchResult.md)
  - [SearchResultPage](doc/SearchResultPage.md)
+ - [Session](doc/Session.md)
+ - [SessionList](doc/SessionList.md)
  - [SupportResourceResponse](doc/SupportResourceResponse.md)
  - [SupportResourcesResponse](doc/SupportResourcesResponse.md)
 

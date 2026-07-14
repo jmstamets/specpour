@@ -49,8 +49,7 @@ public sealed class NotificationsModule : IModule
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
         InboxEndpoint.Map(endpoints);
-
-        // POST /inbox/{id}/read and GET/PUT /me/channels are not yet scheduled by
-        // any task (tracked separately — see memory) — only GET /inbox is in scope.
+        InboxReadEndpoint.Map(endpoints);
+        ChannelPreferencesEndpoint.Map(endpoints);
     }
 }

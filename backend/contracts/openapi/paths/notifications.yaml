@@ -22,13 +22,6 @@ inbox:
       '401':
         $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
 
-# --- Pre-authored for T151 (2026-07-11 gap review) -------------------------------
-# The two path items below are contract-first authored ahead of implementation but
-# are NOT yet $ref'd from openapi.yaml — the root document only describes the
-# implemented API (contract tests validate the running server against it). T151
-# (Phase 4/US2) wires `/inbox/{id}/read` and `/me/channels` into the root and
-# implements the endpoints over T023's existing storage.
-
 inboxRead:
   post:
     operationId: markInboxMessageRead

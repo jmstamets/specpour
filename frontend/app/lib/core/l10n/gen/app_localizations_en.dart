@@ -397,4 +397,80 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get completeExternalRegistrationMissingFieldsError =>
       'Please fill in every field.';
+
+  @override
+  String get sessionsTitle => 'Active sessions';
+
+  @override
+  String get sessionsEmpty => 'No active sessions.';
+
+  @override
+  String sessionsLastActive(String when) {
+    return 'Last active $when';
+  }
+
+  @override
+  String get sessionsRevokeButton => 'Revoke';
+
+  @override
+  String get accountLifecycleTitle => 'Deactivate account';
+
+  @override
+  String get accountLifecycleGracePeriodExplanation =>
+      'Deactivating your account signs you out of every device. You can reactivate any time by signing back in — after the grace period ends, your account and its data are permanently deleted.';
+
+  @override
+  String get accountLifecycleDeactivateButton => 'Deactivate my account';
+
+  @override
+  String get accountLifecycleDeactivateConfirmTitle =>
+      'Deactivate your account?';
+
+  @override
+  String get accountLifecycleDeactivateConfirmMessage =>
+      'You\'ll be signed out of every device. You can reactivate any time before the grace period ends.';
+
+  @override
+  String get accountLifecycleCancelButton => 'Cancel';
+
+  @override
+  String get accountLifecycleDeactivatedConfirmation =>
+      'Your account is now deactivated.';
+
+  @override
+  String get accountLifecycleReactivateButton => 'Reactivate my account';
+
+  @override
+  String get accountLifecycleReactivatedConfirmation =>
+      'Your account is active again.';
+
+  @override
+  String get accountDataTitle => 'Your data';
+
+  @override
+  String get accountDataExportButton => 'Export my data';
+
+  @override
+  String accountDataExportDateOfBirth(String dateOfBirth) {
+    return 'Date of birth: $dateOfBirth';
+  }
+
+  @override
+  String accountDataExportEmail(String email) {
+    return 'Email: $email';
+  }
+
+  @override
+  String get accountDataDeleteExplanation =>
+      'Deleting your account is permanent and cannot be undone. Export your data first if you want to keep a copy.';
+
+  @override
+  String get accountDataDeleteButton => 'Delete my account';
+
+  @override
+  String get accountDataDeleteConfirmTitle => 'Delete your account?';
+
+  @override
+  String get accountDataDeleteConfirmMessage =>
+      'This permanently deletes your account and all its data. This cannot be undone.';
 }

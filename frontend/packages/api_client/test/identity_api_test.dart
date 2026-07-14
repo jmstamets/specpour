@@ -32,6 +32,24 @@ void main() {
       // TODO
     });
 
+    // Deactivate the caller's account (T052)
+    //
+    // Signs the account out of every active session/device immediately. Retained for an operator-configurable grace period (default 12 months, FR-003) during which the caller can reactivate; a warning is sent before expiry, after which the account is automatically deleted via the same path as DELETE /me.
+    //
+    //Future deactivateMyAccount() async
+    test('test deactivateMyAccount', () async {
+      // TODO
+    });
+
+    // Delete the caller's account (T053)
+    //
+    // Hard-deletes the account immediately (self-service path) — the same AccountDeletionService used by T052's grace-period-expiry background job. Cascades to MFA enrollment/backup codes/sessions via real foreign keys; publishes AccountDeleted for the future Community module's public-attribution anonymization.
+    //
+    //Future deleteMyAccount() async
+    test('test deleteMyAccount', () async {
+      // TODO
+    });
+
     // Disable TOTP MFA (T050)
     //
     // Also clears any backup codes (T163) — they're meaningless without an active enrollment.
@@ -50,6 +68,15 @@ void main() {
       // TODO
     });
 
+    // Export the caller's account data (T053)
+    //
+    // The sole surface anywhere in the platform that returns the raw date of birth (FR-002b/SC-017) — every call is audit-logged (identity.dob_exported).
+    //
+    //Future<MeExport> exportMyAccount() async
+    test('test exportMyAccount', () async {
+      // TODO
+    });
+
     // Provider redirect target — not called directly by clients (T049)
     //
     //Future externalSignInCallback(String provider) async
@@ -61,6 +88,15 @@ void main() {
     //
     //Future<MfaStatus> getMfaStatus() async
     test('test getMfaStatus', () async {
+      // TODO
+    });
+
+    // List the caller's active sessions/devices (T051)
+    //
+    // A \"session\" is one OpenIddict authorization — created the first time a device completes the PKCE exchange, refreshed on every subsequent token refresh. Revoked sessions are omitted (not just flagged) since there is nothing further the caller can do with one.
+    //
+    //Future<SessionList> listMySessions() async
+    test('test listMySessions', () async {
       // TODO
     });
 
@@ -79,6 +115,15 @@ void main() {
     //
     //Future<AuthAccount> loginMfa(LoginMfaRequest loginMfaRequest) async
     test('test loginMfa', () async {
+      // TODO
+    });
+
+    // Reactivate the caller's deactivated account (T052)
+    //
+    // Only meaningful once the caller has a fresh, valid bearer token — deactivation revokes every prior session, so reactivating requires signing in again first.
+    //
+    //Future reactivateMyAccount() async
+    test('test reactivateMyAccount', () async {
       // TODO
     });
 
@@ -106,6 +151,15 @@ void main() {
     //
     //Future requestAccountRecovery(RecoveryRequest recoveryRequest) async
     test('test requestAccountRecovery', () async {
+      // TODO
+    });
+
+    // Revoke a session/device (T051)
+    //
+    // Revokes the underlying OpenIddict authorization directly — the whole refresh-token family for that device stops working immediately, not just this one call's session-list visibility.
+    //
+    //Future revokeMySession(String id) async
+    test('test revokeMySession', () async {
       // TODO
     });
 

@@ -11,6 +11,8 @@ import '../../features/discover/discover_screen.dart';
 import '../../features/discover/equipment_detail/equipment_detail_screen.dart';
 import '../../features/discover/ingredient_detail/ingredient_detail_screen.dart';
 import '../../features/discover/recipe_detail/recipe_detail_screen.dart';
+import '../../features/identity/account_data_screen.dart';
+import '../../features/identity/account_lifecycle_screen.dart';
 import '../../features/identity/complete_external_registration_screen.dart';
 import '../../features/identity/external_sign_in_callback_screen.dart';
 import '../../features/identity/mfa_challenge_screen.dart';
@@ -18,6 +20,7 @@ import '../../features/identity/mfa_settings_screen.dart';
 import '../../features/identity/recovery_confirm_screen.dart';
 import '../../features/identity/recovery_request_screen.dart';
 import '../../features/identity/register_screen.dart';
+import '../../features/identity/sessions_screen.dart';
 import '../../features/identity/sign_in_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -76,6 +79,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/account/mfa',
         name: 'mfaSettings',
         builder: (context, state) => const MfaSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/account/sessions',
+        name: 'sessions',
+        builder: (context, state) => const SessionsScreen(),
+      ),
+      GoRoute(
+        path: '/account/lifecycle',
+        name: 'accountLifecycle',
+        builder: (context, state) => const AccountLifecycleScreen(),
+      ),
+      GoRoute(
+        path: '/account/data',
+        name: 'accountData',
+        builder: (context, state) => const AccountDataScreen(),
       ),
       GoRoute(
         path: '/recovery',

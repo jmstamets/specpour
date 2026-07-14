@@ -50,6 +50,46 @@ public sealed class OpenApiConformanceTests(ComposedHostFixture host)
     }
 
     [Fact]
+    public async Task PostInboxMessageRead_without_a_token_conforms_to_its_401_schema()
+    {
+        var requestPath = $"/api/v1/inbox/{Guid.NewGuid()}/read";
+        var response = await host.Client.PostAsync(new Uri(requestPath, UriKind.Relative), content: null);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("POST", requestPath, (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task GetMeChannels_without_a_token_conforms_to_its_401_schema()
+    {
+        var response = await host.Client.GetAsync(new Uri("/api/v1/me/channels", UriKind.Relative));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("GET", "/api/v1/me/channels", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
+    public async Task PutMeChannels_without_a_token_conforms_to_its_401_schema()
+    {
+        var response = await host.Client.PutAsync(new Uri("/api/v1/me/channels", UriKind.Relative), content: null);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("PUT", "/api/v1/me/channels", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
     public async Task PostAuthRegister_conforms_to_its_schema()
     {
         var payload = new

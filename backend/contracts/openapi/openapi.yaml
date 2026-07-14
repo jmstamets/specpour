@@ -95,6 +95,10 @@ paths:
     $ref: './paths/compliance.yaml#/supportResources'
   /inbox:
     $ref: './paths/notifications.yaml#/inbox'
+  /inbox/{id}/read:
+    $ref: './paths/notifications.yaml#/inboxRead'
+  /me/channels:
+    $ref: './paths/notifications.yaml#/meChannels'
   /recipes:
     $ref: './paths/catalog.yaml#/recipes'
   /recipes/{id}:

@@ -12,15 +12,21 @@ Method | HTTP request | Description
 [**challengeExternalSignIn**](IdentityApi.md#challengeexternalsignin) | **GET** /auth/external/{provider} | Start social sign-in with a provider (T049)
 [**completeExternalRegistration**](IdentityApi.md#completeexternalregistration) | **POST** /auth/external/complete-registration | Finish a new account after social sign-in supplied no date of birth (T049)
 [**confirmAccountRecovery**](IdentityApi.md#confirmaccountrecovery) | **POST** /auth/recovery/confirm | Complete account recovery with the emailed code and a new password (T050)
+[**deactivateMyAccount**](IdentityApi.md#deactivatemyaccount) | **POST** /me/deactivate | Deactivate the caller&#39;s account (T052)
+[**deleteMyAccount**](IdentityApi.md#deletemyaccount) | **DELETE** /me | Delete the caller&#39;s account (T053)
 [**disableMfa**](IdentityApi.md#disablemfa) | **DELETE** /me/mfa | Disable TOTP MFA (T050)
 [**enrollOrConfirmMfa**](IdentityApi.md#enrollorconfirmmfa) | **POST** /me/mfa | Start or confirm TOTP MFA enrollment (T050)
+[**exportMyAccount**](IdentityApi.md#exportmyaccount) | **GET** /me/export | Export the caller&#39;s account data (T053)
 [**externalSignInCallback**](IdentityApi.md#externalsignincallback) | **GET** /auth/external/{provider}/callback | Provider redirect target — not called directly by clients (T049)
 [**getMfaStatus**](IdentityApi.md#getmfastatus) | **GET** /me/mfa | Get the caller&#39;s TOTP MFA enrollment status (T050)
+[**listMySessions**](IdentityApi.md#listmysessions) | **GET** /me/sessions | List the caller&#39;s active sessions/devices (T051)
 [**login**](IdentityApi.md#login) | **POST** /auth/login | Email/password sign-in, establishing the cookie session (T047)
 [**loginMfa**](IdentityApi.md#loginmfa) | **POST** /auth/login/mfa | Complete a sign-in that requiresMfa (T050)
+[**reactivateMyAccount**](IdentityApi.md#reactivatemyaccount) | **POST** /me/reactivate | Reactivate the caller&#39;s deactivated account (T052)
 [**regenerateMfaBackupCodes**](IdentityApi.md#regeneratemfabackupcodes) | **POST** /me/mfa/backup-codes | Regenerate the caller&#39;s MFA backup codes (T163)
 [**registerAccount**](IdentityApi.md#registeraccount) | **POST** /auth/register | Email/password registration with DOB capture and underage rejection (FR-001/FR-002/FR-002c, T047)
 [**requestAccountRecovery**](IdentityApi.md#requestaccountrecovery) | **POST** /auth/recovery | Request account recovery (T050, FR — lost-credential recovery)
+[**revokeMySession**](IdentityApi.md#revokemysession) | **DELETE** /me/sessions/{id} | Revoke a session/device (T051)
 
 
 # **challengeExternalSignIn**
@@ -150,6 +156,82 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deactivateMyAccount**
+> deactivateMyAccount()
+
+Deactivate the caller's account (T052)
+
+Signs the account out of every active session/device immediately. Retained for an operator-configurable grace period (default 12 months, FR-003) during which the caller can reactivate; a warning is sent before expiry, after which the account is automatically deleted via the same path as DELETE /me.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    api.deactivateMyAccount();
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->deactivateMyAccount: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteMyAccount**
+> deleteMyAccount()
+
+Delete the caller's account (T053)
+
+Hard-deletes the account immediately (self-service path) — the same AccountDeletionService used by T052's grace-period-expiry background job. Cascades to MFA enrollment/backup codes/sessions via real foreign keys; publishes AccountDeleted for the future Community module's public-attribution anonymization.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    api.deleteMyAccount();
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->deleteMyAccount: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **disableMfa**
 > disableMfa()
 
@@ -231,6 +313,45 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **exportMyAccount**
+> MeExport exportMyAccount()
+
+Export the caller's account data (T053)
+
+The sole surface anywhere in the platform that returns the raw date of birth (FR-002b/SC-017) — every call is audit-logged (identity.dob_exported).
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    final response = api.exportMyAccount();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->exportMyAccount: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**MeExport**](MeExport.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **externalSignInCallback**
 > externalSignInCallback(provider)
 
@@ -296,6 +417,45 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**MfaStatus**](MfaStatus.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listMySessions**
+> SessionList listMySessions()
+
+List the caller's active sessions/devices (T051)
+
+A \"session\" is one OpenIddict authorization — created the first time a device completes the PKCE exchange, refreshed on every subsequent token refresh. Revoked sessions are omitted (not just flagged) since there is nothing further the caller can do with one.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    final response = api.listMySessions();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->listMySessions: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**SessionList**](SessionList.md)
 
 ### Authorization
 
@@ -391,6 +551,44 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/json
  - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **reactivateMyAccount**
+> reactivateMyAccount()
+
+Reactivate the caller's deactivated account (T052)
+
+Only meaningful once the caller has a fresh, valid bearer token — deactivation revokes every prior session, so reactivating requires signing in again first.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    api.reactivateMyAccount();
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->reactivateMyAccount: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -515,6 +713,48 @@ void (empty response body)
 
  - **Content-Type**: application/json
  - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **revokeMySession**
+> revokeMySession(id)
+
+Revoke a session/device (T051)
+
+Revokes the underlying OpenIddict authorization directly — the whole refresh-token family for that device stops working immediately, not just this one call's session-list visibility.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+final String id = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    api.revokeMySession(id);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->revokeMySession: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

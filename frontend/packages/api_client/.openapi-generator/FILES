@@ -9,6 +9,10 @@ doc/AutoLinkMatch.md
 doc/AutoLinkResponse.md
 doc/BackupCodes.md
 doc/CatalogApi.md
+doc/ChannelPreference.md
+doc/ChannelPreferences.md
+doc/ChannelPreferencesUpdate.md
+doc/ChannelPreferencesUpdateChannelsInner.md
 doc/CompleteExternalRegistrationRequest.md
 doc/ComplianceApi.md
 doc/ConceptDetail.md
@@ -42,6 +46,7 @@ doc/IngredientsApi.md
 doc/LoginMfaRequest.md
 doc/LoginRequest.md
 doc/LoginResult.md
+doc/MeExport.md
 doc/MfaEnrollment.md
 doc/MfaStatus.md
 doc/NotificationsApi.md
@@ -58,6 +63,8 @@ doc/RoleGrantSummary.md
 doc/SearchApi.md
 doc/SearchResult.md
 doc/SearchResultPage.md
+doc/Session.md
+doc/SessionList.md
 doc/SupportResourceResponse.md
 doc/SupportResourcesResponse.md
 lib/api_client.dart
@@ -83,6 +90,10 @@ lib/src/model/auth_account.dart
 lib/src/model/auto_link_match.dart
 lib/src/model/auto_link_response.dart
 lib/src/model/backup_codes.dart
+lib/src/model/channel_preference.dart
+lib/src/model/channel_preferences.dart
+lib/src/model/channel_preferences_update.dart
+lib/src/model/channel_preferences_update_channels_inner.dart
 lib/src/model/complete_external_registration_request.dart
 lib/src/model/concept_detail.dart
 lib/src/model/concept_page.dart
@@ -112,6 +123,7 @@ lib/src/model/ingredient_summary.dart
 lib/src/model/login_mfa_request.dart
 lib/src/model/login_request.dart
 lib/src/model/login_result.dart
+lib/src/model/me_export.dart
 lib/src/model/mfa_enrollment.dart
 lib/src/model/mfa_status.dart
 lib/src/model/problem_details.dart
@@ -126,6 +138,8 @@ lib/src/model/responsible_consumption_message_response.dart
 lib/src/model/role_grant_summary.dart
 lib/src/model/search_result.dart
 lib/src/model/search_result_page.dart
+lib/src/model/session.dart
+lib/src/model/session_list.dart
 lib/src/model/support_resource_response.dart
 lib/src/model/support_resources_response.dart
 lib/src/serializers.dart
@@ -137,6 +151,10 @@ test/auto_link_match_test.dart
 test/auto_link_response_test.dart
 test/backup_codes_test.dart
 test/catalog_api_test.dart
+test/channel_preference_test.dart
+test/channel_preferences_test.dart
+test/channel_preferences_update_channels_inner_test.dart
+test/channel_preferences_update_test.dart
 test/complete_external_registration_request_test.dart
 test/compliance_api_test.dart
 test/concept_detail_test.dart
@@ -170,6 +188,7 @@ test/ingredients_api_test.dart
 test/login_mfa_request_test.dart
 test/login_request_test.dart
 test/login_result_test.dart
+test/me_export_test.dart
 test/mfa_enrollment_test.dart
 test/mfa_status_test.dart
 test/notifications_api_test.dart
@@ -186,5 +205,7 @@ test/role_grant_summary_test.dart
 test/search_api_test.dart
 test/search_result_page_test.dart
 test/search_result_test.dart
+test/session_list_test.dart
+test/session_test.dart
 test/support_resource_response_test.dart
 test/support_resources_response_test.dart

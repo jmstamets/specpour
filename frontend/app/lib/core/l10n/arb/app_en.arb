@@ -468,5 +468,98 @@
   "completeExternalRegistrationMissingFieldsError": "Please fill in every field.",
   "@completeExternalRegistrationMissingFieldsError": {
     "description": "T049 social sign-in DOB-completion screen: client-side validation message."
+  },
+  "sessionsTitle": "Active sessions",
+  "@sessionsTitle": {
+    "description": "T051 sessions screen title."
+  },
+  "sessionsEmpty": "No active sessions.",
+  "@sessionsEmpty": {
+    "description": "T051 sessions screen: shown when the list is empty."
+  },
+  "sessionsLastActive": "Last active {when}",
+  "@sessionsLastActive": {
+    "description": "T051 sessions screen: per-session last-active timestamp, pre-formatted by the caller.",
+    "placeholders": {
+      "when": { "type": "String" }
+    }
+  },
+  "sessionsRevokeButton": "Revoke",
+  "@sessionsRevokeButton": {
+    "description": "T051 sessions screen: per-session revoke button."
+  },
+  "accountLifecycleTitle": "Deactivate account",
+  "@accountLifecycleTitle": {
+    "description": "T052 account lifecycle screen title."
+  },
+  "accountLifecycleGracePeriodExplanation": "Deactivating your account signs you out of every device. You can reactivate any time by signing back in — after the grace period ends, your account and its data are permanently deleted.",
+  "@accountLifecycleGracePeriodExplanation": {
+    "description": "T052 account lifecycle screen: explanation of the grace-period behavior (FR-003)."
+  },
+  "accountLifecycleDeactivateButton": "Deactivate my account",
+  "@accountLifecycleDeactivateButton": {
+    "description": "T052 account lifecycle screen: deactivate button."
+  },
+  "accountLifecycleDeactivateConfirmTitle": "Deactivate your account?",
+  "@accountLifecycleDeactivateConfirmTitle": {
+    "description": "T052 account lifecycle screen: deactivate confirmation dialog title."
+  },
+  "accountLifecycleDeactivateConfirmMessage": "You'll be signed out of every device. You can reactivate any time before the grace period ends.",
+  "@accountLifecycleDeactivateConfirmMessage": {
+    "description": "T052 account lifecycle screen: deactivate confirmation dialog message."
+  },
+  "accountLifecycleCancelButton": "Cancel",
+  "@accountLifecycleCancelButton": {
+    "description": "T052/T053 confirmation dialogs: cancel button."
+  },
+  "accountLifecycleDeactivatedConfirmation": "Your account is now deactivated.",
+  "@accountLifecycleDeactivatedConfirmation": {
+    "description": "T052 account lifecycle screen: confirmation message after deactivating."
+  },
+  "accountLifecycleReactivateButton": "Reactivate my account",
+  "@accountLifecycleReactivateButton": {
+    "description": "T052 account lifecycle screen: reactivate button."
+  },
+  "accountLifecycleReactivatedConfirmation": "Your account is active again.",
+  "@accountLifecycleReactivatedConfirmation": {
+    "description": "T052 account lifecycle screen: confirmation message after reactivating."
+  },
+  "accountDataTitle": "Your data",
+  "@accountDataTitle": {
+    "description": "T053 account data (export/delete) screen title."
+  },
+  "accountDataExportButton": "Export my data",
+  "@accountDataExportButton": {
+    "description": "T053 account data screen: export button."
+  },
+  "accountDataExportDateOfBirth": "Date of birth: {dateOfBirth}",
+  "@accountDataExportDateOfBirth": {
+    "description": "T053 account data screen: the sole surface anywhere in the app that displays the raw date of birth.",
+    "placeholders": {
+      "dateOfBirth": { "type": "String" }
+    }
+  },
+  "accountDataExportEmail": "Email: {email}",
+  "@accountDataExportEmail": {
+    "description": "T053 account data screen: exported email.",
+    "placeholders": {
+      "email": { "type": "String" }
+    }
+  },
+  "accountDataDeleteExplanation": "Deleting your account is permanent and cannot be undone. Export your data first if you want to keep a copy.",
+  "@accountDataDeleteExplanation": {
+    "description": "T053 account data screen: explanation above the delete button."
+  },
+  "accountDataDeleteButton": "Delete my account",
+  "@accountDataDeleteButton": {
+    "description": "T053 account data screen: delete button."
+  },
+  "accountDataDeleteConfirmTitle": "Delete your account?",
+  "@accountDataDeleteConfirmTitle": {
+    "description": "T053 account data screen: delete confirmation dialog title."
+  },
+  "accountDataDeleteConfirmMessage": "This permanently deletes your account and all its data. This cannot be undone.",
+  "@accountDataDeleteConfirmMessage": {
+    "description": "T053 account data screen: delete confirmation dialog message."
   }
 }

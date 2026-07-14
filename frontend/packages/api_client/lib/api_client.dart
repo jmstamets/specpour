@@ -25,6 +25,10 @@ export 'package:api_client/src/model/auth_account.dart';
 export 'package:api_client/src/model/auto_link_match.dart';
 export 'package:api_client/src/model/auto_link_response.dart';
 export 'package:api_client/src/model/backup_codes.dart';
+export 'package:api_client/src/model/channel_preference.dart';
+export 'package:api_client/src/model/channel_preferences.dart';
+export 'package:api_client/src/model/channel_preferences_update.dart';
+export 'package:api_client/src/model/channel_preferences_update_channels_inner.dart';
 export 'package:api_client/src/model/complete_external_registration_request.dart';
 export 'package:api_client/src/model/concept_detail.dart';
 export 'package:api_client/src/model/concept_page.dart';
@@ -53,6 +57,7 @@ export 'package:api_client/src/model/ingredient_summary.dart';
 export 'package:api_client/src/model/login_mfa_request.dart';
 export 'package:api_client/src/model/login_request.dart';
 export 'package:api_client/src/model/login_result.dart';
+export 'package:api_client/src/model/me_export.dart';
 export 'package:api_client/src/model/mfa_enrollment.dart';
 export 'package:api_client/src/model/mfa_status.dart';
 export 'package:api_client/src/model/problem_details.dart';
@@ -67,6 +72,8 @@ export 'package:api_client/src/model/responsible_consumption_message_response.da
 export 'package:api_client/src/model/role_grant_summary.dart';
 export 'package:api_client/src/model/search_result.dart';
 export 'package:api_client/src/model/search_result_page.dart';
+export 'package:api_client/src/model/session.dart';
+export 'package:api_client/src/model/session_list.dart';
 export 'package:api_client/src/model/support_resource_response.dart';
 export 'package:api_client/src/model/support_resources_response.dart';
 

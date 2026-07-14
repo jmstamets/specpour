@@ -13,6 +13,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AutoLinkMatch.serializer)
       ..add(AutoLinkResponse.serializer)
       ..add(BackupCodes.serializer)
+      ..add(ChannelPreference.serializer)
+      ..add(ChannelPreferenceChannelEnum.serializer)
+      ..add(ChannelPreferences.serializer)
+      ..add(ChannelPreferencesUpdate.serializer)
+      ..add(ChannelPreferencesUpdateChannelsInner.serializer)
+      ..add(ChannelPreferencesUpdateChannelsInnerChannelEnum.serializer)
       ..add(CompleteExternalRegistrationRequest.serializer)
       ..add(CompleteExternalRegistrationRequestUnitPreferenceEnum.serializer)
       ..add(ConceptDetail.serializer)
@@ -42,6 +48,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(LoginMfaRequest.serializer)
       ..add(LoginRequest.serializer)
       ..add(LoginResult.serializer)
+      ..add(MeExport.serializer)
+      ..add(MeExportUnitPreferenceEnum.serializer)
       ..add(MfaEnrollment.serializer)
       ..add(MfaStatus.serializer)
       ..add(MfaStatusMethodEnum.serializer)
@@ -61,11 +69,20 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(SearchResult.serializer)
       ..add(SearchResultEntityTypeEnum.serializer)
       ..add(SearchResultPage.serializer)
+      ..add(Session.serializer)
+      ..add(SessionList.serializer)
       ..add(SupportResourceResponse.serializer)
       ..add(SupportResourcesResponse.serializer)
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(AutoLinkMatch)]),
           () => ListBuilder<AutoLinkMatch>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(ChannelPreference)]),
+          () => ListBuilder<ChannelPreference>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(ChannelPreferencesUpdateChannelsInner)]),
+          () => ListBuilder<ChannelPreferencesUpdateChannelsInner>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ConceptSummary)]),
           () => ListBuilder<ConceptSummary>())
@@ -99,6 +116,15 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(SearchResult)]),
           () => ListBuilder<SearchResult>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Session)]),
+          () => ListBuilder<Session>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Session)]),
+          () => ListBuilder<Session>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
