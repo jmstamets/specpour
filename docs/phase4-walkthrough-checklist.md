@@ -35,14 +35,14 @@ Two processes: the backend stack (docker-compose) and the built Flutter web app.
    **Build freshness**: verify the served bundle matches what's on disk —
    `sha256sum main.dart.js` on disk must match `curl -s
 http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this build
-   (2026-07-15, includes the finding #1 web-PKCE registration fix — T169):
-   `ea9c3d3cd66515addebb1e8c27bd89c88d1eca3dc6592be130283eabeccce822`.
+   (2026-07-15, includes re-walk fixes #1/F1/F2 — T169/T175/T176):
+   `e4badd9baa251af153f63e82e60b0259128b609b2b85d5ea48128db8a5e73c02`.
 
    **Re-walk note (2026-07-15):** finding #1 (registration failing in a real browser)
    is fixed and now guarded by a headless-Chrome integration test
    (`scripts/run-web-integration-tests.sh`). The stale error _presentation_ (raw
    exception text, no reveal toggle / password-policy hint, uncopyable errors) is
-   tracked as T170–T172 and NOT yet fixed — so on this re-walk, registration should
+   tracked as T170-T172; session persistence (reload logs you out) is T177 — NONE yet fixed — so on this re-walk, registration should
    _succeed and land signed in_, but a deliberately-bad input (short password,
    underage DOB) will still show terse/technical copy until those land.
 
