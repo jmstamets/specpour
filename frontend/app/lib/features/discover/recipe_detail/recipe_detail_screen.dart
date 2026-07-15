@@ -119,9 +119,8 @@ class _RecipeDetailBody extends StatelessWidget {
                   subtitle: line.purpose == null ? null : Text(line.purpose!),
                   onTap: () => showEntityInfoPopover(
                     context,
-                    (ref) => ref.watch(
-                      ingredientInfoProvider(line.ingredientId),
-                    ),
+                    (ref) =>
+                        ref.watch(ingredientInfoProvider(line.ingredientId)),
                   ),
                 ),
               )

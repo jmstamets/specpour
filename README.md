@@ -46,3 +46,15 @@ flutter run
 ```
 
 See `specs/001-specpour-v1/quickstart.md` for end-to-end validation scenarios.
+
+## Local CI gate
+
+No CI provisioning exists yet for this repo (T168 — a repo-hosting decision,
+not made yet), so `.github/workflows/ci.yml`'s gates don't run anywhere on
+their own. Run `scripts/install-git-hooks.sh` once per clone to install a
+local pre-commit/pre-push hook (`scripts/pre-push-checks.sh`) that runs the
+same checks CI would: the four backend test suites, frontend analyze/format/
+test, the generated-client drift check, and a NuGet vulnerable-package scan.
+(Frontend `integration_test` on an Android emulator and the Trivy container
+scan aren't included — impractical for a local hook — and remain CI-only
+once CI exists.) Skip a one-off run with `SKIP_LOCAL_CI_GATE=1 git commit ...`.

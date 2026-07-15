@@ -33,7 +33,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     });
 
     try {
-      await ref.read(identityAuthServiceProvider).revokeSession(sessionId: sessionId);
+      await ref
+          .read(identityAuthServiceProvider)
+          .revokeSession(sessionId: sessionId);
       ref.invalidate(sessionsProvider);
     } catch (error) {
       if (mounted) {
@@ -65,7 +67,11 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context, AppLocalizations l10n, List<Session> sessions) {
+  Widget _buildBody(
+    BuildContext context,
+    AppLocalizations l10n,
+    List<Session> sessions,
+  ) {
     final dateFormat = DateFormat.yMMMd().add_jm();
 
     return ListView(
@@ -87,10 +93,16 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
               key: Key('sessionCard-${session.id}'),
               child: ListTile(
                 title: Text(session.deviceDescription),
-                subtitle: Text(l10n.sessionsLastActive(dateFormat.format(session.lastSeenAt))),
+                subtitle: Text(
+                  l10n.sessionsLastActive(
+                    dateFormat.format(session.lastSeenAt),
+                  ),
+                ),
                 trailing: ElevatedButton(
                   key: Key('sessionRevokeButton-${session.id}'),
-                  onPressed: _revokingSessionId == session.id ? null : () => _revoke(session.id),
+                  onPressed: _revokingSessionId == session.id
+                      ? null
+                      : () => _revoke(session.id),
                   child: Text(l10n.sessionsRevokeButton),
                 ),
               ),

@@ -42,7 +42,9 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
     });
 
     try {
-      final enrollment = await ref.read(identityAuthServiceProvider).startMfaEnrollment();
+      final enrollment = await ref
+          .read(identityAuthServiceProvider)
+          .startMfaEnrollment();
       if (mounted) {
         setState(() => _pendingEnrollment = enrollment);
       }
@@ -71,7 +73,9 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
     });
 
     try {
-      await ref.read(identityAuthServiceProvider).confirmMfaEnrollment(code: _codeController.text);
+      await ref
+          .read(identityAuthServiceProvider)
+          .confirmMfaEnrollment(code: _codeController.text);
       if (!mounted) {
         return;
       }
@@ -137,13 +141,19 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context, AppLocalizations l10n, MfaStatus status) {
+  Widget _buildBody(
+    BuildContext context,
+    AppLocalizations l10n,
+    MfaStatus status,
+  ) {
     final pending = _pendingEnrollment;
 
     return ListView(
       children: [
         Text(
-          status.enabled ? l10n.mfaSettingsStatusEnabled : l10n.mfaSettingsStatusDisabled,
+          status.enabled
+              ? l10n.mfaSettingsStatusEnabled
+              : l10n.mfaSettingsStatusDisabled,
           key: const Key('mfaSettingsStatusText'),
           style: Theme.of(context).textTheme.titleMedium,
         ),
@@ -178,13 +188,17 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
           SelectableText(
             pending.secret ?? '',
             key: const Key('mfaSettingsSecretText'),
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontFamily: 'monospace'),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontFamily: 'monospace'),
           ),
           const SizedBox(height: 16),
           TextField(
             key: const Key('mfaSettingsCodeField'),
             controller: _codeController,
-            decoration: InputDecoration(labelText: l10n.mfaSettingsEnterCodeLabel),
+            decoration: InputDecoration(
+              labelText: l10n.mfaSettingsEnterCodeLabel,
+            ),
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 16),

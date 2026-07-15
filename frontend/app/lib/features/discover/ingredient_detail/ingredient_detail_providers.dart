@@ -6,11 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/api_client_provider.dart';
 
-final ingredientDetailProvider = FutureProvider.family<IngredientDetail, String>((
-  ref,
-  id,
-) async {
-  final api = ref.watch(ingredientsApiProvider);
-  final response = await api.getIngredient(id: id);
-  return response.data!;
-});
+final ingredientDetailProvider =
+    FutureProvider.family<IngredientDetail, String>((ref, id) async {
+      final api = ref.watch(ingredientsApiProvider);
+      final response = await api.getIngredient(id: id);
+      return response.data!;
+    });

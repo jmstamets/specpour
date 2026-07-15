@@ -210,9 +210,7 @@ void main() {
 
       await tester.tap(
         find.byKey(
-          const Key(
-            'recipeGlasswareChip-66666666-6666-6666-6666-666666666666',
-          ),
+          const Key('recipeGlasswareChip-66666666-6666-6666-6666-666666666666'),
         ),
       );
       await tester.pumpAndSettle();

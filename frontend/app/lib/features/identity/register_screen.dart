@@ -68,7 +68,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     try {
-      await ref.read(identityAuthServiceProvider).register(
+      await ref
+          .read(identityAuthServiceProvider)
+          .register(
             email: _emailController.text,
             password: _passwordController.text,
             displayName: _displayNameController.text,
@@ -118,23 +120,32 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             TextField(
               key: const Key('registerPasswordField'),
               controller: _passwordController,
-              decoration: InputDecoration(labelText: l10n.registerPasswordLabel),
+              decoration: InputDecoration(
+                labelText: l10n.registerPasswordLabel,
+              ),
               obscureText: true,
             ),
             const SizedBox(height: 16),
             TextField(
               key: const Key('registerDisplayNameField'),
               controller: _displayNameController,
-              decoration: InputDecoration(labelText: l10n.registerDisplayNameLabel),
+              decoration: InputDecoration(
+                labelText: l10n.registerDisplayNameLabel,
+              ),
             ),
             const SizedBox(height: 16),
-            Text(l10n.registerDateOfBirthLabel, style: Theme.of(context).textTheme.labelLarge),
+            Text(
+              l10n.registerDateOfBirthLabel,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
             const SizedBox(height: 8),
             OutlinedButton(
               key: const Key('registerDateOfBirthButton'),
               onPressed: () => _pickDate(context),
               child: Text(
-                _dateOfBirth == null ? l10n.registerDateOfBirthHint : _formatDate(_dateOfBirth!),
+                _dateOfBirth == null
+                    ? l10n.registerDateOfBirthHint
+                    : _formatDate(_dateOfBirth!),
               ),
             ),
             if (_errorMessage case final error?) ...[

@@ -31,7 +31,11 @@ class SocialSignInButtons extends ConsumerWidget {
     );
   }
 
-  Future<void> _launch(BuildContext context, WidgetRef ref, String provider) async {
+  Future<void> _launch(
+    BuildContext context,
+    WidgetRef ref,
+    String provider,
+  ) async {
     final redirectUri = _resolveCallbackUri();
     final url = ref
         .read(identityAuthServiceProvider)

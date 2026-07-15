@@ -379,15 +379,33 @@ public sealed class US02IdentitySteps
         // to this already-merged T051 scenario for one consistent story with T052's):
         // DELETE /me/sessions/{id} revokes the underlying OpenIddict authorization,
         // which blocks this refresh_token grant — that's the real, immediate effect.
-        // It does not retroactively invalidate the first device's already-issued access
-        // token, which stays valid until its own short (10-minute) natural expiry.
+        // It does not retroactively invalidate the just-revoked session's already-
+        // issued access token, which stays valid until its own short (10-minute)
+        // natural expiry.
+        //
+        // T167 root cause (2026-07-14): `_sessionIds[0]` — the session
+        // WhenTheUserRevokesTheFirstSession actually deletes — is NOT
+        // `_deviceTokens[0]`'s session. SessionsEndpoints.ListAsync orders
+        // most-recently-active FIRST; device index 1 signs in after device
+        // index 0, so it has the later (or, when both land in the same
+        // TestClock tick, the tie-broken-later per SessionDevice.Id, a
+        // UUIDv7 that's genuinely time-ordered by real wall-clock regardless
+        // of TestClock) LastSeenAt — making `_sessionIds[0]` device 1's
+        // session, not device 0's. This index (1) is therefore correct, not
+        // an off-by-one: it names the SECOND device precisely because the
+        // list is newest-first and device 1 signed in second. Verified via a
+        // temporary diagnostic (both SessionDevice rows' timestamps were
+        // confirmed byte-for-byte identical under TestClock, explaining why
+        // this only ever surfaced as an intermittent Postgres-tie-order
+        // flake before the query itself gained a deterministic secondary
+        // sort — see SessionsEndpoints.cs's own comment on the fix).
         using var client = AcceptanceHooks.Factory.CreateClient();
         var response = await client.PostAsync(
             new Uri("/connect/token", UriKind.Relative),
             new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["grant_type"] = "refresh_token",
-                ["refresh_token"] = _deviceRefreshTokens[0],
+                ["refresh_token"] = _deviceRefreshTokens[1],
                 ["client_id"] = "specpour-app",
             }));
 

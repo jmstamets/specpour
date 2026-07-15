@@ -40,9 +40,18 @@ public static class SessionsEndpoints
         ClaimsPrincipal user, IdentityDbContext db, CancellationToken cancellationToken)
     {
         var userId = CurrentUserId(user);
+        // T167 root cause: LastSeenAt alone is not a unique sort key — two
+        // sessions created close enough together (the same clock tick; in the
+        // acceptance suite, TestClock doesn't advance between two rapid token
+        // exchanges, so both get the IDENTICAL timestamp) leaves ties with no
+        // deterministic order, and Postgres's own tie-break for equal ORDER BY
+        // values is unspecified — it can vary run to run. Id is a second,
+        // always-unique key that makes the ordering fully deterministic
+        // regardless of timestamp collisions, in both the real system and tests.
         var sessions = await db.SessionDevices
             .Where(s => s.UserId == userId && s.RevokedAt == null)
             .OrderByDescending(s => s.LastSeenAt)
+            .ThenByDescending(s => s.Id)
             .ToListAsync(cancellationToken);
 
         return TypedResults.Ok(new SessionListResponse(

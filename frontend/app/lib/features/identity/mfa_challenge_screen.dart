@@ -41,7 +41,9 @@ class _MfaChallengeScreenState extends ConsumerState<MfaChallengeScreen> {
     });
 
     try {
-      await ref.read(identityAuthServiceProvider).completeMfaSignIn(code: _codeController.text);
+      await ref
+          .read(identityAuthServiceProvider)
+          .completeMfaSignIn(code: _codeController.text);
 
       if (!mounted) {
         return;
@@ -80,7 +82,9 @@ class _MfaChallengeScreenState extends ConsumerState<MfaChallengeScreen> {
             TextField(
               key: const Key('mfaChallengeCodeField'),
               controller: _codeController,
-              decoration: InputDecoration(labelText: l10n.mfaChallengeCodeLabel),
+              decoration: InputDecoration(
+                labelText: l10n.mfaChallengeCodeLabel,
+              ),
               keyboardType: TextInputType.number,
             ),
             if (_errorMessage case final error?) ...[

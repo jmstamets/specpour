@@ -12,10 +12,12 @@ class AccountLifecycleScreen extends ConsumerStatefulWidget {
   const AccountLifecycleScreen({super.key});
 
   @override
-  ConsumerState<AccountLifecycleScreen> createState() => _AccountLifecycleScreenState();
+  ConsumerState<AccountLifecycleScreen> createState() =>
+      _AccountLifecycleScreenState();
 }
 
-class _AccountLifecycleScreenState extends ConsumerState<AccountLifecycleScreen> {
+class _AccountLifecycleScreenState
+    extends ConsumerState<AccountLifecycleScreen> {
   String? _errorMessage;
   String? _infoMessage;
   bool _submitting = false;

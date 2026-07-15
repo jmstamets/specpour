@@ -31,7 +31,9 @@ void _wireCookieSupport(Dio dio, CookieJar cookieJar) {
 /// The API host, without the /api/v1 suffix — T047/ADR-0003's authorization-code+PKCE
 /// exchange talks to /connect/authorize and /connect/token, which live at the host
 /// root, not under /api/v1.
-final apiHostBaseUrlProvider = Provider<String>((ref) => 'http://localhost:5001');
+final apiHostBaseUrlProvider = Provider<String>(
+  (ref) => 'http://localhost:5001',
+);
 
 /// API base URL. A single local-dev default today; per-environment configuration
 /// (dev/staging/prod flavors) is not yet a scheduled task — this is the seam for it.
@@ -69,7 +71,9 @@ class RefreshToken extends Notifier<String?> {
   void set(String? token) => state = token;
 }
 
-final refreshTokenProvider = NotifierProvider<RefreshToken, String?>(RefreshToken.new);
+final refreshTokenProvider = NotifierProvider<RefreshToken, String?>(
+  RefreshToken.new,
+);
 
 const _bearerSchemeName = 'bearerAuth';
 
@@ -95,10 +99,16 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
   final Dio _apiDio;
 
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
-    final alreadyRetried = err.requestOptions.extra['tokenRefreshRetried'] == true;
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final alreadyRetried =
+        err.requestOptions.extra['tokenRefreshRetried'] == true;
     final refreshToken = _ref.read(refreshTokenProvider);
-    if (err.response?.statusCode != 401 || alreadyRetried || refreshToken == null) {
+    if (err.response?.statusCode != 401 ||
+        alreadyRetried ||
+        refreshToken == null) {
       handler.next(err);
       return;
     }
@@ -118,7 +128,9 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
       final newAccessToken = response.data!['access_token'] as String;
       final newRefreshToken = response.data!['refresh_token'] as String?;
       _ref.read(authTokenProvider.notifier).set(newAccessToken);
-      _ref.read(refreshTokenProvider.notifier).set(newRefreshToken ?? refreshToken);
+      _ref
+          .read(refreshTokenProvider.notifier)
+          .set(newRefreshToken ?? refreshToken);
 
       final retryOptions = err.requestOptions;
       retryOptions.extra['tokenRefreshRetried'] = true;

@@ -120,7 +120,9 @@ class _IngredientDetailBody extends StatelessWidget {
 
         if (ingredient.shelfLife != null) ...[
           const SizedBox(height: 8),
-          Text('${l10n.ingredientDetailShelfLifeLabel}: ${ingredient.shelfLife}'),
+          Text(
+            '${l10n.ingredientDetailShelfLifeLabel}: ${ingredient.shelfLife}',
+          ),
         ],
 
         if (ingredient.storageInstructions != null) ...[

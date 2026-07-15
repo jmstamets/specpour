@@ -44,7 +44,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     });
 
     try {
-      final requiresMfa = await ref.read(identityAuthServiceProvider).signIn(
+      final requiresMfa = await ref
+          .read(identityAuthServiceProvider)
+          .signIn(
             email: _emailController.text,
             password: _passwordController.text,
           );
@@ -97,7 +99,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             TextField(
               key: const Key('signInPasswordField'),
               controller: _passwordController,
-              decoration: InputDecoration(labelText: l10n.registerPasswordLabel),
+              decoration: InputDecoration(
+                labelText: l10n.registerPasswordLabel,
+              ),
               obscureText: true,
             ),
             if (_errorMessage case final error?) ...[

@@ -13,7 +13,8 @@ class RecoveryRequestScreen extends ConsumerStatefulWidget {
   const RecoveryRequestScreen({super.key});
 
   @override
-  ConsumerState<RecoveryRequestScreen> createState() => _RecoveryRequestScreenState();
+  ConsumerState<RecoveryRequestScreen> createState() =>
+      _RecoveryRequestScreenState();
 }
 
 class _RecoveryRequestScreenState extends ConsumerState<RecoveryRequestScreen> {
@@ -43,7 +44,9 @@ class _RecoveryRequestScreenState extends ConsumerState<RecoveryRequestScreen> {
     });
 
     try {
-      await ref.read(identityAuthServiceProvider).requestRecovery(email: _emailController.text);
+      await ref
+          .read(identityAuthServiceProvider)
+          .requestRecovery(email: _emailController.text);
       if (mounted) {
         setState(() => _successMessage = l10n.recoveryRequestSuccessMessage);
       }
@@ -72,7 +75,9 @@ class _RecoveryRequestScreenState extends ConsumerState<RecoveryRequestScreen> {
             TextField(
               key: const Key('recoveryRequestEmailField'),
               controller: _emailController,
-              decoration: InputDecoration(labelText: l10n.recoveryRequestEmailLabel),
+              decoration: InputDecoration(
+                labelText: l10n.recoveryRequestEmailLabel,
+              ),
               keyboardType: TextInputType.emailAddress,
             ),
             if (_successMessage case final success?) ...[

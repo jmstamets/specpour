@@ -108,8 +108,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/auth/external/callback',
         name: 'externalSignInCallback',
-        builder: (context, state) =>
-            ExternalSignInCallbackScreen(queryParameters: state.uri.queryParameters),
+        builder: (context, state) => ExternalSignInCallbackScreen(
+          queryParameters: state.uri.queryParameters,
+        ),
       ),
       GoRoute(
         path: '/auth/external/complete-registration',

@@ -16,7 +16,10 @@ import 'entity_info_data.dart';
 
 typedef EntityInfoWatch = AsyncValue<EntityInfoData> Function(WidgetRef ref);
 
-Future<void> showEntityInfoPopover(BuildContext context, EntityInfoWatch watch) {
+Future<void> showEntityInfoPopover(
+  BuildContext context,
+  EntityInfoWatch watch,
+) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,

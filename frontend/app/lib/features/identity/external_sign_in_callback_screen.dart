@@ -11,15 +11,20 @@ import '../../core/guest_gate/guest_gate.dart';
 import '../../core/l10n/gen/app_localizations.dart';
 
 class ExternalSignInCallbackScreen extends ConsumerStatefulWidget {
-  const ExternalSignInCallbackScreen({required this.queryParameters, super.key});
+  const ExternalSignInCallbackScreen({
+    required this.queryParameters,
+    super.key,
+  });
 
   final Map<String, String> queryParameters;
 
   @override
-  ConsumerState<ExternalSignInCallbackScreen> createState() => _ExternalSignInCallbackScreenState();
+  ConsumerState<ExternalSignInCallbackScreen> createState() =>
+      _ExternalSignInCallbackScreenState();
 }
 
-class _ExternalSignInCallbackScreenState extends ConsumerState<ExternalSignInCallbackScreen> {
+class _ExternalSignInCallbackScreenState
+    extends ConsumerState<ExternalSignInCallbackScreen> {
   String? _errorMessage;
 
   @override
@@ -30,7 +35,11 @@ class _ExternalSignInCallbackScreenState extends ConsumerState<ExternalSignInCal
 
   Future<void> _process() async {
     if (widget.queryParameters['error'] != null) {
-      setState(() => _errorMessage = AppLocalizations.of(context).externalCallbackErrorMessage);
+      setState(
+        () => _errorMessage = AppLocalizations.of(
+          context,
+        ).externalCallbackErrorMessage,
+      );
       return;
     }
 

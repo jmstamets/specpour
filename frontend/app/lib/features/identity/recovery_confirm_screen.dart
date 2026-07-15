@@ -12,7 +12,8 @@ class RecoveryConfirmScreen extends ConsumerStatefulWidget {
   const RecoveryConfirmScreen({super.key});
 
   @override
-  ConsumerState<RecoveryConfirmScreen> createState() => _RecoveryConfirmScreenState();
+  ConsumerState<RecoveryConfirmScreen> createState() =>
+      _RecoveryConfirmScreenState();
 }
 
 class _RecoveryConfirmScreenState extends ConsumerState<RecoveryConfirmScreen> {
@@ -46,7 +47,9 @@ class _RecoveryConfirmScreenState extends ConsumerState<RecoveryConfirmScreen> {
     });
 
     try {
-      await ref.read(identityAuthServiceProvider).confirmRecovery(
+      await ref
+          .read(identityAuthServiceProvider)
+          .confirmRecovery(
             email: _emailController.text,
             token: _tokenController.text,
             newPassword: _newPasswordController.text,
@@ -85,20 +88,26 @@ class _RecoveryConfirmScreenState extends ConsumerState<RecoveryConfirmScreen> {
             TextField(
               key: const Key('recoveryConfirmEmailField'),
               controller: _emailController,
-              decoration: InputDecoration(labelText: l10n.recoveryConfirmEmailLabel),
+              decoration: InputDecoration(
+                labelText: l10n.recoveryConfirmEmailLabel,
+              ),
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
             TextField(
               key: const Key('recoveryConfirmTokenField'),
               controller: _tokenController,
-              decoration: InputDecoration(labelText: l10n.recoveryConfirmTokenLabel),
+              decoration: InputDecoration(
+                labelText: l10n.recoveryConfirmTokenLabel,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               key: const Key('recoveryConfirmNewPasswordField'),
               controller: _newPasswordController,
-              decoration: InputDecoration(labelText: l10n.recoveryConfirmNewPasswordLabel),
+              decoration: InputDecoration(
+                labelText: l10n.recoveryConfirmNewPasswordLabel,
+              ),
               obscureText: true,
             ),
             if (_errorMessage case final error?) ...[

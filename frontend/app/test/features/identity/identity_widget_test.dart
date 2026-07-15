@@ -33,15 +33,27 @@ void main() {
     final router = GoRouter(
       initialLocation: initialLocation,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const Scaffold(body: Text('HOME', key: Key('homeMarker')))),
-        GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
-        GoRoute(path: '/sign-in', builder: (context, state) => const SignInScreen()),
+        GoRoute(
+          path: '/',
+          builder: (context, state) =>
+              const Scaffold(body: Text('HOME', key: Key('homeMarker'))),
+        ),
+        GoRoute(
+          path: '/register',
+          builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+          path: '/sign-in',
+          builder: (context, state) => const SignInScreen(),
+        ),
       ],
     );
 
     return ProviderScope(
       overrides: [
-        identityApiProvider.overrideWithValue(IdentityApi(identityDio, standardSerializers)),
+        identityApiProvider.overrideWithValue(
+          IdentityApi(identityDio, standardSerializers),
+        ),
         authDioProvider.overrideWithValue(authDio),
       ],
       child: Consumer(
@@ -73,85 +85,141 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('registering with valid details signs the user in and navigates home', (tester) async {
-    final identityInterceptor = _FakeIdentityInterceptor();
-    final authInterceptor = _FakeAuthInterceptor();
+  testWidgets(
+    'registering with valid details signs the user in and navigates home',
+    (tester) async {
+      final identityInterceptor = _FakeIdentityInterceptor();
+      final authInterceptor = _FakeAuthInterceptor();
 
-    late WidgetRef capturedRef;
-    await tester.pumpWidget(buildTestApp(
-      identityInterceptor: identityInterceptor,
-      authInterceptor: authInterceptor,
-      onRef: (ref) => capturedRef = ref,
-    ));
-    await tester.pumpAndSettle();
+      late WidgetRef capturedRef;
+      await tester.pumpWidget(
+        buildTestApp(
+          identityInterceptor: identityInterceptor,
+          authInterceptor: authInterceptor,
+          onRef: (ref) => capturedRef = ref,
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byKey(const Key('registerEmailField')), 'new-user@example.test');
-    await tester.enterText(find.byKey(const Key('registerPasswordField')), 'correct horse battery staple');
-    await tester.enterText(find.byKey(const Key('registerDisplayNameField')), 'New User');
-    await enterDateOfBirth(tester, const Key('registerDateOfBirthButton'));
+      await tester.enterText(
+        find.byKey(const Key('registerEmailField')),
+        'new-user@example.test',
+      );
+      await tester.enterText(
+        find.byKey(const Key('registerPasswordField')),
+        'correct horse battery staple',
+      );
+      await tester.enterText(
+        find.byKey(const Key('registerDisplayNameField')),
+        'New User',
+      );
+      await enterDateOfBirth(tester, const Key('registerDateOfBirthButton'));
 
-    expectNoRawLocalizationKeys(tester);
+      expectNoRawLocalizationKeys(tester);
 
-    await tester.tap(find.byKey(const Key('registerSubmitButton')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('registerSubmitButton')));
+      await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('homeMarker')), findsOneWidget);
-    expect(capturedRef.read(authTokenProvider), 'fake-access-token');
-    expect(identityInterceptor.registerCallCount, 1);
-  });
+      expect(find.byKey(const Key('homeMarker')), findsOneWidget);
+      expect(capturedRef.read(authTokenProvider), 'fake-access-token');
+      expect(identityInterceptor.registerCallCount, 1);
+    },
+  );
 
-  testWidgets('an underage-rejected registration shows the error and does not navigate', (tester) async {
-    final identityInterceptor = _FakeIdentityInterceptor(rejectRegistration: true);
-    final authInterceptor = _FakeAuthInterceptor();
+  testWidgets(
+    'an underage-rejected registration shows the error and does not navigate',
+    (tester) async {
+      final identityInterceptor = _FakeIdentityInterceptor(
+        rejectRegistration: true,
+      );
+      final authInterceptor = _FakeAuthInterceptor();
 
-    await tester.pumpWidget(buildTestApp(identityInterceptor: identityInterceptor, authInterceptor: authInterceptor));
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        buildTestApp(
+          identityInterceptor: identityInterceptor,
+          authInterceptor: authInterceptor,
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byKey(const Key('registerEmailField')), 'too-young@example.test');
-    await tester.enterText(find.byKey(const Key('registerPasswordField')), 'correct horse battery staple');
-    await tester.enterText(find.byKey(const Key('registerDisplayNameField')), 'Too Young');
-    await enterDateOfBirth(tester, const Key('registerDateOfBirthButton'));
+      await tester.enterText(
+        find.byKey(const Key('registerEmailField')),
+        'too-young@example.test',
+      );
+      await tester.enterText(
+        find.byKey(const Key('registerPasswordField')),
+        'correct horse battery staple',
+      );
+      await tester.enterText(
+        find.byKey(const Key('registerDisplayNameField')),
+        'Too Young',
+      );
+      await enterDateOfBirth(tester, const Key('registerDateOfBirthButton'));
 
-    await tester.tap(find.byKey(const Key('registerSubmitButton')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('registerSubmitButton')));
+      await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('registerScreen')), findsOneWidget);
-    expect(find.byKey(const Key('registerErrorMessage')), findsOneWidget);
-    expect(find.text('Registration requires meeting the applicable legal drinking age.'), findsOneWidget);
-    expectNoRawLocalizationKeys(tester);
-  });
+      expect(find.byKey(const Key('registerScreen')), findsOneWidget);
+      expect(find.byKey(const Key('registerErrorMessage')), findsOneWidget);
+      expect(
+        find.text(
+          'Registration requires meeting the applicable legal drinking age.',
+        ),
+        findsOneWidget,
+      );
+      expectNoRawLocalizationKeys(tester);
+    },
+  );
 
-  testWidgets('signing in with valid credentials signs the user in and navigates home', (tester) async {
-    final identityInterceptor = _FakeIdentityInterceptor();
-    final authInterceptor = _FakeAuthInterceptor();
+  testWidgets(
+    'signing in with valid credentials signs the user in and navigates home',
+    (tester) async {
+      final identityInterceptor = _FakeIdentityInterceptor();
+      final authInterceptor = _FakeAuthInterceptor();
 
-    late WidgetRef capturedRef;
-    await tester.pumpWidget(buildTestApp(
-      identityInterceptor: identityInterceptor,
-      authInterceptor: authInterceptor,
-      initialLocation: '/sign-in',
-      onRef: (ref) => capturedRef = ref,
-    ));
-    await tester.pumpAndSettle();
+      late WidgetRef capturedRef;
+      await tester.pumpWidget(
+        buildTestApp(
+          identityInterceptor: identityInterceptor,
+          authInterceptor: authInterceptor,
+          initialLocation: '/sign-in',
+          onRef: (ref) => capturedRef = ref,
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byKey(const Key('signInEmailField')), 'existing-user@example.test');
-    await tester.enterText(find.byKey(const Key('signInPasswordField')), 'correct horse battery staple');
+      await tester.enterText(
+        find.byKey(const Key('signInEmailField')),
+        'existing-user@example.test',
+      );
+      await tester.enterText(
+        find.byKey(const Key('signInPasswordField')),
+        'correct horse battery staple',
+      );
 
-    expectNoRawLocalizationKeys(tester);
+      expectNoRawLocalizationKeys(tester);
 
-    await tester.tap(find.byKey(const Key('signInSubmitButton')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('signInSubmitButton')));
+      await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('homeMarker')), findsOneWidget);
-    expect(capturedRef.read(authTokenProvider), 'fake-access-token');
-    expect(identityInterceptor.loginCallCount, 1);
-  });
+      expect(find.byKey(const Key('homeMarker')), findsOneWidget);
+      expect(capturedRef.read(authTokenProvider), 'fake-access-token');
+      expect(identityInterceptor.loginCallCount, 1);
+    },
+  );
 
-  testWidgets('bad credentials show the error and do not navigate', (tester) async {
+  testWidgets('bad credentials show the error and do not navigate', (
+    tester,
+  ) async {
     final identityInterceptor = _FakeIdentityInterceptor(rejectLogin: true);
     final authInterceptor = _FakeAuthInterceptor();
 
-    await tester.pumpWidget(buildTestApp(identityInterceptor: identityInterceptor, authInterceptor: authInterceptor));
+    await tester.pumpWidget(
+      buildTestApp(
+        identityInterceptor: identityInterceptor,
+        authInterceptor: authInterceptor,
+      ),
+    );
     await tester.pumpAndSettle();
     // Navigate to sign-in from the register screen's link, exercising that route too.
     await tester.tap(find.byKey(const Key('registerSignInInsteadLink')));
@@ -159,8 +227,14 @@ void main() {
 
     expect(find.byKey(const Key('signInScreen')), findsOneWidget);
 
-    await tester.enterText(find.byKey(const Key('signInEmailField')), 'nobody@example.test');
-    await tester.enterText(find.byKey(const Key('signInPasswordField')), 'wrong password entirely');
+    await tester.enterText(
+      find.byKey(const Key('signInEmailField')),
+      'nobody@example.test',
+    );
+    await tester.enterText(
+      find.byKey(const Key('signInPasswordField')),
+      'wrong password entirely',
+    );
     await tester.tap(find.byKey(const Key('signInSubmitButton')));
     await tester.pumpAndSettle();
 
@@ -172,7 +246,10 @@ void main() {
 }
 
 class _FakeIdentityInterceptor extends Interceptor {
-  _FakeIdentityInterceptor({this.rejectRegistration = false, this.rejectLogin = false});
+  _FakeIdentityInterceptor({
+    this.rejectRegistration = false,
+    this.rejectLogin = false,
+  });
 
   final bool rejectRegistration;
   final bool rejectLogin;
@@ -184,53 +261,75 @@ class _FakeIdentityInterceptor extends Interceptor {
     if (options.path == '/auth/register') {
       registerCallCount++;
       if (rejectRegistration) {
-        return handler.reject(DioException(
-          requestOptions: options,
-          response: Response(
+        return handler.reject(
+          DioException(
             requestOptions: options,
-            statusCode: 403,
-            data: {
-              'title': 'Underage registration',
-              'status': 403,
-              'detail': 'Registration requires meeting the applicable legal drinking age.',
-            },
+            response: Response(
+              requestOptions: options,
+              statusCode: 403,
+              data: {
+                'title': 'Underage registration',
+                'status': 403,
+                'detail':
+                    'Registration requires meeting the applicable legal drinking age.',
+              },
+            ),
           ),
-        ));
+        );
       }
 
-      return handler.resolve(Response(
-        requestOptions: options,
-        statusCode: 201,
-        data: {'userId': '11111111-1111-1111-1111-111111111111', 'email': 'new-user@example.test', 'displayName': 'New User'},
-      ));
+      return handler.resolve(
+        Response(
+          requestOptions: options,
+          statusCode: 201,
+          data: {
+            'userId': '11111111-1111-1111-1111-111111111111',
+            'email': 'new-user@example.test',
+            'displayName': 'New User',
+          },
+        ),
+      );
     }
 
     if (options.path == '/auth/login') {
       loginCallCount++;
       if (rejectLogin) {
-        return handler.reject(DioException(
-          requestOptions: options,
-          response: Response(
+        return handler.reject(
+          DioException(
             requestOptions: options,
-            statusCode: 401,
-            data: {'title': 'Sign-in failed', 'status': 401, 'detail': 'Invalid email or password.'},
+            response: Response(
+              requestOptions: options,
+              statusCode: 401,
+              data: {
+                'title': 'Sign-in failed',
+                'status': 401,
+                'detail': 'Invalid email or password.',
+              },
+            ),
           ),
-        ));
+        );
       }
 
-      return handler.resolve(Response(
-        requestOptions: options,
-        statusCode: 200,
-        data: {
-          'requiresMfa': false,
-          'userId': '11111111-1111-1111-1111-111111111111',
-          'email': 'existing-user@example.test',
-          'displayName': 'Existing User',
-        },
-      ));
+      return handler.resolve(
+        Response(
+          requestOptions: options,
+          statusCode: 200,
+          data: {
+            'requiresMfa': false,
+            'userId': '11111111-1111-1111-1111-111111111111',
+            'email': 'existing-user@example.test',
+            'displayName': 'Existing User',
+          },
+        ),
+      );
     }
 
-    handler.reject(DioException(requestOptions: options, response: Response(requestOptions: options, statusCode: 404)));
+    handler.reject(
+      DioException(
+        requestOptions: options,
+        response: Response(requestOptions: options, statusCode: 404),
+      ),
+    );
   }
 }
 
@@ -238,28 +337,39 @@ class _FakeAuthInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (options.path == '/connect/authorize') {
-      return handler.resolve(Response(
-        requestOptions: options,
-        statusCode: 302,
-        headers: Headers.fromMap({
-          'location': ['http://localhost:5173/callback?code=fake-auth-code&state=abc'],
-        }),
-      ));
+      return handler.resolve(
+        Response(
+          requestOptions: options,
+          statusCode: 302,
+          headers: Headers.fromMap({
+            'location': [
+              'http://localhost:5173/callback?code=fake-auth-code&state=abc',
+            ],
+          }),
+        ),
+      );
     }
 
     if (options.path == '/connect/token') {
-      return handler.resolve(Response(
-        requestOptions: options,
-        statusCode: 200,
-        data: {
-          'access_token': 'fake-access-token',
-          'refresh_token': 'fake-refresh-token',
-          'token_type': 'Bearer',
-          'expires_in': 3600,
-        },
-      ));
+      return handler.resolve(
+        Response(
+          requestOptions: options,
+          statusCode: 200,
+          data: {
+            'access_token': 'fake-access-token',
+            'refresh_token': 'fake-refresh-token',
+            'token_type': 'Bearer',
+            'expires_in': 3600,
+          },
+        ),
+      );
     }
 
-    handler.reject(DioException(requestOptions: options, response: Response(requestOptions: options, statusCode: 404)));
+    handler.reject(
+      DioException(
+        requestOptions: options,
+        response: Response(requestOptions: options, statusCode: 404),
+      ),
+    );
   }
 }

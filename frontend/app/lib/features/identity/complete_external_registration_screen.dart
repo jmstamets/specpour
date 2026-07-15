@@ -53,7 +53,10 @@ class _CompleteExternalRegistrationScreenState
     final dateOfBirth = _dateOfBirth;
 
     if (_displayNameController.text.isEmpty || dateOfBirth == null) {
-      setState(() => _errorMessage = l10n.completeExternalRegistrationMissingFieldsError);
+      setState(
+        () =>
+            _errorMessage = l10n.completeExternalRegistrationMissingFieldsError,
+      );
       return;
     }
 
@@ -63,7 +66,9 @@ class _CompleteExternalRegistrationScreenState
     });
 
     try {
-      await ref.read(identityAuthServiceProvider).completeExternalRegistration(
+      await ref
+          .read(identityAuthServiceProvider)
+          .completeExternalRegistration(
             dateOfBirth: dateOfBirth,
             displayName: _displayNameController.text,
           );
@@ -101,10 +106,15 @@ class _CompleteExternalRegistrationScreenState
             TextField(
               key: const Key('completeExternalRegistrationDisplayNameField'),
               controller: _displayNameController,
-              decoration: InputDecoration(labelText: l10n.completeExternalRegistrationDisplayNameLabel),
+              decoration: InputDecoration(
+                labelText: l10n.completeExternalRegistrationDisplayNameLabel,
+              ),
             ),
             const SizedBox(height: 16),
-            Text(l10n.completeExternalRegistrationDateOfBirthLabel, style: Theme.of(context).textTheme.labelLarge),
+            Text(
+              l10n.completeExternalRegistrationDateOfBirthLabel,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
             const SizedBox(height: 8),
             OutlinedButton(
               key: const Key('completeExternalRegistrationDateOfBirthButton'),

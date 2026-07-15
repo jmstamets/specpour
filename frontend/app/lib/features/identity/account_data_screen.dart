@@ -29,7 +29,9 @@ class _AccountDataScreenState extends ConsumerState<AccountDataScreen> {
     });
 
     try {
-      final export = await ref.read(identityAuthServiceProvider).exportAccountData();
+      final export = await ref
+          .read(identityAuthServiceProvider)
+          .exportAccountData();
       if (mounted) {
         setState(() => _export = export);
       }
@@ -118,7 +120,9 @@ class _AccountDataScreenState extends ConsumerState<AccountDataScreen> {
             if (export != null) ...[
               const SizedBox(height: 16),
               Text(
-                l10n.accountDataExportDateOfBirth(export.dateOfBirth.toString()),
+                l10n.accountDataExportDateOfBirth(
+                  export.dateOfBirth.toString(),
+                ),
                 key: const Key('accountDataExportDateOfBirth'),
               ),
               Text(l10n.accountDataExportEmail(export.email)),

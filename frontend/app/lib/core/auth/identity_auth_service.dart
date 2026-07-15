@@ -66,9 +66,11 @@ class IdentityAuthService {
   /// returned bool is true when that second step is needed.
   Future<bool> signIn({required String email, required String password}) async {
     final response = await _identityApi.login(
-      loginRequest: LoginRequest((b) => b
-        ..email = email
-        ..password = password),
+      loginRequest: LoginRequest(
+        (b) => b
+          ..email = email
+          ..password = password,
+      ),
     );
 
     if (response.data!.requiresMfa) {
@@ -82,7 +84,9 @@ class IdentityAuthService {
   /// Completes a sign-in that [signIn] (or a social sign-in's callback)
   /// reported as requiring an MFA code.
   Future<void> completeMfaSignIn({required String code}) async {
-    await _identityApi.loginMfa(loginMfaRequest: LoginMfaRequest((b) => b..code = code));
+    await _identityApi.loginMfa(
+      loginMfaRequest: LoginMfaRequest((b) => b..code = code),
+    );
     await _completeTokenExchange();
   }
 
@@ -170,10 +174,12 @@ class IdentityAuthService {
     required String newPassword,
   }) async {
     await _identityApi.confirmAccountRecovery(
-      recoveryConfirmRequest: RecoveryConfirmRequest((b) => b
-        ..email = email
-        ..token = token
-        ..newPassword = newPassword),
+      recoveryConfirmRequest: RecoveryConfirmRequest(
+        (b) => b
+          ..email = email
+          ..token = token
+          ..newPassword = newPassword,
+      ),
     );
   }
 
@@ -182,9 +188,13 @@ class IdentityAuthService {
   /// see the social sign-in button's use of url_launcher's webOnlyWindowName:
   /// '_self'). [redirectUri] is where the provider's callback eventually
   /// sends the browser back to — the app's own /auth/external/callback route.
-  String socialSignInUrl({required String provider, required String redirectUri}) {
-    final uri = Uri.parse('$_apiHostBaseUrl/api/v1/auth/external/$provider')
-        .replace(queryParameters: {'redirectUri': redirectUri});
+  String socialSignInUrl({
+    required String provider,
+    required String redirectUri,
+  }) {
+    final uri = Uri.parse(
+      '$_apiHostBaseUrl/api/v1/auth/external/$provider',
+    ).replace(queryParameters: {'redirectUri': redirectUri});
     return uri.toString();
   }
 
@@ -202,10 +212,12 @@ class IdentityAuthService {
     String? locale,
   }) async {
     await _identityApi.completeExternalRegistration(
-      completeExternalRegistrationRequest: CompleteExternalRegistrationRequest((b) => b
-        ..dateOfBirth = dateOfBirth.toDate()
-        ..displayName = displayName
-        ..locale = locale),
+      completeExternalRegistrationRequest: CompleteExternalRegistrationRequest(
+        (b) => b
+          ..dateOfBirth = dateOfBirth.toDate()
+          ..displayName = displayName
+          ..locale = locale,
+      ),
     );
     await _completeTokenExchange();
   }
