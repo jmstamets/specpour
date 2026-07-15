@@ -24,13 +24,14 @@ public sealed class OpenIddictClientSeedingHostedService(
         await using var scope = serviceProvider.CreateAsyncScope();
         var applicationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
 
-        if (await applicationManager.FindByClientIdAsync(ClientId, cancellationToken) is not null)
-        {
-            return;
-        }
-
         var redirectUris = configuration.GetSection("Identity:OAuthClient:RedirectUris").Get<string[]>()
-            ?? ["com.specpour.app://callback", "http://localhost:5173/callback"];
+            // Native custom-scheme callback + the web PKCE landing endpoint (see
+            // TokenEndpoints' /connect/spa-callback). Per-environment origins are set via
+            // Identity:OAuthClient:RedirectUris in config; these dev defaults target the
+            // local docker API. The old http://localhost:5173/callback default was a stale
+            // Vite placeholder no surface actually served, which broke real-browser
+            // registration (2026-07-15 walkthrough).
+            ?? ["com.specpour.app://callback", "http://localhost:5001/connect/spa-callback"];
 
         var descriptor = new OpenIddictApplicationDescriptor
         {
@@ -57,7 +58,19 @@ public sealed class OpenIddictClientSeedingHostedService(
             descriptor.RedirectUris.Add(new Uri(redirectUri, UriKind.RelativeOrAbsolute));
         }
 
-        await applicationManager.CreateAsync(descriptor, cancellationToken);
+        // Sync on every startup rather than create-once: config is the source of truth
+        // for redirect URIs/permissions, so a config change (or a fix like the 5173 ->
+        // spa-callback correction) takes effect on the next boot instead of being
+        // silently ignored because a stale client row already exists.
+        var existing = await applicationManager.FindByClientIdAsync(ClientId, cancellationToken);
+        if (existing is null)
+        {
+            await applicationManager.CreateAsync(descriptor, cancellationToken);
+        }
+        else
+        {
+            await applicationManager.UpdateAsync(existing, descriptor, cancellationToken);
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

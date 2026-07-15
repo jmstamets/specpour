@@ -28,7 +28,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.edit_outlined));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField).first, '01/01/1990');
+    // .last, not .first: the date picker's field is in an Overlay, so .first would
+    // type into the register email field behind the dialog (only surfaces in a real
+    // browser run — caught 2026-07-15 building the web registration test).
+    await tester.enterText(find.byType(TextField).last, '01/01/1990');
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
@@ -119,7 +122,8 @@ void main() {
         const Duration(days: 365 * 10),
       );
       await tester.enterText(
-        find.byType(TextField).first,
+        // .last: the date picker's field is in an Overlay (see enterDateOfBirth).
+        find.byType(TextField).last,
         '${tenYearsAgo.month.toString().padLeft(2, '0')}/${tenYearsAgo.day.toString().padLeft(2, '0')}/${tenYearsAgo.year}',
       );
       await tester.pumpAndSettle();

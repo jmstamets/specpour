@@ -30,6 +30,22 @@ public static class TokenEndpoints
     {
         endpoints.MapMethods("/connect/authorize", ["GET", "POST"], HandleAuthorizeAsync);
         endpoints.MapPost("/connect/token", HandleTokenAsync);
+
+        // ADR-0003 web PKCE landing target. The Flutter web client can't read a
+        // 302's Location header (browser XHR follows redirects opaquely and
+        // dio_web_adapter discards xhr.responseURL into Response.realUri — verified
+        // 2026-07-15), so instead of chasing the Location it lets the /connect/authorize
+        // redirect land here (this endpoint is the client's registered redirect_uri on
+        // web), reads the authorization code straight off the final same-origin URL via
+        // XMLHttpRequest.responseURL, and posts it to /connect/token itself. This page
+        // is never actually rendered — the XHR reads only its URL — so the body is just
+        // a graceful fallback for a human who somehow lands here directly. Native
+        // clients keep the standard custom-scheme redirect (com.specpour.app://callback)
+        // and read the Location header normally, so this is web-only infrastructure.
+        endpoints.MapGet("/connect/spa-callback", () => Results.Content(
+            "<!doctype html><meta charset=\"utf-8\"><title>Signing you in…</title>" +
+            "<p>Signing you in… you can close this window if it doesn't return automatically.</p>",
+            "text/html"));
     }
 
     private static async Task<IResult> HandleAuthorizeAsync(HttpContext httpContext, UserManager<ApplicationUser> userManager)

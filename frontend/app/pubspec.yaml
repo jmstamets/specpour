@@ -57,6 +57,9 @@ dependencies:
   cookie_jar: ^4.0.8
   dio_cookie_manager: ^3.2.0
   crypto: ^3.0.6
+  # T-walkthrough#1 (2026-07-15): web-only fetch to read the /connect/authorize
+  # redirect's final URL (Dio can't on web). See core/auth/web_authorize.dart.
+  web: ^1.1.0
 
   # T049: social sign-in is a real browser-redirect OAuth handshake, not a
   # Dio call — the app must navigate the whole tab to the provider's own

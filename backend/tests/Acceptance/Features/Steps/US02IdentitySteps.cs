@@ -30,7 +30,7 @@ namespace SpecPour.Tests.Acceptance.Features.Steps;
 public sealed class US02IdentitySteps
 {
     private const string Password = "correct horse battery staple";
-    private const string RedirectUri = "http://localhost:5173/callback";
+    private const string RedirectUri = "http://localhost:5001/connect/spa-callback";
 
     private HttpResponseMessage _lastResponse = null!;
     private JsonDocument? _lastJson;

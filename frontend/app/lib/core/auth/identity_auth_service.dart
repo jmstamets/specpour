@@ -13,15 +13,19 @@ import 'dart:math';
 import 'package:api_client/api_client.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/api_client_provider.dart';
+import 'web_authorize_stub.dart'
+    if (dart.library.js_interop) 'web_authorize.dart';
 
-/// Must exactly match a redirect URI OpenIddictClientSeedingHostedService
-/// registered for the `specpour-app` client — never actually navigated to (the
-/// PKCE exchange below intercepts the redirect via the Location header instead
-/// of following it), so its value only matters as an exact-match key.
-const _redirectUri = 'http://localhost:5173/callback';
+/// The native (custom-scheme) redirect URI. On web the redirect URI is instead the
+/// API's same-origin /connect/spa-callback endpoint, computed at runtime from the
+/// API host (see [IdentityAuthService._redirectUri]) so nothing is hardcoded to a
+/// served origin. Both must be registered for the `specpour-app` client
+/// (OpenIddictClientSeedingHostedService).
+const _nativeRedirectUri = 'com.specpour.app://callback';
 const _clientId = 'specpour-app';
 const _scope = 'openid email profile offline_access';
 
@@ -228,37 +232,58 @@ class IdentityAuthService {
     _refreshToken.set(tokens.refreshToken);
   }
 
+  /// The redirect URI for the current platform. On web it's the API's own
+  /// /connect/spa-callback (see web_authorize.dart for why); on native it's the
+  /// registered custom scheme. Must match between the authorize request and the
+  /// token exchange (OAuth requirement).
+  String get _redirectUri =>
+      kIsWeb ? '$_apiHostBaseUrl/connect/spa-callback' : _nativeRedirectUri;
+
   Future<({String accessToken, String? refreshToken})> _acquireTokens() async {
     final codeVerifier = _generateCodeVerifier();
     final codeChallenge = _codeChallengeFor(codeVerifier);
+    final query = {
+      'client_id': _clientId,
+      'response_type': 'code',
+      'redirect_uri': _redirectUri,
+      'scope': _scope,
+      'code_challenge': codeChallenge,
+      'code_challenge_method': 'S256',
+      'state': _generateCodeVerifier(),
+    };
 
-    final authorizeResponse = await _authDio.get<void>(
-      '/connect/authorize',
-      queryParameters: {
-        'client_id': _clientId,
-        'response_type': 'code',
-        'redirect_uri': _redirectUri,
-        'scope': _scope,
-        'code_challenge': codeChallenge,
-        'code_challenge_method': 'S256',
-        'state': _generateCodeVerifier(),
-      },
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) => status != null && status < 400,
-      ),
-    );
-
-    final location = authorizeResponse.headers.value('location');
-    if (location == null) {
-      throw StateError(
-        '/connect/authorize did not redirect (status ${authorizeResponse.statusCode}) — is the caller actually signed in?',
+    final String code;
+    if (kIsWeb) {
+      // Web: let the browser follow the redirect and read the code off the final
+      // URL — Dio can't read a followed redirect's Location on web. See
+      // web_authorize.dart.
+      final authorizeUrl = Uri.parse(
+        '$_apiHostBaseUrl/connect/authorize',
+      ).replace(queryParameters: query).toString();
+      code = await resolveAuthorizationCode(authorizeUrl);
+    } else {
+      // Native: honor followRedirects:false and read the Location header.
+      final authorizeResponse = await _authDio.get<void>(
+        '/connect/authorize',
+        queryParameters: query,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) => status != null && status < 400,
+        ),
       );
-    }
 
-    final code = Uri.parse(location).queryParameters['code'];
-    if (code == null) {
-      throw StateError('No authorization code in redirect: $location');
+      final location = authorizeResponse.headers.value('location');
+      if (location == null) {
+        throw StateError(
+          '/connect/authorize did not redirect (status ${authorizeResponse.statusCode}) — is the caller actually signed in?',
+        );
+      }
+
+      final parsed = Uri.parse(location).queryParameters['code'];
+      if (parsed == null) {
+        throw StateError('No authorization code in redirect: $location');
+      }
+      code = parsed;
     }
 
     final tokenResponse = await _authDio.post<Map<String, dynamic>>(

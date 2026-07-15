@@ -24,7 +24,7 @@ namespace SpecPour.Tests.Acceptance.Features.Steps;
 [Binding]
 public sealed class NotificationsSteps
 {
-    private const string RedirectUri = "http://localhost:5173/callback";
+    private const string RedirectUri = "http://localhost:5001/connect/spa-callback";
     private const string ClientId = "specpour-app";
 
     private HttpClient _sessionClient = null!;
