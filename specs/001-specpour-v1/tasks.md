@@ -268,6 +268,7 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - [ ] T091 [US6] RatingEvent append-only store + latest-per-user RatingProjection via outbox, recompute job, POST /ratings + GET /ratings/mine in backend/src/Modules/Community/Application/Ratings/
 - [ ] T092 [US6] Concept-page variant attachment (published-only, proposed→approved moderation state), POST /concepts/{id}/variants in backend/src/Modules/Catalog/Application/Variants/
 - [ ] T093 [US6] Flutter community feature: publish flow with cascade/warning dialogs, public browse, copy, rate ("your rating" editable) in frontend/app/lib/features/community/
+  - Note (2026-07-15, Phase 4 forward-note from John): copy and rate are this app's first *action-type* guest-gated intents (`requireAccount` in `guest_gate.dart`) — until now the only gated action was navigational (T176's account-menu intent, verified in `web_auth_smoke_test.dart`). The preserve-intent contract's real test lands here: after a guest attempts to copy/rate, is prompted, and signs up/in, the ORIGINAL action must actually execute (the copy is created / the rating is submitted), not just that some destination screen loads. Extend the browser-tier smoke set (T179) with a case covering this before calling US6's guest-gate coverage complete.
 - [ ] T149 [US6] Complete the rating search facet over RatingProjection and enable the deferred US1-scenario-5 acceptance assertions (tagged to this checkpoint) in backend/src/Modules/Search/Application/Facets/. Includes full facet-aware pagination, replacing T155's documented post-filter-after-pagination limitation on `/search` (same limitation T148 also targets — whichever of T148/T149 lands second should confirm the other's pagination fix already covers this facet too rather than re-solving it) — gap review 2026-07-14, /speckit-analyze C3.
 
 **Checkpoint**: Community loop live with rating integrity
@@ -345,6 +346,7 @@ is independently implementable and testable. Backend paths are `backend/…`, cl
 - [ ] T112 [US11] Collections module: Collection entity (+ per-account offline pin flag), Menu promotion with per-item price/description/order, CRUD endpoints in backend/src/Modules/Collections/
 - [ ] T113 [US11] Print/export layout service: recipe card (single/batch), spec sheet, styled menu, prep list, shopping list document rendering, GET /print/{artifact}/{id} in backend/src/Modules/Collections/Application/Print/
 - [ ] T114 [US11] Flutter collections feature: collection manager, menu editor with pour-cost guidance, native print/share integration in frontend/app/lib/features/collections/
+  - Note (2026-07-15, Phase 4 forward-note from John): if a guest can attempt "save to collection" (the wishlist-style action) before the collection exists, it's another action-type guest-gated intent (see T093's identical note) — the preserve-intent contract needs the same "the save actually happens post-signup" verification, not just navigation. Cross-check against whichever of T093/this lands second so the pattern isn't re-discovered independently.
 
 **Checkpoint**: Organization + output workflows complete
 
