@@ -670,6 +670,30 @@ abstract class AppLocalizations {
   /// **'Please enter the code.'**
   String get mfaSettingsMissingCodeError;
 
+  /// T163 MFA settings screen: label above the issued backup-code set, shown exactly once after enrollment confirmation or regeneration.
+  ///
+  /// In en, this message translates to:
+  /// **'Save these backup codes somewhere safe. Each can be used once to sign in if you lose access to your authenticator app. They won\'t be shown again.'**
+  String get mfaSettingsBackupCodesLabel;
+
+  /// T163 MFA settings screen: dismisses the one-time backup-code display.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve saved these codes'**
+  String get mfaSettingsBackupCodesSavedButton;
+
+  /// T163 MFA settings screen: issues a fresh backup-code set, invalidating the prior one.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate backup codes'**
+  String get mfaSettingsRegenerateBackupCodesButton;
+
+  /// T163 MFA settings screen: confirmation message after regenerating backup codes.
+  ///
+  /// In en, this message translates to:
+  /// **'Your backup codes have been regenerated. Your old codes no longer work.'**
+  String get mfaSettingsBackupCodesRegeneratedConfirmation;
+
   /// T050 account-recovery request screen title.
   ///
   /// In en, this message translates to:

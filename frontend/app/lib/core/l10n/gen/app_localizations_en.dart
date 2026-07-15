@@ -313,6 +313,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mfaSettingsMissingCodeError => 'Please enter the code.';
 
   @override
+  String get mfaSettingsBackupCodesLabel =>
+      'Save these backup codes somewhere safe. Each can be used once to sign in if you lose access to your authenticator app. They won\'t be shown again.';
+
+  @override
+  String get mfaSettingsBackupCodesSavedButton => 'I\'ve saved these codes';
+
+  @override
+  String get mfaSettingsRegenerateBackupCodesButton =>
+      'Regenerate backup codes';
+
+  @override
+  String get mfaSettingsBackupCodesRegeneratedConfirmation =>
+      'Your backup codes have been regenerated. Your old codes no longer work.';
+
+  @override
   String get recoveryRequestTitle => 'Recover your account';
 
   @override

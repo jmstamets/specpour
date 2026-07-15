@@ -365,6 +365,22 @@
   "@mfaSettingsMissingCodeError": {
     "description": "T050 MFA settings screen: client-side validation message."
   },
+  "mfaSettingsBackupCodesLabel": "Save these backup codes somewhere safe. Each can be used once to sign in if you lose access to your authenticator app. They won't be shown again.",
+  "@mfaSettingsBackupCodesLabel": {
+    "description": "T163 MFA settings screen: label above the issued backup-code set, shown exactly once after enrollment confirmation or regeneration."
+  },
+  "mfaSettingsBackupCodesSavedButton": "I've saved these codes",
+  "@mfaSettingsBackupCodesSavedButton": {
+    "description": "T163 MFA settings screen: dismisses the one-time backup-code display."
+  },
+  "mfaSettingsRegenerateBackupCodesButton": "Regenerate backup codes",
+  "@mfaSettingsRegenerateBackupCodesButton": {
+    "description": "T163 MFA settings screen: issues a fresh backup-code set, invalidating the prior one."
+  },
+  "mfaSettingsBackupCodesRegeneratedConfirmation": "Your backup codes have been regenerated. Your old codes no longer work.",
+  "@mfaSettingsBackupCodesRegeneratedConfirmation": {
+    "description": "T163 MFA settings screen: confirmation message after regenerating backup codes."
+  },
   "recoveryRequestTitle": "Recover your account",
   "@recoveryRequestTitle": {
     "description": "T050 account-recovery request screen title."

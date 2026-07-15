@@ -179,6 +179,63 @@ void main() {
 
       expect(find.byKey(const Key('mfaSettingsInfoMessage')), findsOneWidget);
       expect(identityInterceptor.enabled, isTrue);
+
+      // T163: the confirm response's backup codes are shown exactly once.
+      expect(
+        find.byKey(const Key('mfaSettingsBackupCodesText')),
+        findsOneWidget,
+      );
+      expect(find.text('AAAA-1111\nBBBB-2222'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('mfaSettingsBackupCodesSavedButton')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('mfaSettingsBackupCodesText')), findsNothing);
+      expect(find.byKey(const Key('mfaSettingsDisableButton')), findsOneWidget);
+      expectNoRawLocalizationKeys(tester);
+    },
+  );
+
+  testWidgets(
+    'MFA settings: regenerating backup codes shows the fresh set once',
+    (tester) async {
+      final identityInterceptor = _FakeIdentityInterceptor(mfaEnabled: true);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          identityInterceptor: identityInterceptor,
+          initialLocation: '/account/mfa',
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('mfaSettingsRegenerateBackupCodesButton')),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('mfaSettingsRegenerateBackupCodesButton')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(identityInterceptor.regenerateBackupCodesCallCount, 1);
+      expect(
+        find.byKey(const Key('mfaSettingsBackupCodesText')),
+        findsOneWidget,
+      );
+      expect(find.text('CCCC-3333\nDDDD-4444'), findsOneWidget);
+      expectNoRawLocalizationKeys(tester);
+
+      await tester.tap(
+        find.byKey(const Key('mfaSettingsBackupCodesSavedButton')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('mfaSettingsBackupCodesText')), findsNothing);
+      expect(find.byKey(const Key('mfaSettingsDisableButton')), findsOneWidget);
     },
   );
 
@@ -216,6 +273,9 @@ class _FakeIdentityInterceptor extends Interceptor {
   bool enabled;
   final bool rejectMfaCode;
   String? _pendingSecret;
+  int regenerateBackupCodesCallCount = 0;
+  static const _confirmBackupCodes = ['AAAA-1111', 'BBBB-2222'];
+  static const regeneratedBackupCodes = ['CCCC-3333', 'DDDD-4444'];
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -299,7 +359,12 @@ class _FakeIdentityInterceptor extends Interceptor {
         Response(
           requestOptions: options,
           statusCode: 200,
-          data: {'enabled': true, 'secret': null, 'otpAuthUri': null},
+          data: {
+            'enabled': true,
+            'secret': null,
+            'otpAuthUri': null,
+            'backupCodes': _confirmBackupCodes,
+          },
         ),
       );
     }
@@ -308,6 +373,17 @@ class _FakeIdentityInterceptor extends Interceptor {
       enabled = false;
       return handler.resolve(
         Response(requestOptions: options, statusCode: 204),
+      );
+    }
+
+    if (options.path == '/me/mfa/backup-codes' && options.method == 'POST') {
+      regenerateBackupCodesCallCount++;
+      return handler.resolve(
+        Response(
+          requestOptions: options,
+          statusCode: 200,
+          data: {'backupCodes': regeneratedBackupCodes},
+        ),
       );
     }
 

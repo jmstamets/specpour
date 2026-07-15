@@ -28,6 +28,11 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
   String? _infoMessage;
   bool _submitting = false;
 
+  /// T163: the backup-code set from the most recent confirm/regenerate
+  /// response — shown exactly once (the backend never re-shows a set once
+  /// issued), then dismissed by the user acknowledging they've saved it.
+  List<String>? _backupCodesToShow;
+
   @override
   void dispose() {
     _codeController.dispose();
@@ -73,7 +78,7 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
     });
 
     try {
-      await ref
+      final enrollment = await ref
           .read(identityAuthServiceProvider)
           .confirmMfaEnrollment(code: _codeController.text);
       if (!mounted) {
@@ -82,6 +87,7 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
       setState(() {
         _pendingEnrollment = null;
         _infoMessage = l10n.mfaSettingsEnabledConfirmation;
+        _backupCodesToShow = enrollment.backupCodes?.toList();
       });
       _codeController.clear();
       ref.invalidate(mfaStatusProvider);
@@ -109,8 +115,44 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _infoMessage = l10n.mfaSettingsDisabledConfirmation);
+      setState(() {
+        _infoMessage = l10n.mfaSettingsDisabledConfirmation;
+        // Disabling MFA clears backup codes server-side (meaningless without
+        // an active enrollment) — nothing left to show.
+        _backupCodesToShow = null;
+      });
       ref.invalidate(mfaStatusProvider);
+    } catch (error) {
+      if (mounted) {
+        setState(() => _errorMessage = describeIdentityError(error));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    }
+  }
+
+  /// T163: invalidates every prior backup code and issues a fresh set of 10.
+  Future<void> _regenerateBackupCodes() async {
+    final l10n = AppLocalizations.of(context);
+
+    setState(() {
+      _submitting = true;
+      _errorMessage = null;
+      _infoMessage = null;
+    });
+
+    try {
+      final codes = await ref
+          .read(identityAuthServiceProvider)
+          .regenerateBackupCodes();
+      if (mounted) {
+        setState(() {
+          _backupCodesToShow = codes.backupCodes.toList();
+          _infoMessage = l10n.mfaSettingsBackupCodesRegeneratedConfirmation;
+        });
+      }
     } catch (error) {
       if (mounted) {
         setState(() => _errorMessage = describeIdentityError(error));
@@ -170,11 +212,33 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
           ),
           const SizedBox(height: 16),
         ],
-        if (status.enabled) ...[
+        if (_backupCodesToShow case final codes?) ...[
+          Text(l10n.mfaSettingsBackupCodesLabel),
+          const SizedBox(height: 8),
+          SelectableText(
+            codes.join('\n'),
+            key: const Key('mfaSettingsBackupCodesText'),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontFamily: 'monospace'),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            key: const Key('mfaSettingsBackupCodesSavedButton'),
+            onPressed: () => setState(() => _backupCodesToShow = null),
+            child: Text(l10n.mfaSettingsBackupCodesSavedButton),
+          ),
+        ] else if (status.enabled) ...[
           ElevatedButton(
             key: const Key('mfaSettingsDisableButton'),
             onPressed: _submitting ? null : _disable,
             child: Text(l10n.mfaSettingsDisableButton),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            key: const Key('mfaSettingsRegenerateBackupCodesButton'),
+            onPressed: _submitting ? null : _regenerateBackupCodes,
+            child: Text(l10n.mfaSettingsRegenerateBackupCodesButton),
           ),
         ] else if (pending == null) ...[
           ElevatedButton(
