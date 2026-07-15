@@ -152,3 +152,37 @@ Two-factor authentication:
 
 NOTE: if a user unsuccsessfully attempts to sign in, "Invalid email or password" is presented. If the user then creates a new sign-in, the user is returned to the login page with the previous data still present (not cleared). Clicking sign in at this point fails, and the sign in button disables, even if the user corrects the information.
 HOWEVER, if the user returns to the home page via the left-arrow link in the app, they are actually logged in.
+
+### Round 2 disposition (2026-07-15, after re-walk fixes — see docs/phase4-walkthrough-feedback-2026-07-15.md for John's full findings)
+
+This checklist is **not yet signed off**. Status of every finding above, for
+anyone picking this back up:
+
+- **#1 (registration broken on web)** — FIXED, T169 (`07d1c28`). PKCE-semantics
+  rider verified, T174 (`06067a7`).
+- **F1 (MFA enrollment 500, section (c) step 3 above)** — FIXED, T175
+  (`06067a7`). Section (c)'s remaining sub-items (backup-code wording, "I've
+  saved these codes", regenerate, disable) were blocked pending a working
+  enrollment and **still need a full re-walk with a real/simulated TOTP
+  code** — not yet re-walked.
+- **F2 (sign-in state-machine/stranding, the NOTE above)** — FIXED, T176
+  (`58ccad1`), plus a follow-through browser test for the register-path
+  intent (`7a47453`).
+- **F3 (session not persisted across reload; orphan sessions in (e))** —
+  **STILL OPEN**, tracked as T177 (ADR → refresh-rotation/persistent-storage
+  implementation → acceptance set). Blocks re-walking (e)'s reload-duplicate-
+  session concern and (f)'s persistence check ("Unable to test - refresh logs
+  out user").
+- **F4 (data export must download a file, section (h))** — **STILL OPEN**,
+  tracked as T178.
+- **Structural browser-tier growth** — ONGOING, T179. `web_auth_smoke_test.dart`
+  now covers register, sign-in fail-then-succeed, MFA enroll, and the
+  register-path preserve-intent case; still needs MFA confirm/disable,
+  reload-restores-session (after T177), export-download (after T178), and
+  wiring into a real CI pipeline (T168 — see that task for current status).
+- **T170–T173 (error presentation, password UX, selectable/copyable errors,
+  social sign-in productionization)** — **STILL OPEN**, not started, last in
+  John's sequence.
+
+Sign-off is gated on: T177 → T178 → the (c)/(f) re-walks → T170–T173, per
+John's 2026-07-15 sequencing.
