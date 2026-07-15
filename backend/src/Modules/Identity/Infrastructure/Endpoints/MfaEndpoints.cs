@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
@@ -53,7 +55,15 @@ public static class MfaEndpoints
     }
 
     private static async Task<Results<Ok<MfaEnrollmentResponse>, ProblemHttpResult>> EnrollOrConfirmAsync(
-        EnrollMfaRequest request,
+        // F1 (2026-07-15): the body is genuinely optional — an empty POST starts
+        // enrollment, a body with a code confirms it. The OpenAPI already declares
+        // requestBody optional (no `required: true`), so a non-nullable parameter here
+        // contradicted the contract and made the minimal-API pipeline reject the
+        // no-body start call in a real browser ("Implicit body inferred ... but no body
+        // was provided") — the generated Dart client sends no body for a no-arg POST,
+        // where the C# acceptance test happened to send `{}`, which is why suites were
+        // green while the browser was dead. EmptyBodyBehavior.Allow honors the contract.
+        [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] EnrollMfaRequest? request,
         ClaimsPrincipal user,
         UserManager<ApplicationUser> userManager,
         IdentityDbContext db,
@@ -66,7 +76,7 @@ public static class MfaEndpoints
     {
         var userId = CurrentUserId(user);
 
-        if (string.IsNullOrWhiteSpace(request.Code))
+        if (string.IsNullOrWhiteSpace(request?.Code))
         {
             // Phase 1: start enrollment. A fresh secret always replaces any prior
             // unconfirmed one — the client just re-scans the new QR code.
@@ -102,7 +112,8 @@ public static class MfaEndpoints
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        if (!TotpCodeGenerator.VerifyCode(cipher.Decrypt(userId, enrollment.EncryptedSecret), request.Code))
+        // request is non-null here: the empty-code branch above already returned.
+        if (!TotpCodeGenerator.VerifyCode(cipher.Decrypt(userId, enrollment.EncryptedSecret), request!.Code))
         {
             return TypedResults.Problem(title: "Invalid code", statusCode: StatusCodes.Status401Unauthorized);
         }

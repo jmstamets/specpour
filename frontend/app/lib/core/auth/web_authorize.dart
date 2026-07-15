@@ -14,15 +14,28 @@ import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 
 /// Drives GET [authorizeUrl] with credentials, follows the redirect, and returns
-/// the `code` query parameter from the final (spa-callback) URL. Throws if no code
-/// comes back (e.g. the caller isn't actually signed in, so /connect/authorize
-/// challenged instead of redirecting).
-Future<String> resolveAuthorizationCode(String authorizeUrl) async {
+/// the `code` query parameter from the final (spa-callback) URL. Validates the
+/// returned `state` against [expectedState] (T174) before trusting the code. Throws
+/// if no code comes back (e.g. the caller isn't actually signed in, so
+/// /connect/authorize challenged instead of redirecting) or if state doesn't match.
+Future<String> resolveAuthorizationCode(
+  String authorizeUrl,
+  String expectedState,
+) async {
   final response = await web.window
       .fetch(authorizeUrl.toJS, web.RequestInit(credentials: 'include'))
       .toDart;
 
-  final code = Uri.parse(response.url).queryParameters['code'];
+  final params = Uri.parse(response.url).queryParameters;
+  final returnedState = params['state'];
+  if (returnedState != expectedState) {
+    throw StateError(
+      'Sign-in did not complete: authorization state mismatch '
+      '(expected $expectedState, got $returnedState).',
+    );
+  }
+
+  final code = params['code'];
   if (code == null || code.isEmpty) {
     throw StateError(
       'Sign-in did not complete: the authorization endpoint returned no code '

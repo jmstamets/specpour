@@ -46,7 +46,7 @@ sleep 3
 
 cd "$APP"
 # Target may be overridden: run-web-integration-tests.sh <target>
-TARGET="${1:-integration_test/web_registration_test.dart}"
+TARGET="${1:-integration_test/web_auth_smoke_test.dart}"
 flutter drive \
   --driver=test_driver/integration_test.dart \
   --target="$TARGET" \

@@ -242,6 +242,7 @@ class IdentityAuthService {
   Future<({String accessToken, String? refreshToken})> _acquireTokens() async {
     final codeVerifier = _generateCodeVerifier();
     final codeChallenge = _codeChallengeFor(codeVerifier);
+    final state = _generateCodeVerifier();
     final query = {
       'client_id': _clientId,
       'response_type': 'code',
@@ -249,18 +250,18 @@ class IdentityAuthService {
       'scope': _scope,
       'code_challenge': codeChallenge,
       'code_challenge_method': 'S256',
-      'state': _generateCodeVerifier(),
+      'state': state,
     };
 
     final String code;
     if (kIsWeb) {
       // Web: let the browser follow the redirect and read the code off the final
       // URL — Dio can't read a followed redirect's Location on web. See
-      // web_authorize.dart.
+      // web_authorize.dart. State is validated there (T174).
       final authorizeUrl = Uri.parse(
         '$_apiHostBaseUrl/connect/authorize',
       ).replace(queryParameters: query).toString();
-      code = await resolveAuthorizationCode(authorizeUrl);
+      code = await resolveAuthorizationCode(authorizeUrl, state);
     } else {
       // Native: honor followRedirects:false and read the Location header.
       final authorizeResponse = await _authDio.get<void>(

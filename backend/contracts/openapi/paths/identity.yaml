@@ -248,6 +248,9 @@ meMfa:
     security:
       - bearerAuth: []
     requestBody:
+      # Optional (F1, 2026-07-15): an empty POST starts enrollment; a body with a
+      # code confirms it. Made explicit so the contract unambiguously permits no body.
+      required: false
       content:
         application/json:
           schema:

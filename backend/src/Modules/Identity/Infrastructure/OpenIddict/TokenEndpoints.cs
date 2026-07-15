@@ -42,10 +42,20 @@ public static class TokenEndpoints
         // a graceful fallback for a human who somehow lands here directly. Native
         // clients keep the standard custom-scheme redirect (com.specpour.app://callback)
         // and read the Location header normally, so this is web-only infrastructure.
-        endpoints.MapGet("/connect/spa-callback", () => Results.Content(
-            "<!doctype html><meta charset=\"utf-8\"><title>Signing you in…</title>" +
-            "<p>Signing you in… you can close this window if it doesn't return automatically.</p>",
-            "text/html"));
+        endpoints.MapGet("/connect/spa-callback", (HttpContext http) =>
+        {
+            // T174: the redirected URL carries the one-time authorization code, so its
+            // response must never be cached (a cached response could leak the
+            // code-bearing URL). The code is also single-use and PKCE-bound, and this
+            // page is only ever read via fetch's Response.url in the initiating JS
+            // context (never navigated to → no browser-history entry), so no other
+            // browsing context can observe it.
+            http.Response.Headers.CacheControl = "no-store";
+            return Results.Content(
+                "<!doctype html><meta charset=\"utf-8\"><title>Signing you in…</title>" +
+                "<p>Signing you in… you can close this window if it doesn't return automatically.</p>",
+                "text/html");
+        });
     }
 
     private static async Task<IResult> HandleAuthorizeAsync(HttpContext httpContext, UserManager<ApplicationUser> userManager)
