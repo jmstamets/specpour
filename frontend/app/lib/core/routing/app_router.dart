@@ -13,6 +13,8 @@ import '../../features/discover/ingredient_detail/ingredient_detail_screen.dart'
 import '../../features/discover/recipe_detail/recipe_detail_screen.dart';
 import '../../features/identity/account_data_screen.dart';
 import '../../features/identity/account_lifecycle_screen.dart';
+import '../../features/identity/account_menu_screen.dart';
+import '../../features/identity/channel_preferences_screen.dart';
 import '../../features/identity/complete_external_registration_screen.dart';
 import '../../features/identity/external_sign_in_callback_screen.dart';
 import '../../features/identity/mfa_challenge_screen.dart';
@@ -76,6 +78,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const MfaChallengeScreen(),
       ),
       GoRoute(
+        path: '/account',
+        name: 'accountMenu',
+        builder: (context, state) => const AccountMenuScreen(),
+      ),
+      GoRoute(
         path: '/account/mfa',
         name: 'mfaSettings',
         builder: (context, state) => const MfaSettingsScreen(),
@@ -84,6 +91,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/account/sessions',
         name: 'sessions',
         builder: (context, state) => const SessionsScreen(),
+      ),
+      GoRoute(
+        path: '/account/channels',
+        name: 'channelPreferences',
+        builder: (context, state) => const ChannelPreferencesScreen(),
       ),
       GoRoute(
         path: '/account/lifecycle',

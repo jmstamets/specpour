@@ -120,6 +120,21 @@ void main() {
   });
 
   testWidgets(
+    'T161: tapping the account nav button as a guest shows the sign-in prompt, not the account menu',
+    (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('accountNavButton')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('accountGateSignInPrompt')), findsOneWidget);
+      expect(find.byKey(const Key('accountMenuScreen')), findsNothing);
+      expectNoRawLocalizationKeys(tester);
+    },
+  );
+
+  testWidgets(
     '4: search results are typed and grouped by entity kind (amended FR-049)',
     (tester) async {
       await tester.pumpWidget(buildApp());

@@ -473,4 +473,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountDataDeleteConfirmMessage =>
       'This permanently deletes your account and all its data. This cannot be undone.';
+
+  @override
+  String get accountMenuTitle => 'Account';
+
+  @override
+  String get channelPreferencesTitle => 'Notification preferences';
+
+  @override
+  String get channelPreferencesEmailLabel => 'Email';
+
+  @override
+  String get channelPreferencesPushLabel => 'Push notifications';
 }

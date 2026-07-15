@@ -951,6 +951,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This permanently deletes your account and all its data. This cannot be undone.'**
   String get accountDataDeleteConfirmMessage;
+
+  /// T161 account menu screen title, and the tooltip/gated-action label for the AppBar entry point that opens it.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountMenuTitle;
+
+  /// T151 channel-preferences screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification preferences'**
+  String get channelPreferencesTitle;
+
+  /// T151 channel-preferences screen: email channel row label.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get channelPreferencesEmailLabel;
+
+  /// T151 channel-preferences screen: push channel row label (modeled in V1, no delivery until Phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications'**
+  String get channelPreferencesPushLabel;
 }
 
 class _AppLocalizationsDelegate

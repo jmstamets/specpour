@@ -561,5 +561,21 @@
   "accountDataDeleteConfirmMessage": "This permanently deletes your account and all its data. This cannot be undone.",
   "@accountDataDeleteConfirmMessage": {
     "description": "T053 account data screen: delete confirmation dialog message."
+  },
+  "accountMenuTitle": "Account",
+  "@accountMenuTitle": {
+    "description": "T161 account menu screen title, and the tooltip/gated-action label for the AppBar entry point that opens it."
+  },
+  "channelPreferencesTitle": "Notification preferences",
+  "@channelPreferencesTitle": {
+    "description": "T151 channel-preferences screen title."
+  },
+  "channelPreferencesEmailLabel": "Email",
+  "@channelPreferencesEmailLabel": {
+    "description": "T151 channel-preferences screen: email channel row label."
+  },
+  "channelPreferencesPushLabel": "Push notifications",
+  "@channelPreferencesPushLabel": {
+    "description": "T151 channel-preferences screen: push channel row label (modeled in V1, no delivery until Phase 2)."
   }
 }

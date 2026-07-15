@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/guest_gate/guest_gate.dart';
 import '../../core/l10n/content_key_labels.dart';
 import '../../core/l10n/gen/app_localizations.dart';
 import 'discover_providers.dart';
@@ -37,6 +38,17 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       appBar: AppBar(
         title: Text(l10n.discoverTitle),
         actions: [
+          IconButton(
+            key: const Key('accountNavButton'),
+            icon: const Icon(Icons.account_circle_outlined),
+            tooltip: l10n.accountMenuTitle,
+            onPressed: () => requireAccount(
+              ref: ref,
+              context: context,
+              actionLabel: l10n.accountMenuTitle,
+              onAuthenticated: () => context.push('/account'),
+            ),
+          ),
           IconButton(
             key: const Key('aboutNavButton'),
             icon: const Icon(Icons.info_outline),
