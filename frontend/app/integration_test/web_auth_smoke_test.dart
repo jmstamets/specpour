@@ -205,6 +205,84 @@ void main() {
     );
   });
 
+  testWidgets('T176 follow-up: guest-gated REGISTER also lands on the intent', (
+    tester,
+  ) async {
+    // completePendingIntent has two real consumers: sign_in_screen (T176
+    // above) and register_screen. F2's fix touched the shared function, so
+    // the register path needs its own verification — a guest gated by the
+    // same account-nav intent, but who completes it via Register instead of
+    // Sign In. This is "the other consumer" John flagged as the most likely
+    // silent casualty of the F2 fix.
+    final email =
+        'webregister-${DateTime.now().microsecondsSinceEpoch}@example.test';
+    late WidgetRef ref;
+    await tester.pumpWidget(
+      ProviderScope(
+        child: Consumer(
+          builder: (context, r, _) {
+            ref = r;
+            return const SpecPourApp();
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Guest lands on Discover, taps the gated account icon.
+    await tester.tap(find.byKey(const Key('accountNavButton')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('accountGateSignInPrompt')), findsOneWidget);
+
+    // Complete the captured intent via Register instead of Sign In.
+    await tester.tap(find.byKey(const Key('accountGateRegisterButton')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('registerScreen')), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('registerEmailField')), email);
+    await tester.enterText(
+      find.byKey(const Key('registerPasswordField')),
+      'correct horse battery staple',
+    );
+    await tester.enterText(
+      find.byKey(const Key('registerDisplayNameField')),
+      'Register Intent User',
+    );
+    await tester.tap(find.byKey(const Key('registerDateOfBirthButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, '07/14/2000');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('registerSubmitButton')));
+    await tester.pumpAndSettle(const Duration(seconds: 10));
+
+    final errorFinder = find.byKey(const Key('registerErrorMessage'));
+    final onScreenError = errorFinder.evaluate().isNotEmpty
+        ? tester.widget<Text>(errorFinder).data
+        : '(no error widget)';
+    expect(
+      ref.read(authTokenProvider),
+      isNotNull,
+      reason: 'registration should sign in; onScreenError=[$onScreenError]',
+    );
+    // Must land on the intent target (/account), NOT be stranded on register.
+    expect(
+      find.byKey(const Key('registerScreen')),
+      findsNothing,
+      reason: 'a successful registration must leave the register screen (F2)',
+    );
+    expect(
+      find.byKey(const Key('accountMenuScreen')),
+      findsOneWidget,
+      reason:
+          'the captured intent (open /account) must complete on the '
+          'register path too (F2)',
+    );
+  });
+
   testWidgets('T175: MFA enrollment shows the secret in a real browser', (
     tester,
   ) async {
