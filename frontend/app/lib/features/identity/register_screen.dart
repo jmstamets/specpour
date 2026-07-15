@@ -81,11 +81,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         return;
       }
 
-      completePendingIntent(ref);
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        context.go('/');
+      // F2: only navigate ourselves when there was no pending intent — a resumed
+      // intent already navigates to its target (see sign_in_screen).
+      if (!completePendingIntent(ref)) {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/');
+        }
       }
     } catch (error) {
       if (!mounted) {

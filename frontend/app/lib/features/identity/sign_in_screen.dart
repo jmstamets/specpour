@@ -60,11 +60,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         return;
       }
 
-      completePendingIntent(ref);
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        context.go('/');
+      // F2: only navigate ourselves when there was no pending intent — a resumed
+      // intent already navigates to its target, and popping on top of it would
+      // strand the user back on the sign-in screen (signed in but stuck).
+      if (!completePendingIntent(ref)) {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/');
+        }
       }
     } catch (error) {
       if (!mounted) {

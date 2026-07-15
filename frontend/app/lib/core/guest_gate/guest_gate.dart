@@ -40,15 +40,19 @@ Future<void> requireAccount({
 
 /// Called by the sign-in flow (T055) after a successful authentication: replays
 /// the captured guest intent, if any, then clears it. Safe to call when there is
-/// no pending intent (no-op).
-void completePendingIntent(WidgetRef ref) {
+/// no pending intent (no-op). Returns true if an intent was resumed — the caller
+/// must then NOT also navigate itself (the resumed intent already navigated), or it
+/// would strand the user (F2, 2026-07-15: sign-in resumed the intent AND then popped
+/// the screen it just pushed, leaving the user signed in but stuck on sign-in).
+bool completePendingIntent(WidgetRef ref) {
   final intent = ref.read(pendingGuestIntentProvider);
   if (intent == null) {
-    return;
+    return false;
   }
 
   ref.read(pendingGuestIntentProvider.notifier).clear();
   intent.resume();
+  return true;
 }
 
 /// The sign-in prompt shown to a gated guest. The sign-in / register buttons

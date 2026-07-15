@@ -84,6 +84,127 @@ void main() {
     expect(find.byKey(const Key('registerErrorMessage')), findsNothing);
   });
 
+  testWidgets('T176: guest-gated sign-in fail-then-succeed lands on the intent', (
+    tester,
+  ) async {
+    // Register a fresh account (capturing creds), then simulate a signed-out UI and
+    // drive the REAL guest-gate flow: tap the account icon (as a guest) -> prompt ->
+    // sign in. That flow captures a pending intent (open /account), which is exactly
+    // what surfaced F2 — a successful sign-in resumed the intent AND popped the
+    // screen it pushed, stranding the user back on sign-in.
+    final email =
+        'websignin-${DateTime.now().microsecondsSinceEpoch}@example.test';
+    const password = 'correct horse battery staple';
+    late WidgetRef ref;
+    await tester.pumpWidget(
+      ProviderScope(
+        child: Consumer(
+          builder: (context, r, _) {
+            ref = r;
+            return const SpecPourApp();
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    ref.read(appRouterProvider).go('/register');
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('registerEmailField')), email);
+    await tester.enterText(
+      find.byKey(const Key('registerPasswordField')),
+      password,
+    );
+    await tester.enterText(
+      find.byKey(const Key('registerDisplayNameField')),
+      'Sign In User',
+    );
+    await tester.tap(find.byKey(const Key('registerDateOfBirthButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, '07/14/2000');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('registerSubmitButton')));
+    await tester.pumpAndSettle(const Duration(seconds: 10));
+    expect(
+      ref.read(authTokenProvider),
+      isNotNull,
+      reason: 'registered + signed in',
+    );
+
+    // Simulate signed-out, land on Discover, and enter the guest-gate flow.
+    ref.read(authTokenProvider.notifier).set(null);
+    ref.read(refreshTokenProvider.notifier).set(null);
+    ref.read(appRouterProvider).go('/');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('accountNavButton')));
+    await tester.pumpAndSettle();
+    // Guest -> prompt; tapping "sign in" captures the intent (open /account).
+    expect(find.byKey(const Key('accountGateSignInPrompt')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('accountGateSignInButton')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('signInScreen')), findsOneWidget);
+
+    // Attempt 1: wrong password -> error, submit must remain ENABLED.
+    await tester.enterText(find.byKey(const Key('signInEmailField')), email);
+    await tester.enterText(
+      find.byKey(const Key('signInPasswordField')),
+      'wrong password entirely',
+    );
+    await tester.tap(find.byKey(const Key('signInSubmitButton')));
+    await tester.pumpAndSettle(const Duration(seconds: 5));
+
+    expect(
+      find.byKey(const Key('signInErrorMessage')),
+      findsOneWidget,
+      reason: 'wrong password should show an error',
+    );
+    expect(
+      tester
+          .widget<ElevatedButton>(find.byKey(const Key('signInSubmitButton')))
+          .onPressed,
+      isNotNull,
+      reason: 'submit must be re-enabled after a failed sign-in (F2)',
+    );
+
+    // Attempt 2: set the CORRECT password. Set the controller directly rather than
+    // via enterText — a second enterText on the same focused field doesn't reliably
+    // replace on Flutter web (a test-input quirk, not the app), and F2 is about the
+    // post-login state machine, not typing.
+    tester
+            .widget<TextField>(find.byKey(const Key('signInPasswordField')))
+            .controller!
+            .text =
+        password;
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('signInSubmitButton')));
+    await tester.pumpAndSettle(const Duration(seconds: 10));
+
+    final err2Finder = find.byKey(const Key('signInErrorMessage'));
+    final err2 = err2Finder.evaluate().isNotEmpty
+        ? tester.widget<Text>(err2Finder).data
+        : '(no error widget)';
+    expect(
+      ref.read(authTokenProvider),
+      isNotNull,
+      reason: 'correct password should sign in; onScreenError=[$err2]',
+    );
+    // Must land on the intent target (/account), NOT be stranded on sign-in.
+    expect(
+      find.byKey(const Key('signInScreen')),
+      findsNothing,
+      reason: 'a successful sign-in must leave the sign-in screen (F2)',
+    );
+    expect(
+      find.byKey(const Key('accountMenuScreen')),
+      findsOneWidget,
+      reason: 'the captured intent (open /account) must complete (F2)',
+    );
+  });
+
   testWidgets('T175: MFA enrollment shows the secret in a real browser', (
     tester,
   ) async {
