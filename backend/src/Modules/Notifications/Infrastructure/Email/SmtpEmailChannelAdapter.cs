@@ -38,6 +38,7 @@ public sealed class SmtpEmailChannelAdapter(IOptions<SmtpEmailOptions> options) 
 
         if (!string.IsNullOrEmpty(settings.Username))
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(settings.Password);
             await client.AuthenticateAsync(settings.Username, settings.Password, cancellationToken);
         }
 

@@ -85,6 +85,13 @@ jobs:
   # one of the plan's three first-class target platforms. ---
   frontend-integration-tests:
     runs-on: ubuntu-latest
+    # 2026-07-15, first real CI run: this job hung for 1h+ with no timeout and
+    # had to be cancelled by hand — ubuntu-latest hosted runners don't reliably
+    # have KVM acceleration for the x86_64 emulator, so a cold boot can take far
+    # longer than a working run ever should. Bounding it turns a silent multi-
+    # hour hang into a visible, fast failure. Root fix (KVM/acceleration, or an
+    # alternative runner) is tracked separately — see T180.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -102,6 +109,46 @@ jobs:
           profile: pixel_6
           working-directory: frontend/app
           script: flutter test integration_test
+
+  # --- Frontend: the headless-Chrome browser-context smoke tier (T179), wired
+  # in as a required CI check per T168's re-opened mandate (2026-07-15): every
+  # green-but-dead bug found this project (registration T169, MFA enroll T175,
+  # sign-in stranding T176) only showed up in a real browser, never in
+  # unit/widget/Android-integration tests. ubuntu-latest ships Chrome, so this
+  # doesn't hit frontend-integration-tests' KVM problem — no emulator involved.
+  frontend-web-browser-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - working-directory: frontend/app
+        run: flutter pub get
+      - name: Start backend stack (postgres/minio/otel/smtp4dev/migrations/api)
+        run: docker compose up -d --build
+      - name: Wait for API health
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:5001/health/live > /dev/null; then
+              echo "API is up."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::API never became healthy within 120s."
+          docker compose logs
+          exit 1
+      - name: Run the browser-context auth smoke set
+        run: scripts/run-web-integration-tests.sh
+      - name: Docker logs (always, for diagnosis)
+        if: always()
+        run: docker compose logs
 
   # --- Generated client must never drift from the authored OpenAPI document
   # (Principle II hand-edit prohibition — T008). ---
@@ -131,6 +178,15 @@ jobs:
         run: |
           dotnet restore backend/SpecPour.slnx
           dotnet list backend/SpecPour.slnx package --vulnerable --include-transitive 2>&1 | tee vulnerable.log
+          # Fail closed, not open: "The following sources were used" only appears
+          # when the advisory-feed query actually completed. Its absence means the
+          # scan was inconclusive (network/feed issue) and must not be read as
+          # "no vulnerabilities" (2026-07-15: this is exactly how a real MailKit/
+          # MimeKit CVE pair went undetected locally for weeks).
+          if ! grep -q "The following sources were used" vulnerable.log; then
+            echo "::error::NuGet vulnerability scan did not complete (no source query recorded) — treating as inconclusive, not clean. See log above."
+            exit 1
+          fi
           if grep -q "has the following vulnerable packages" vulnerable.log; then
             echo "::error::Vulnerable NuGet packages found (see log above)."
             exit 1
@@ -153,7 +209,7 @@ jobs:
       - name: Build API image
         run: docker build -t specpour-api:ci -f backend/src/Api/Dockerfile backend
       - name: Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: specpour-api:ci
           severity: CRITICAL,HIGH

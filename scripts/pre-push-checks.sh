@@ -32,6 +32,18 @@ cd "$ROOT"
 # the invoking shell's own profile.
 export PATH="$HOME/.dotnet:$HOME/flutter-sdk/bin:$PATH"
 
+# Loud, not silent: if $HOME/.dotnet isn't populated on some future machine/
+# contributor, bare `dotnet` falls through to an ambient older SDK that can
+# silently mis-parse this repo's .slnx (observed 2026-07-15: an ambient .NET 8
+# SDK's `dotnet list package --vulnerable` printed a usage screen instead of an
+# error on a .slnx it couldn't read, which a naive grep read as "no results").
+dotnet_major="$(dotnet --version | cut -d. -f1)"
+if [[ "$dotnet_major" -lt 10 ]]; then
+  echo "ERROR: resolved dotnet is $(dotnet --version), but this repo needs .NET 10+." >&2
+  echo "  (bare 'dotnet' is resolving to the wrong SDK — check PATH)" >&2
+  exit 1
+fi
+
 echo "==> [1/4] Backend: build + all four test suites"
 dotnet build backend/SpecPour.slnx -c Release
 for suite in Acceptance Contract Integration Unit; do
@@ -49,8 +61,18 @@ scripts/check-client-drift.sh
 
 echo "==> [4/4] NuGet vulnerable-package scan"
 dotnet restore backend/SpecPour.slnx
-if dotnet list backend/SpecPour.slnx package --vulnerable --include-transitive 2>&1 \
-    | tee /tmp/specpour-vulnerable.log | grep -q "has the following vulnerable packages"; then
+dotnet list backend/SpecPour.slnx package --vulnerable --include-transitive 2>&1 \
+    | tee /tmp/specpour-vulnerable.log
+# Fail closed, not open: "The following sources were used" only appears when the
+# advisory-feed query actually completed. Its absence means the scan was
+# inconclusive (network/feed issue), not clean — a real MailKit/MimeKit CVE pair
+# went undetected here for weeks because this check silently passed on an
+# incomplete scan (2026-07-15, root-caused when real CI finally ran and caught it).
+if ! grep -q "The following sources were used" /tmp/specpour-vulnerable.log; then
+  echo "ERROR: NuGet vulnerability scan did not complete (no source query recorded) — treating as inconclusive, not clean. See /tmp/specpour-vulnerable.log." >&2
+  exit 1
+fi
+if grep -q "has the following vulnerable packages" /tmp/specpour-vulnerable.log; then
   echo "ERROR: vulnerable NuGet packages found (see above)." >&2
   exit 1
 fi

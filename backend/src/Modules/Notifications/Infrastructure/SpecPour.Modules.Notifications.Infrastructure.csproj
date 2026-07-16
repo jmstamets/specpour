@@ -17,7 +17,7 @@
     <!-- T146: MailKit, not System.Net.Mail.SmtpClient (obsolete/unsupported by
          Microsoft for new development) — the modern, actively-maintained .NET SMTP
          client. -->
-    <PackageReference Include="MailKit" Version="4.13.0" />
+    <PackageReference Include="MailKit" Version="4.17.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
