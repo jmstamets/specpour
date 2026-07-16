@@ -78,12 +78,18 @@ public static class TokenEndpoints
         return Results.SignIn(principal, authenticationScheme: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
+    /// <summary>ADR-0005 (T177): a session older than this, regardless of activity, must
+    /// re-authenticate — the complement to the 14-day SLIDING window (SetRefreshTokenLifetime
+    /// in IdentityModule.cs), which alone would let an actively-used session live forever.</summary>
+    private static readonly TimeSpan MaxAbsoluteSessionAge = TimeSpan.FromDays(90);
+
     private static async Task<IResult> HandleTokenAsync(
         HttpContext httpContext,
         UserManager<ApplicationUser> userManager,
         IdentityDbContext db,
         IUuidGenerator uuidGenerator,
-        IClock clock)
+        IClock clock,
+        IOpenIddictAuthorizationManager authorizationManager)
     {
         var request = httpContext.GetOpenIddictServerRequest()
             ?? throw new InvalidOperationException("The OpenIddict token request cannot be retrieved.");
@@ -142,6 +148,24 @@ public static class TokenEndpoints
                 var existing = await db.SessionDevices.SingleOrDefaultAsync(s => s.AuthorizationId == authorizationId, httpContext.RequestAborted);
                 if (existing is not null)
                 {
+                    // ADR-0005 (T177): the 90-day absolute cap. Sliding expiration alone
+                    // (14 days, reset on every refresh) would let an actively-used session
+                    // live forever — this bounds it regardless of activity. Checked BEFORE
+                    // updating LastSeenAt / issuing new tokens: an over-cap session is
+                    // revoked outright, the same as an explicit user-initiated revoke.
+                    if (clock.UtcNow - existing.CreatedAt > MaxAbsoluteSessionAge)
+                    {
+                        var expiredAuthorization = await authorizationManager.FindByIdAsync(authorizationId, httpContext.RequestAborted);
+                        if (expiredAuthorization is not null)
+                        {
+                            await authorizationManager.TryRevokeAsync(expiredAuthorization, httpContext.RequestAborted);
+                        }
+
+                        existing.RevokedAt = clock.UtcNow;
+                        await db.SaveChangesAsync(httpContext.RequestAborted);
+                        return Results.Forbid(authenticationSchemes: [OpenIddictServerAspNetCoreDefaults.AuthenticationScheme]);
+                    }
+
                     existing.LastSeenAt = clock.UtcNow;
                 }
             }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using OpenIddict.Abstractions;
 using Reqnroll;
 using SpecPour.Modules.Authorization.Infrastructure;
 using SpecPour.Modules.Identity.Application.Lifecycle;
@@ -49,6 +50,8 @@ public sealed class US02IdentitySteps
     private string? _deactivationToken;
     private string? _deactivationRefreshToken;
     private readonly List<string> _deviceRefreshTokens = [];
+    private string? _reuseTestRefreshToken;
+    private Guid _reuseTestSessionId;
 
     [When(@"a visitor registers with a valid adult date of birth")]
     public async Task WhenAVisitorRegistersWithAValidAdultDateOfBirth() =>
@@ -411,6 +414,142 @@ public sealed class US02IdentitySteps
 
         Assert.False(response.IsSuccessStatusCode, "A revoked session's refresh token must be rejected.");
     }
+
+    [When(@"the user acquires a refresh token")]
+    public async Task WhenTheUserAcquiresARefreshToken()
+    {
+        var (_, refreshToken) = await AcquireTokenPairAsync();
+        _reuseTestRefreshToken = refreshToken;
+
+        using var scope = AcceptanceHooks.Factory.Services.CreateScope();
+        var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        var session = await identityDb.SessionDevices.SingleAsync(s => s.UserId == _registeredUserId);
+        _reuseTestSessionId = session.Id;
+    }
+
+    [When(@"the refresh token is redeemed once")]
+    public async Task WhenTheRefreshTokenIsRedeemedOnce()
+    {
+        // ADR-0005 (T177): deliberately does NOT capture/overwrite _reuseTestRefreshToken
+        // with the rotated token this returns — the whole point is to keep presenting the
+        // now-stale, already-redeemed token in the next step.
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        var response = await client.PostAsync(
+            new Uri("/connect/token", UriKind.Relative),
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["grant_type"] = "refresh_token",
+                ["refresh_token"] = _reuseTestRefreshToken!,
+                ["client_id"] = "specpour-app",
+            }));
+
+        Assert.True(response.IsSuccessStatusCode, $"The first redemption should succeed: {await response.Content.ReadAsStringAsync()}");
+    }
+
+    [When(@"time passes beyond the refresh-token reuse leeway")]
+    public static void WhenTimePassesBeyondTheRefreshTokenReuseLeeway() =>
+        // OpenIddictServerOptions.RefreshTokenReuseLeeway defaults to 30 seconds (per the
+        // package's own XML docs: "the period of time rolling refresh tokens marked as
+        // redeemed can still be used to make concurrent refresh token requests") —
+        // deliberate tolerance for genuinely concurrent client requests, not a bug. This
+        // test must advance PAST that window, or a real reuse-detection regression would
+        // be indistinguishable from the leeway correctly tolerating a fast, benign retry
+        // (confirmed by first running this test WITHOUT the advance: it failed here, not
+        // because reuse detection is broken, but because the leeway legitimately allowed
+        // it — exactly the multi-tab-race scenario ADR-0005 designs around).
+        AcceptanceHooks.Factory.Clock.Advance(TimeSpan.FromSeconds(60));
+
+    [Then(@"the second redemption of the same refresh token is rejected")]
+    public async Task ThenTheSecondRedemptionOfTheSameRefreshTokenIsRejected()
+    {
+        // ADR-0005 (T177): OpenIddict's rolling refresh tokens mark a redeemed token as
+        // used; presenting it again is the reuse-detection signal — the fingerprint of a
+        // stolen persisted token being used by both a thief and the legitimate client.
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        var response = await client.PostAsync(
+            new Uri("/connect/token", UriKind.Relative),
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["grant_type"] = "refresh_token",
+                ["refresh_token"] = _reuseTestRefreshToken!,
+                ["client_id"] = "specpour-app",
+            }));
+
+        Assert.False(response.IsSuccessStatusCode, "Reusing an already-redeemed refresh token must be rejected.");
+    }
+
+    [Then(@"the session is no longer active")]
+    public async Task ThenTheSessionIsNoLongerActive()
+    {
+        // ADR-0005 (T177) orphan hygiene: the real acceptance bar is what
+        // GET /me/sessions reports, not a raw RevokedAt column check — OpenIddict's
+        // own internal reuse-detection revokes the authorization without ever
+        // touching our RevokedAt field, so only the endpoint's live-status check
+        // (SessionsEndpoints.ListAsync, cross-checked against IOpenIddictAuthorizationManager)
+        // is a faithful assertion. A genuinely FRESH sign-in (not the aged
+        // _sessionClient's cookie) — the 90-day-cap scenario advances the shared
+        // TestTimeProvider far enough that the ORIGINAL cookie session's own default
+        // 14-day expiry would confound the assertion; a fresh login sidesteps that
+        // entirely and is also the more realistic "user just signs in again" case.
+        _sessionClient = NewClientWithoutRedirects();
+        var loginResponse = await _sessionClient.PostAsJsonAsync(
+            new Uri("/api/v1/auth/login", UriKind.Relative),
+            new { email = _registeredEmail, password = _currentPassword });
+        Assert.True(loginResponse.IsSuccessStatusCode, $"Fresh sign-in should succeed: {await loginResponse.Content.ReadAsStringAsync()}");
+        var freshToken = await AcquireAccessTokenAsync();
+
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", freshToken);
+        var response = await client.GetAsync(new Uri("/api/v1/me/sessions", UriKind.Relative));
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var ids = json.RootElement.GetProperty("sessions").EnumerateArray()
+            .Select(e => e.GetProperty("id").GetGuid())
+            .ToList();
+
+        Assert.DoesNotContain(_reuseTestSessionId, ids);
+    }
+
+    [When(@"the user refreshes the session every 10 days until the absolute cap is reached")]
+    public async Task WhenTheUserRefreshesTheSessionEvery10DaysUntilTheAbsoluteCapIsReached()
+    {
+        // ADR-0005 (T177): must stay WITHIN OpenIddict's own native 14-day sliding
+        // refresh-token lifetime on every hop (10 days < 14), or THAT check — not our
+        // own 90-day absolute cap — would reject the refresh first, and this test
+        // would silently be exercising the wrong code path (confirmed: an earlier
+        // version of this test advanced 91 days in one jump and passed for the wrong
+        // reason — OpenIddict's native expiry fired before HandleTokenAsync's custom
+        // absolute-cap check ever ran). Refreshing every 10 days while the TOTAL
+        // elapsed time crosses 90 days isolates the absolute cap specifically.
+        for (var cycle = 0; cycle < 12; cycle++)
+        {
+            AcceptanceHooks.Factory.Clock.Advance(TimeSpan.FromDays(10));
+
+            using var client = AcceptanceHooks.Factory.CreateClient();
+            _lastResponse = await client.PostAsync(
+                new Uri("/connect/token", UriKind.Relative),
+                new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["grant_type"] = "refresh_token",
+                    ["refresh_token"] = _reuseTestRefreshToken!,
+                    ["client_id"] = "specpour-app",
+                }));
+
+            if (!_lastResponse.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            var body = await _lastResponse.Content.ReadAsStringAsync();
+            using var json = JsonDocument.Parse(body);
+            _reuseTestRefreshToken = json.RootElement.GetProperty("refresh_token").GetString();
+        }
+
+        Assert.Fail("Expected the 90-day absolute session cap to reject a refresh within 12 ten-day cycles (120 days).");
+    }
+
+    [Then(@"the refresh token is rejected")]
+    public void ThenTheRefreshTokenIsRejected() =>
+        Assert.False(_lastResponse.IsSuccessStatusCode, "Expected the refresh to be rejected.");
 
     [When(@"the user deactivates their account")]
     public async Task WhenTheUserDeactivatesTheirAccount()

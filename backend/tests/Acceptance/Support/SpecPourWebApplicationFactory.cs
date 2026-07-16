@@ -70,6 +70,28 @@ public sealed class SpecPourWebApplicationFactory : WebApplicationFactory<Progra
             services.RemoveAll<IClock>();
             services.AddSingleton<IClock>(Clock);
 
+            // ADR-0005 (T177): OpenIddict reads time via .NET's own TimeProvider
+            // (OpenIddictServerOptions.TimeProvider), not this app's IClock — confirmed
+            // via its XML docs ("if this property is not explicitly set, ... TimeProvider.
+            // System is used"). Wiring it to the SAME TestClock means one Clock.Advance
+            // call moves both our own logic (the 90-day absolute-cap check) and
+            // OpenIddict's internal token-expiry / refresh-token-reuse-leeway timing —
+            // without this, a scenario advancing Clock would silently NOT affect
+            // OpenIddict's reuse-detection window, since it would still be reading the
+            // real wall clock underneath.
+            //
+            // Deliberately NOT a global `services.AddSingleton<TimeProvider>(...)`:
+            // confirmed by direct reproduction that ASP.NET Core's cookie authentication
+            // handler ALSO resolves an ambient DI-registered TimeProvider, so a global
+            // registration made the pre-existing T052 deactivation-warning scenario's
+            // 336-day clock jump silently expire the test's cookie session too (a real,
+            // if test-only, side effect this change would otherwise have introduced) —
+            // scoping the custom TimeProvider directly onto OpenIddictServerOptions only
+            // (a closure over Clock, no DI mediation needed) keeps cookie-auth on the
+            // real wall clock, unaffected.
+            services.AddOptions<OpenIddict.Server.OpenIddictServerOptions>()
+                .PostConfigure(options => options.TimeProvider = new TestTimeProvider(Clock));
+
             // T146: the shared acceptance host has no reachable SMTP server (no
             // Testcontainers smtp4dev here — SmtpEmailChannelAdapterContractTests
             // owns that verification in isolation) — swap back to the logging
