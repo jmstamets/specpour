@@ -498,6 +498,24 @@ public sealed class US02IdentitySteps
         Assert.True(loginResponse.IsSuccessStatusCode, $"Fresh sign-in should succeed: {await loginResponse.Content.ReadAsStringAsync()}");
         var freshToken = await AcquireAccessTokenAsync();
 
+        // John's rider (2026-07-16): a filter that silently matches zero tokens (the
+        // exact shape of the TokenTypeIdentifiers-vs-TokenTypeHints bug) makes
+        // DoesNotContain trivially pass on an accidentally-EMPTY list — a fail-open
+        // disguised as a negative assertion. Capture the fresh session created by the
+        // sign-in just above and require it to POSITIVELY appear, so an "everything
+        // filtered out" regression fails loudly here instead of hiding behind a
+        // vacuously-true DoesNotContain.
+        Guid freshSessionId;
+        using (var scope = AcceptanceHooks.Factory.Services.CreateScope())
+        {
+            var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+            freshSessionId = await identityDb.SessionDevices
+                .Where(s => s.UserId == _registeredUserId)
+                .OrderByDescending(s => s.CreatedAt)
+                .Select(s => s.Id)
+                .FirstAsync();
+        }
+
         using var client = AcceptanceHooks.Factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", freshToken);
         var response = await client.GetAsync(new Uri("/api/v1/me/sessions", UriKind.Relative));
@@ -506,6 +524,7 @@ public sealed class US02IdentitySteps
             .Select(e => e.GetProperty("id").GetGuid())
             .ToList();
 
+        Assert.Contains(freshSessionId, ids);
         Assert.DoesNotContain(_reuseTestSessionId, ids);
     }
 

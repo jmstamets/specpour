@@ -69,11 +69,28 @@ grant.** Concretely:
    explicit cross-tab refresh coordination**: a single-refresher election (Web
    Locks API, with a `BroadcastChannel` fallback for browsers without Web Locks)
    so only one tab ever redeems a given refresh token; the winner distributes the
-   new token pair to the other tabs via the same channel. **Acceptance criterion,
-   explicit**: two tabs open, spanning a token-expiry boundary → both tabs remain
-   signed in, zero revocation events. Skipping this ships as an intermittent
-   everyone's-logged-out bug indistinguishable from T167's original ghost —
-   exactly the class of defect this ADR-first sequence exists to prevent.
+   new token pair to the other tabs via the same channel. Skipping this ships as
+   an intermittent everyone's-logged-out bug indistinguishable from T167's
+   original ghost — exactly the class of defect this ADR-first sequence exists
+   to prevent.
+
+   **Leeway is the safety net; single-refresher election is the design — the
+   test must verify the design, not the net** (John's rider, 2026-07-16, after
+   the backend work confirmed the 30-second leeway is real and legitimately
+   forgiving). Because the leeway tolerates most realistic two-tab timings on
+   its own, an acceptance test asserting only "both tabs remain signed in, zero
+   revocations" could pass with the election mechanism **entirely broken** — the
+   leeway would quietly cover for it, exactly as long as both tabs happen to
+   race within 30 seconds of each other, which is the common case but not a
+   guarantee (a backgrounded tab that only wakes minutes later is the case that
+   actually needs coordination, and a leeway-masked test would never catch its
+   own mechanism failing). **The browser-tier test must assert the mechanism
+   directly**: exactly ONE refresh request crosses the wire at the expiry
+   boundary (a network-request count or an instrumented refresh-attempt
+   counter), with both tabs ending up holding the same rotated token pair. "Both
+   stay signed in" is necessary but not sufficient; the request-count assertion
+   is what actually proves the election worked rather than the leeway quietly
+   absorbing a broken one.
 
 2. **Refresh-token rotation, explicit not implicit, two explicit lifetime
    numbers.** Verified directly against the installed `OpenIddict.Server` 7.5.0
@@ -128,7 +145,15 @@ grant.** Concretely:
      stable session id, `LastSeenAt` updated, **no new session row**).
    - **Failure** (expired, consumed, or revoked refresh token) → **clean
      signed-out state, never a surfaced error** — the user simply starts as a guest,
-     exactly the outcome a fully-expired session already produces.
+     exactly the outcome a fully-expired session already produces. **This
+     guarantee is not just for the "closed while revoked" case (rider (c)
+     below) — John's rider (2026-07-16): the 90-day absolute cap and a detected
+     reuse are two MORE triggers that land the client in exactly this same
+     failure branch** (both, per the backend implementation, present as an
+     ordinary refresh_token-grant rejection — no distinct error shape the client
+     needs to special-case). All three triggers (revoked-while-closed, cap
+     expiry, reuse detection) must be asserted to produce the identical clean
+     sign-out, never an error screen or a limbo state.
 
 4. **Orphan hygiene** (SessionDevice "active" semantics): a SessionDevice whose
    refresh-token family is no longer usable (revoked, or `LastSeenAt` older than the
@@ -186,8 +211,18 @@ decision blocks adopting it later behind the same `IdentityAuthService` seam.
   semantics precisely because restore uses refresh (not a fresh login). (d)
   reuse detection — redeem the same refresh token twice → second attempt fails,
   authorization revoked, client lands cleanly signed out. (e) multi-tab
-  coordination — two tabs open across a token-expiry boundary → both stay signed
-  in, zero revocation events.
+  coordination — asserts the MECHANISM (John's rider 2, 2026-07-16), not just
+  the outcome: two tabs open across a token-expiry boundary → exactly ONE
+  refresh request crosses the wire (request-count/attempt-counter assertion),
+  both tabs end up holding the identical rotated token pair, zero revocation
+  events. "Both stay signed in" alone is insufficient — OpenIddict's own
+  30-second reuse leeway would mask a fully broken election in most realistic
+  timings, so only the request-count assertion actually proves coordination
+  works rather than the leeway quietly covering for it. (f) cap/reuse clean
+  sign-out (John's rider 3) — the SAME clean-signed-out assertion as (c),
+  extended to two more triggers: a session hitting the 90-day absolute cap, and
+  a detected reuse. All three (c)/(f)'s two triggers must land the client
+  identically signed out, never an error screen or limbo state.
 - **T167 disposition: unaffected, pending confirmation — not yet closed** (John's
   rider: "accepted as unaffected, not yet closed"). The tie-break fix
   (`ThenByDescending(s => s.Id)` in `SessionsEndpoints.ListAsync`) stands as the

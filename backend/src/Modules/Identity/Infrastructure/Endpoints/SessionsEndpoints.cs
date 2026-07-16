@@ -92,6 +92,14 @@ public static class SessionsEndpoints
                 continue;
             }
 
+            // Standing rule (John, 2026-07-16, after the TokenTypeIdentifiers-vs-
+            // TokenTypeHints mistake below): any filter against a provider-internal
+            // string constant like this one MUST be guarded by a positive-match
+            // acceptance test (a known-live session actually appears), not only a
+            // negative one (a dead session is excluded) — the wrong constant silently
+            // matches zero tokens, which a negative-only assertion can't distinguish
+            // from correct filtering. See US02_Identity.feature scenario 18's
+            // "the session is no longer active" step for the positive-match test.
             var hasValidRefreshToken = false;
             await foreach (var token in tokenManager.FindByAuthorizationIdAsync(session.AuthorizationId, cancellationToken))
             {
