@@ -19,6 +19,25 @@ import 'package:specpour_app/core/routing/app_router.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  // 2026-07-16 fail-open audit (John): a target with zero testWidgets() blocks
+  // makes `flutter drive` print "All tests passed." and exit 0 — verified by
+  // direct reproduction. That means this job could silently run 0 of its 4
+  // cases (an accidental deletion, a setup exception before any test body
+  // runs) and still report green. This counter + the tearDownAll below turn
+  // "fewer cases ran than expected" into a real, reported test failure.
+  const expectedCaseCount = 4;
+  var executedCaseCount = 0;
+  tearDownAll(() {
+    expect(
+      executedCaseCount,
+      expectedCaseCount,
+      reason:
+          'expected all $expectedCaseCount auth-smoke cases to run; only '
+          '$executedCaseCount did — the smoke tier silently ran fewer checks '
+          'than intended.',
+    );
+  });
+
   /// Registers a fresh adult account through the real UI and returns once signed in.
   Future<WidgetRef> pumpAndRegister(WidgetTester tester, String tag) async {
     late WidgetRef ref;
@@ -68,6 +87,7 @@ void main() {
   testWidgets('T169: registration completes end-to-end and lands signed in', (
     tester,
   ) async {
+    executedCaseCount++;
     final ref = await pumpAndRegister(tester, 'webreg');
 
     final errorFinder = find.byKey(const Key('registerErrorMessage'));
@@ -87,6 +107,7 @@ void main() {
   testWidgets('T176: guest-gated sign-in fail-then-succeed lands on the intent', (
     tester,
   ) async {
+    executedCaseCount++;
     // Register a fresh account (capturing creds), then simulate a signed-out UI and
     // drive the REAL guest-gate flow: tap the account icon (as a guest) -> prompt ->
     // sign in. That flow captures a pending intent (open /account), which is exactly
@@ -208,6 +229,7 @@ void main() {
   testWidgets('T176 follow-up: guest-gated REGISTER also lands on the intent', (
     tester,
   ) async {
+    executedCaseCount++;
     // completePendingIntent has two real consumers: sign_in_screen (T176
     // above) and register_screen. F2's fix touched the shared function, so
     // the register path needs its own verification — a guest gated by the
@@ -286,6 +308,7 @@ void main() {
   testWidgets('T175: MFA enrollment shows the secret in a real browser', (
     tester,
   ) async {
+    executedCaseCount++;
     final ref = await pumpAndRegister(tester, 'webmfa');
     expect(
       ref.read(authTokenProvider),

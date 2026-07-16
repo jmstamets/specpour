@@ -48,7 +48,16 @@ echo "==> [1/4] Backend: build + all four test suites"
 dotnet build backend/SpecPour.slnx -c Release
 for suite in Acceptance Contract Integration Unit; do
   echo "----> $suite"
-  dotnet test "backend/tests/$suite" -c Release --no-build
+  dotnet test "backend/tests/$suite" -c Release --no-build 2>&1 | tee /tmp/specpour-test-output.log
+  # Defense-in-depth (2026-07-16 fail-open audit): no --filter is used here,
+  # so the confirmed "0 tests matched a filter -> exit 0" mode isn't
+  # reachable today, but a genuinely empty test project is a separate,
+  # unconfirmed code path in dotnet test. Require evidence that a nonzero
+  # number of tests actually ran, not just "no failure."
+  if ! grep -qE "Passed!.*Total: *[1-9]" /tmp/specpour-test-output.log; then
+    echo "ERROR: no evidence that any tests actually ran in $suite — treating as inconclusive, not clean." >&2
+    exit 1
+  fi
 done
 
 echo "==> [2/4] Frontend: analyze, format check, unit/widget tests"

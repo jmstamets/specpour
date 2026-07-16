@@ -47,7 +47,18 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - run: dotnet build backend/SpecPour.slnx -c Release
-      - run: dotnet test backend/tests/${{ matrix.suite }} -c Release --no-build
+      - name: Run ${{ matrix.suite }} suite
+        run: |
+          dotnet test backend/tests/${{ matrix.suite }} -c Release --no-build 2>&1 | tee test-output.log
+          # Defense-in-depth (2026-07-16 fail-open audit): no --filter is used
+          # here, so the confirmed "0 tests matched a filter -> exit 0" mode
+          # isn't reachable today, but a genuinely empty test project is a
+          # separate, unconfirmed code path in dotnet test. Require evidence
+          # that a nonzero number of tests actually ran, not just "no failure."
+          if ! grep -qE "Passed!.*Total: *[1-9]" test-output.log; then
+            echo "::error::No evidence that any tests actually ran in ${{ matrix.suite }} — treating as inconclusive, not clean."
+            exit 1
+          fi
 
   # --- Frontend: analyzer + formatting gate (mirrors T006's local commands). ---
   frontend-analyze:
@@ -91,7 +102,14 @@ jobs:
     # longer than a working run ever should. Bounding it turns a silent multi-
     # hour hang into a visible, fast failure. Root fix (KVM/acceleration, or an
     # alternative runner) is tracked separately — see T180.
+    #
+    # 2026-07-16 (John): NOT in main's required-status-checks and marked
+    # continue-on-error so it can't turn every run red-by-design until T180
+    # lands — a permanently red pipeline trains everyone to ignore red, which
+    # undoes exactly what wiring real CI in was for. Its own steps still show
+    # true pass/fail; only the run-level rollup is spared.
     timeout-minutes: 20
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
