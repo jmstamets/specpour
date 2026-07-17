@@ -1,11 +1,15 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.3.0 → 1.4.0 (amendment from revised docs/constitution-statement.md:
-anti-gamification guardrail added to Principle XIII — engagement mechanics must never
-reward consumption volume or drinking frequency, and no prompts may encourage
-additional in-session drinking).
-Prior amendments: 1.2.0 → 1.3.0 (sensitive-PII data classification in Engineering
+Version change: 1.4.0 → 1.5.0 (amendment from revised docs/constitution-statement.md,
+T177 docs batch C1: Engineering Standards' "Code quality" bullet amended — literal
+"peer review required for all merges" replaced with a review gate that actually holds
+in this project's solo-developer operating mode (documented human review of
+AI-authored changes, or independent higher-tier AI review of human-authored changes,
+plus the full CI gate set; unreviewed direct merges remain prohibited in either mode).
+Recorded as ADR-0006.
+Prior amendments: 1.3.0 → 1.4.0 (anti-gamification guardrail added to Principle XIII);
+1.2.0 → 1.3.0 (sensitive-PII data classification in Engineering
 Standards); 1.1.0 → 1.2.0 (platform-administration governance in Principle XIV);
 1.0.0 → 1.1.0 (network-era principles ahead of the Phase 2 addendum)
 Modified principles:
@@ -291,8 +295,11 @@ stores only what its analytics features require.
 - **Accessibility**: WCAG 2.1 AA is the target for all client surfaces, including the
   hands-free/large-type operational modes the product requires.
 - **Code quality**: Enforced formatting and static analysis in CI for both C# and Dart;
-  peer review required for all merges; architecture decision records (ADRs) for
-  significant decisions.
+  all merges require review independent of the author: human peer review where a team
+  exists; in solo-developer operation, documented human review of AI-authored changes
+  (or independent, higher-tier AI review of human-authored changes) plus the full CI
+  gate set satisfies this — unreviewed direct merges are prohibited in either mode
+  (ADR-0006); architecture decision records (ADRs) for significant decisions.
 - **Documentation**: The OpenAPI contract, ADRs, and module boundary definitions are
   living, versioned documentation and part of the definition of done.
 
@@ -321,4 +328,4 @@ plan-template Constitution Check is a hard gate before design work proceeds.
   the default verification mechanism; license documents retained only until verification
   completes plus a short audit window; strictest-applicable-rule default for age gating.
 
-**Version**: 1.4.0 | **Ratified**: 2026-07-10 | **Last Amended**: 2026-07-10
+**Version**: 1.5.0 | **Ratified**: 2026-07-10 | **Last Amended**: 2026-07-17

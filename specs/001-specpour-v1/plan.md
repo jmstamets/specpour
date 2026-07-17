@@ -1,6 +1,6 @@
 # Implementation Plan: SpecPour V1
 
-**Branch**: `main` (repo initialized at T001; V1 implementation proceeds directly on trunk — the `001-specpour-v1` name lives on as the spec directory, not a git branch) | **Date**: 2026-07-10 | **Spec**: [spec.md](spec.md)
+**Branch**: `main` (repo initialized at T001 directly on trunk, before a remote existed; once real CI + branch protection landed (T168, 2026-07-16) all changes moved to feature branches + PR review — see ADR-0006 for the solo-dev review-gate this satisfies — trunk-direct was the bootstrap mode, not the standing workflow; the `001-specpour-v1` name lives on as the spec directory, not a git branch) | **Date**: 2026-07-10 | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `/specs/001-specpour-v1/spec.md`
 
@@ -27,7 +27,9 @@ contract-first `/api/v1` OpenAPI surface consumed by a single Flutter codebase
 
 **Storage**: PostgreSQL 17 + PostGIS (module-owned schemas, forward-only migrations); S3-compatible object storage for all binary media (MinIO locally); client-side SQLite via Drift for offline
 
-**Testing**: Reqnroll acceptance (Gherkin, real PostgreSQL via Testcontainers), xUnit unit/integration, OpenAPI contract tests, `flutter_test` + `integration_test` — all four suites are CI merge gates
+**Testing**: Reqnroll acceptance (Gherkin, real PostgreSQL via Testcontainers), xUnit unit/integration, OpenAPI contract tests, `flutter_test` widget/unit tests, and a headless-Chrome browser tier (`integration_test` driven via `flutter drive` against the real docker-composed stack — auth-critical journeys: register, sign-in, MFA, session persistence/revocation) — all of these are required CI merge gates (branch-protected on `main`). The Android-emulator variant of `integration_test` (`frontend-integration-tests`) is NOT currently a gate — known-flaky emulator-boot issue, tracked as T180, `continue-on-error` until resolved.
+
+**Human verification ("walkthrough artifact" convention)**: automated suites (above) verify correctness, not UX — this sandbox has no browser to click through the running app itself, so checkpoint-style human verification (Phase 3 MVP checkpoint, Phase 4 walkthrough) uses a standing pattern: rebuild + freshly deploy the real web build against the current docker-composed backend, checksum-verify the served build matches disk (see the build-freshness convention), then hand John a click-through checklist against that live deployment (`docs/*-walkthrough-checklist.md`). Findings get filed as tasks, not silently fixed; checklist items are updated in place (one canonical file per checkpoint, no `-revN` copies) as fixes land, and sign-off is explicit and gated on every open finding, never inferred from a partial confirmation. Reuse this convention for every future checkpoint rather than re-deriving the process each time.
 
 **Target Platform**: Android, iOS, and web as first-class citizens (single Flutter codebase); backend as OCI containers, locally via Docker Compose, cloud-agnostic (Azure expected later, only behind seams)
 

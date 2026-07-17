@@ -27,6 +27,7 @@ Global conventions:
 | POST `/auth/recovery` (+confirm) | Secure account recovery | anon |
 | GET/POST/DELETE `/me/mfa` | TOTP MFA enroll/disable | user |
 | GET `/me/sessions` / DELETE `/me/sessions/{id}` | Device/session management | user |
+| POST `/me/sessions/sign-out-everywhere` | Revoke all active sessions in one action (FR-001b) — task filed near T166, not yet implemented | user |
 | POST `/me/deactivate` / POST `/me/reactivate` | Lifecycle (grace period) | user |
 | GET `/me/export` | Full personal data export (SC-015) | user |
 | DELETE `/me` | Account deletion | user |

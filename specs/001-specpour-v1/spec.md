@@ -155,6 +155,22 @@ and technique conforming to professional craft-cocktail standards."
   substance in the canonical location (one-time salted-hash backup codes as the
   self-service path, an audited staff MFA-reset as the assisted path). FR-001a's
   provenance is intact; no further spec.md change needed.
+- Q: (/speckit-analyze U1, 2026-07-17) Sign-out-everywhere (a single action revoking
+  all of a user's active sessions/devices at once) had no FR — `docs/specification-
+  statement.md` §1 named it explicitly ("session and device management (including
+  per-session revocation and a single-action sign-out-everywhere)") but spec.md's FR
+  list hadn't caught up. → A: FR-001b added, matching the source statement's wording;
+  canonical-source chain intact (same resolution shape as FR-001a above). Contract
+  path and implementation task filed near T166 (the other high-severity session-
+  invalidation work) — not implemented as part of this reconciliation.
+- Q: (/speckit-analyze U2, 2026-07-17) The data-export deliverable's format
+  (downloadable JSON artifact vs. on-screen-only rendering) had no FR — `docs/
+  specification-statement.md` §1 stated it explicitly ("Data export produces a
+  downloadable, machine-readable artifact (JSON) containing the user's data; any
+  on-screen rendering is a courtesy view, not the deliverable") but spec.md's FR list
+  hadn't caught up. → A: FR-003a added, matching the source statement's wording
+  verbatim; canonical-source chain intact (FR-001a precedent). T178 already tracks
+  the implementation (download-a-file); this reconciliation only adds the FR itself.
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -743,6 +759,9 @@ action, target, timestamp, and before/after state.
   self-service recovery path (e.g., one-time backup codes issued at enrollment) not
   contingent on possessing the lost factor, escalating to a staff-assisted,
   audit-logged reset (FR-065) when self-service recovery is also unavailable.
+- **FR-001b**: Session/device management MUST include per-session revocation and a
+  single-action "sign out everywhere" that revokes all of a user's active
+  sessions/devices at once.
 - **FR-002**: System MUST capture and store date of birth at registration; V1 enforces
   no mandatory age gating on its informational surfaces (per-surface configuration per
   FR-002a), but the data must exist for future age-gated features without
@@ -776,6 +795,9 @@ action, target, timestamp, and before/after state.
   period (default 12 months) during which the user can reactivate; the user is warned
   before expiry, and on expiry the account is automatically deleted via the standard
   deletion flow.
+- **FR-003a**: Data export MUST produce a downloadable, machine-readable artifact (JSON)
+  containing the user's data; any on-screen rendering of the export is a courtesy view,
+  not the deliverable.
 - **FR-004**: Every feature MUST be declared against a configuration-driven
   capability/entitlement map; V1 ships a single default tier granting all end-user
   (home and professional) features, and new tiers MUST be introducible purely by
