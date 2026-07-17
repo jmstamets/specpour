@@ -91,6 +91,15 @@ void main() {
       // TODO
     });
 
+    // Which social providers are configured (T173)
+    //
+    // Anonymous. IdentityModule registers a provider's handler only when its ClientId is configured (T049) — a client renders a provider's sign-in button only if its key appears in this list, so a login screen never shows a button that would 400 \"unknown provider\" when tapped. Provider keys only, never secrets or full config.
+    //
+    //Future<ExternalProviders> listExternalProviders() async
+    test('test listExternalProviders', () async {
+      // TODO
+    });
+
     // List the caller's active sessions/devices (T051)
     //
     // A \"session\" is one OpenIddict authorization — created the first time a device completes the PKCE exchange, refreshed on every subsequent token refresh. Revoked sessions are omitted (not just flagged) since there is nothing further the caller can do with one.

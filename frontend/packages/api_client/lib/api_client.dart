@@ -41,6 +41,7 @@ export 'package:api_client/src/model/equipment_detail.dart';
 export 'package:api_client/src/model/equipment_page.dart';
 export 'package:api_client/src/model/equipment_ref.dart';
 export 'package:api_client/src/model/equipment_summary.dart';
+export 'package:api_client/src/model/external_providers.dart';
 export 'package:api_client/src/model/glossary_article_detail.dart';
 export 'package:api_client/src/model/glossary_article_page.dart';
 export 'package:api_client/src/model/glossary_article_summary.dart';

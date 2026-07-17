@@ -19,6 +19,7 @@ Method | HTTP request | Description
 [**exportMyAccount**](IdentityApi.md#exportmyaccount) | **GET** /me/export | Export the caller&#39;s account data (T053)
 [**externalSignInCallback**](IdentityApi.md#externalsignincallback) | **GET** /auth/external/{provider}/callback | Provider redirect target — not called directly by clients (T049)
 [**getMfaStatus**](IdentityApi.md#getmfastatus) | **GET** /me/mfa | Get the caller&#39;s TOTP MFA enrollment status (T050)
+[**listExternalProviders**](IdentityApi.md#listexternalproviders) | **GET** /auth/external/providers | Which social providers are configured (T173)
 [**listMySessions**](IdentityApi.md#listmysessions) | **GET** /me/sessions | List the caller&#39;s active sessions/devices (T051)
 [**login**](IdentityApi.md#login) | **POST** /auth/login | Email/password sign-in, establishing the cookie session (T047)
 [**loginMfa**](IdentityApi.md#loginmfa) | **POST** /auth/login/mfa | Complete a sign-in that requiresMfa (T050)
@@ -426,6 +427,45 @@ This endpoint does not need any parameter.
 
  - **Content-Type**: Not defined
  - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listExternalProviders**
+> ExternalProviders listExternalProviders()
+
+Which social providers are configured (T173)
+
+Anonymous. IdentityModule registers a provider's handler only when its ClientId is configured (T049) — a client renders a provider's sign-in button only if its key appears in this list, so a login screen never shows a button that would 400 \"unknown provider\" when tapped. Provider keys only, never secrets or full config.
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getIdentityApi();
+
+try {
+    final response = api.listExternalProviders();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling IdentityApi->listExternalProviders: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**ExternalProviders**](ExternalProviders.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

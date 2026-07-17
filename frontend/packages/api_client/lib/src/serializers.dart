@@ -35,6 +35,7 @@ import 'package:api_client/src/model/equipment_detail.dart';
 import 'package:api_client/src/model/equipment_page.dart';
 import 'package:api_client/src/model/equipment_ref.dart';
 import 'package:api_client/src/model/equipment_summary.dart';
+import 'package:api_client/src/model/external_providers.dart';
 import 'package:api_client/src/model/glossary_article_detail.dart';
 import 'package:api_client/src/model/glossary_article_page.dart';
 import 'package:api_client/src/model/glossary_article_summary.dart';
@@ -95,6 +96,7 @@ part 'serializers.g.dart';
   EquipmentPage,
   EquipmentRef,
   EquipmentSummary,
+  ExternalProviders,
   GlossaryArticleDetail,
   GlossaryArticlePage,
   GlossaryArticleSummary,

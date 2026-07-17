@@ -33,9 +33,27 @@ public static class ExternalAuthEndpoints
     public static void Map(IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapApiV1Group();
+        group.MapGet("/auth/external/providers", ListConfiguredProviders);
         group.MapGet("/auth/external/{provider}", ChallengeAsync);
         group.MapGet("/auth/external/{provider}/callback", CallbackAsync);
         group.MapPost("/auth/external/complete-registration", CompleteRegistrationAsync);
+    }
+
+    /// <summary>
+    /// T173: which social providers are actually configured (IdentityModule only
+    /// registers a provider's <see cref="IExternalIdentityProviderPort"/> when its
+    /// ClientId is set) — names only, never secrets. Anonymous, sibling route to the
+    /// existing /auth/external/{provider} family (not the Authorization module's
+    /// /me/entitlements, which is about capability/tier, a different concern from
+    /// "which auth methods exist" — this needed its own small surface). The client
+    /// renders a provider's button only if its key appears here, so a login screen
+    /// never shows a button that would 400 "unknown provider" when tapped.
+    /// </summary>
+    private static Ok<ExternalProvidersResponse> ListConfiguredProviders(
+        IEnumerable<IExternalIdentityProviderPort> providers)
+    {
+        return TypedResults.Ok(new ExternalProvidersResponse(
+            [.. providers.Select(p => p.ProviderKey)]));
     }
 
     private static Results<ChallengeHttpResult, ProblemHttpResult> ChallengeAsync(
@@ -191,6 +209,9 @@ public static class ExternalAuthEndpoints
     private static string AppendQuery(string uri, string key, string value) =>
         QueryHelpers.AddQueryString(uri, key, value);
 }
+
+/// <summary>T173: provider keys only ("google", "microsoft", "apple") — never secrets, never full config.</summary>
+public sealed record ExternalProvidersResponse(IReadOnlyList<string> Providers);
 
 public sealed record CompleteExternalRegistrationRequest(
     DateOnly DateOfBirth,

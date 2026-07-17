@@ -67,6 +67,8 @@ paths:
     $ref: './paths/identity.yaml#/meMfa'
   /me/mfa/backup-codes:
     $ref: './paths/identity.yaml#/meMfaBackupCodes'
+  /auth/external/providers:
+    $ref: './paths/identity.yaml#/externalProviders'
   /auth/external/{provider}:
     $ref: './paths/identity.yaml#/externalChallenge'
   /auth/external/{provider}/callback:

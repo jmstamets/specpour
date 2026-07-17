@@ -27,6 +27,7 @@ doc/EquipmentDetail.md
 doc/EquipmentPage.md
 doc/EquipmentRef.md
 doc/EquipmentSummary.md
+doc/ExternalProviders.md
 doc/GlossaryApi.md
 doc/GlossaryArticleDetail.md
 doc/GlossaryArticlePage.md
@@ -107,6 +108,7 @@ lib/src/model/equipment_detail.dart
 lib/src/model/equipment_page.dart
 lib/src/model/equipment_ref.dart
 lib/src/model/equipment_summary.dart
+lib/src/model/external_providers.dart
 lib/src/model/glossary_article_detail.dart
 lib/src/model/glossary_article_page.dart
 lib/src/model/glossary_article_summary.dart
@@ -169,6 +171,7 @@ test/equipment_detail_test.dart
 test/equipment_page_test.dart
 test/equipment_ref_test.dart
 test/equipment_summary_test.dart
+test/external_providers_test.dart
 test/glossary_api_test.dart
 test/glossary_article_detail_test.dart
 test/glossary_article_page_test.dart
