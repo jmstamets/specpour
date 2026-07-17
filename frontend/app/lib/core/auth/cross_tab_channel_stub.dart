@@ -20,5 +20,15 @@ void startTokenBroadcastListener(
   void Function(String accessToken, String refreshToken) onTokens,
 ) {}
 
-/// Native never adopts another tab's refresh, so there is nothing to wait for.
-Future<bool> waitForNextTokenBroadcast(Duration timeout) async => false;
+/// Nothing to hand off — native is single-context.
+void writeHandoff(
+  String fromRefreshToken,
+  String accessToken,
+  String newRefreshToken,
+) {}
+
+/// Native never adopts a peer's refresh (there is no peer), so there is never a
+/// handoff to read — always refresh directly.
+({String accessToken, String refreshToken})? readHandoffFor(
+  String fromRefreshToken,
+) => null;

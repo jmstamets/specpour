@@ -79,6 +79,12 @@ public sealed class IdentityModule : IModule
         services.AddScoped<Contracts.IAgePredicatePort, AgePredicateAdapter>();
         services.AddScoped<AccountDeletionService>();
 
+        // ADR-0005 (T177 #100) test-only refresh-attempt telemetry. Registered
+        // unconditionally (a tiny empty singleton), but only INCREMENTED and only
+        // READABLE in Development (see TokenEndpoints + the /dev/refresh-attempts
+        // endpoint's env gates) — never an observable production surface.
+        services.AddSingleton<RefreshAttemptCounter>();
+
         // FR-003: "operator-configurable grace period" — config-bound (falls back to
         // LifecycleOptions' in-class defaults, same style as SmtpEmailOptions).
         services.Configure<LifecycleOptions>(configuration.GetSection("Identity:Lifecycle"));

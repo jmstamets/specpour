@@ -1,13 +1,17 @@
 using Microsoft.AspNetCore; // OpenIddictServerAspNetCoreHelpers: HttpContext.GetOpenIddictServerRequest()
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using OpenIddict.Validation.AspNetCore;
 using SpecPour.BuildingBlocks.Identifiers;
 using SpecPour.BuildingBlocks.Time;
 using SpecPour.Modules.Identity.Domain;
@@ -56,6 +60,27 @@ public static class TokenEndpoints
                 "<p>Signing you in… you can close this window if it doesn't return automatically.</p>",
                 "text/html");
         });
+
+        // ADR-0005 (T177 #100) test-only observability, DEVELOPMENT ONLY. Returns
+        // the current user's refresh-token grant ATTEMPT count so the cross-tab
+        // election mechanism test can assert exactly one refresh crossed the wire.
+        // Never mapped outside Development — no production surface leaks grant
+        // telemetry (John's rider).
+        if (endpoints.ServiceProvider.GetService<IHostEnvironment>()?.IsDevelopment() == true)
+        {
+            endpoints.MapGet("/dev/refresh-attempts", (HttpContext http, RefreshAttemptCounter counter) =>
+            {
+                var subject = http.User.GetClaim(Claims.Subject);
+                if (subject is null || !Guid.TryParse(subject, out var userId))
+                {
+                    return Results.Unauthorized();
+                }
+                return Results.Ok(new { attempts = counter.Get(userId) });
+            }).RequireAuthorization(new AuthorizeAttribute
+            {
+                AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme,
+            });
+        }
     }
 
     private static async Task<IResult> HandleAuthorizeAsync(HttpContext httpContext, UserManager<ApplicationUser> userManager)
@@ -118,6 +143,18 @@ public static class TokenEndpoints
         if (user is null)
         {
             return Results.Forbid(authenticationSchemes: [OpenIddictServerAspNetCoreDefaults.AuthenticationScheme]);
+        }
+
+        // ADR-0005 (T177 #100): count every refresh_token grant that REACHES this
+        // handler (an ATTEMPT — before the cap/session logic that could still
+        // reject it), Development-only, so the cross-tab-election mechanism test
+        // can assert exactly one refresh crosses the wire under a two-tab race.
+        // Skipped in production (env gate) so there is no telemetry/leak footprint.
+        if (request.IsRefreshTokenGrantType()
+            && httpContext.RequestServices.GetService<IHostEnvironment>() is { } environment
+            && environment.IsDevelopment())
+        {
+            httpContext.RequestServices.GetService<RefreshAttemptCounter>()?.Increment(user.Id);
         }
 
         // T051: SessionDevice tracking. The authorization code/refresh token's

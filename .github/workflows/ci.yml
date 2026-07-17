@@ -164,6 +164,8 @@ jobs:
           exit 1
       - name: Run the browser-context auth smoke set
         run: scripts/run-web-integration-tests.sh
+      - name: Run the cross-tab election mechanism test (T177 #100)
+        run: scripts/run-web-integration-tests.sh integration_test/web_multitab_test.dart
       - name: Docker logs (always, for diagnosis)
         if: always()
         run: docker compose logs

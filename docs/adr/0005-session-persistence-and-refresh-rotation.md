@@ -252,14 +252,36 @@ app-start restore). The web/native split is a conditional import
 
 - **Web**: `navigator.locks.request('specpour.refresh', …)` is the election —
   exactly one tab holds the exclusive lock and does the refresh; queued tabs, on
-  acquiring the lock, see the rotated token already in storage and **adopt** it
-  rather than redeeming the now-stale one. The winner's fresh `{access, refresh}`
-  pair is distributed to the other tabs over a `BroadcastChannel('specpour.auth')`
-  (the access token is never persisted, so it must travel in the message); a
-  persistent listener (`crossTabAuthSyncProvider`, watched once at app start)
-  applies it to the other tabs' in-memory providers. The queued adopter waits on
-  that broadcast (bounded), with a documented fallback to a single refresh with
-  the fresh stored token only in the pathological "broadcast never arrives" case.
+  acquiring the lock, **adopt** the holder's result rather than redeeming the
+  now-stale token. The holder passes its fresh `{access, refresh}` pair to a
+  queued tab through a **synchronous `window.localStorage` handoff** keyed by the
+  refresh token it replaced (`from`): the holder writes it directly to
+  localStorage (not `shared_preferences`) synchronously *before releasing the
+  lock*, so the next tab to acquire the lock reads it back synchronously and
+  live. The `from` key makes it stale-safe — a leftover handoff from an
+  unrelated cycle has a different `from` and is ignored. A `BroadcastChannel(
+  'specpour.auth')` + persistent listener (`crossTabAuthSyncProvider`) is kept
+  as a *best-effort optimisation only* — it proactively freshens PASSIVE tabs'
+  in-memory state so their next request needn't 401-then-refresh — but
+  correctness no longer depends on it (a passive tab that misses a broadcast
+  still adopts correctly via the handoff on its next refresh).
+
+  **Why the handoff and not the broadcast for the load-bearing adopt (a bug the
+  mechanism test caught, 2026-07-17).** The first design distributed the pair
+  over the BroadcastChannel and had the adopter read the rotated token back from
+  `shared_preferences`. The two-context mechanism test proved that broken: (1)
+  the persistence write is async/fire-and-forget, and (2) `shared_preferences`
+  caches per-instance, so a DIFFERENT tab's read never saw the winner's rotation
+  — both tabs refreshed, defeating the election (2 wire attempts). Broadcast
+  delivery is also async, so an adopter can't deterministically know it has
+  landed. `window.localStorage` is synchronous and cross-context-live, and the
+  lock guarantees the holder wrote before the adopter reads — so the adopt is
+  deterministic. **This means the fresh access token IS briefly persisted in the
+  localStorage handoff** (superseding this ADR's earlier "the access token is
+  never persisted" phrasing): accepted within the same threat model as the
+  refresh token (an attacker with localStorage read already holds the more
+  powerful refresh token; the handoff is short-lived and same-origin), and it is
+  the price of a deterministic, non-flaky cross-tab handoff.
 - **Native**: the channel primitives are no-ops — a native app is single-context,
   so the lock is always uncontended and `coordinatedRefresh` degenerates cleanly
   to a plain `silentlyRefreshTokens`. Zero behavioural change off-web.

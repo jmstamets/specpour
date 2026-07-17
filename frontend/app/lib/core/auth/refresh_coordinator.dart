@@ -11,19 +11,11 @@
 // refresh because the channel primitives are no-ops (single context, nothing to
 // race).
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/api_client_provider.dart';
 import 'cross_tab_channel_stub.dart'
     if (dart.library.js_interop) 'cross_tab_channel_web.dart';
-import 'token_store.dart';
-
-/// How long an adopting tab waits for the winner's broadcast to land before
-/// falling back to its own refresh. Generous relative to a same-origin
-/// BroadcastChannel hop (sub-millisecond) — this only ever elapses in the
-/// pathological "broadcast never arrives" case the fallback exists for.
-const _adoptBroadcastTimeout = Duration(seconds: 2);
 
 /// Performs a refresh under the cross-tab election. Returns true if the session
 /// is now fresh (whether this tab did the refresh or adopted another tab's),
@@ -34,63 +26,37 @@ Future<bool> coordinatedRefresh(
   required String startingRefreshToken,
 }) {
   return withRefreshLock(() async {
-    final tokenStore = ref.read(tokenStoreProvider);
-    // Re-read storage UNDER THE LOCK: another tab may have rotated the token
-    // while we were queued, so the token we arrived with may already be
-    // redeemed. Storage holds the freshest known refresh token.
-    final stored = await tokenStore.readRefreshToken();
-
-    if (kIsWeb && stored != null && stored != startingRefreshToken) {
-      // Another tab already refreshed (storage holds a token we didn't start
-      // with). Refreshing again would be the SECOND wire request the whole
-      // election exists to prevent — adopt the winner's result instead.
-      return _adopt(ref, freshRefreshToken: stored);
+    // Did a peer already refresh THIS token while we were queued? The handoff is
+    // written to window.localStorage synchronously before a holder releases the
+    // lock, so — having just acquired the lock — we read it back synchronously
+    // and live (unlike shared_preferences, whose async/per-instance cache never
+    // let a different tab see the winner's rotation; T177 #100). Keyed by 'from'
+    // == our starting token, so a stale handoff from an unrelated cycle is
+    // ignored.
+    final adopted = readHandoffFor(startingRefreshToken);
+    if (adopted != null) {
+      ref.read(authTokenProvider.notifier).set(adopted.accessToken);
+      ref.read(refreshTokenProvider.notifier).set(adopted.refreshToken);
+      return true;
     }
 
-    // We are the elected refresher (or native single-context). Use the freshest
-    // token available; on success, hand the fresh pair to the other tabs (the
-    // access token is never persisted, so it must travel in the broadcast).
+    // We are the elected refresher (or native single-context).
     final refreshed = await silentlyRefreshTokens(
       ref,
-      refreshToken: stored ?? startingRefreshToken,
+      refreshToken: startingRefreshToken,
     );
     if (refreshed) {
-      broadcastTokens(
-        ref.read(authTokenProvider)!,
-        ref.read(refreshTokenProvider)!,
-      );
+      final access = ref.read(authTokenProvider)!;
+      final refresh = ref.read(refreshTokenProvider)!;
+      // Record the result for any tab queued behind us to adopt (synchronous,
+      // before we release the lock)...
+      writeHandoff(startingRefreshToken, access, refresh);
+      // ...and proactively wake passive tabs (best-effort optimisation).
+      broadcastTokens(access, refresh);
     }
     return refreshed;
   });
 }
-
-/// Adopt a peer tab's just-completed refresh instead of doing our own. The
-/// winner broadcasts the fresh {access, refresh} pair; the persistent listener
-/// ([crossTabAuthSyncProvider]) applies it to our providers. If it has already
-/// landed we're done; otherwise wait briefly for it.
-Future<bool> _adopt(Ref ref, {required String freshRefreshToken}) async {
-  if (_broadcastApplied(ref, freshRefreshToken)) {
-    return true;
-  }
-  final arrived = await waitForNextTokenBroadcast(_adoptBroadcastTimeout);
-  if (arrived && _broadcastApplied(ref, freshRefreshToken)) {
-    return true;
-  }
-  // Fallback (rare, documented): the broadcast never arrived (channel closed,
-  // pathological timing). The token now in storage is FRESH and unredeemed, so
-  // refreshing with it is safe — no reuse, no revocation — it just costs one
-  // extra wire request in this edge case only, which beats leaving a live
-  // session stuck without an access token.
-  return silentlyRefreshTokens(ref, refreshToken: freshRefreshToken);
-}
-
-/// The winner's broadcast is applied once the persistent listener has set our
-/// refresh token to the fresh value (before that, this tab still holds its old,
-/// pre-refresh token — so a match is a reliable "the broadcast landed" signal)
-/// AND we hold an access token to retry with.
-bool _broadcastApplied(Ref ref, String freshRefreshToken) =>
-    ref.read(refreshTokenProvider) == freshRefreshToken &&
-    ref.read(authTokenProvider) != null;
 
 /// Keeps THIS tab's in-memory auth state in sync with whichever tab last
 /// refreshed — watched once at app start (see app.dart). On native

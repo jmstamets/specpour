@@ -9,15 +9,27 @@
 // election so that, whatever the timing, exactly one tab ever redeems a given
 // refresh token.
 //
-// Two web primitives, both same-origin-shared across every tab of the app:
+// Three web primitives, all same-origin-shared across every tab of the app:
 //   - Web Locks (navigator.locks): the election. Exactly one tab holds the
 //     named exclusive lock at a time; the rest queue. The holder does the
-//     refresh; a queued tab, on finally acquiring the lock, sees the rotated
-//     token already in storage and ADOPTS rather than refreshing again.
-//   - BroadcastChannel: distributes the fresh {access, refresh} pair to the
-//     other tabs (the access token is never persisted, so it must travel in the
-//     message), waking passive tabs and handing the just-rotated pair to the
-//     active loser waiting to retry its request.
+//     refresh; a queued tab, on finally acquiring the lock, adopts the holder's
+//     result rather than refreshing again.
+//   - A synchronous localStorage HANDOFF: how a queued tab learns the holder's
+//     rotated {access, refresh} pair. This is written directly to
+//     window.localStorage (NOT via shared_preferences), synchronously, before
+//     the holder releases the lock — so a queued tab, acquiring the lock next,
+//     reads it back synchronously and live. This was the fix for a real bug the
+//     mechanism test caught (T177 #100, 2026-07-17): shared_preferences writes
+//     are async/fire-and-forget AND cached per-instance, so a DIFFERENT tab's
+//     read never saw the winner's rotation → both tabs refreshed → reuse
+//     detection risk. localStorage is synchronous and cross-context-live, which
+//     makes the adopt deterministic. The handoff is keyed by the token being
+//     REPLACED ('from') so a stale handoff from an unrelated cycle is ignored.
+//   - BroadcastChannel: a best-effort OPTIMISATION that proactively refreshes
+//     PASSIVE tabs' in-memory state (so their next request doesn't even need a
+//     401→refresh). Correctness no longer depends on it — a passive tab that
+//     misses a broadcast still adopts correctly via the handoff on its next
+//     refresh.
 
 import 'dart:async';
 import 'dart:convert';
@@ -28,13 +40,10 @@ import 'package:web/web.dart' as web;
 /// A well-known, app-specific name so only SpecPour's own tabs contend on it.
 const _lockName = 'specpour.refresh';
 const _channelName = 'specpour.auth';
+const _handoffKey = 'specpour.auth-handoff';
 
 web.BroadcastChannel? _channel;
 void Function(String accessToken, String refreshToken)? _onTokens;
-
-/// One-shot waiters for "the next token broadcast arrived" — completed by the
-/// channel's message handler. Used by the adopt path (see refresh_coordinator).
-final List<Completer<void>> _broadcastWaiters = <Completer<void>>[];
 
 web.BroadcastChannel _channelInstance() {
   final existing = _channel;
@@ -61,13 +70,6 @@ web.BroadcastChannel _channelInstance() {
       return;
     }
     _onTokens?.call(access, refresh);
-    // Release any adopt-path waiters — the fresh pair is now in hand.
-    for (final waiter in _broadcastWaiters) {
-      if (!waiter.isCompleted) {
-        waiter.complete();
-      }
-    }
-    _broadcastWaiters.clear();
   }).toJS;
   _channel = channel;
   return channel;
@@ -127,19 +129,50 @@ void startTokenBroadcastListener(
   _channelInstance();
 }
 
-/// Completes true when the next token broadcast arrives within [timeout], false
-/// on timeout. The adopt path uses this to wait for the winner's fresh pair
-/// before giving up and falling back to its own refresh.
-Future<bool> waitForNextTokenBroadcast(Duration timeout) {
-  final completer = Completer<void>();
-  _broadcastWaiters.add(completer);
-  return completer.future
-      .then((_) => true)
-      .timeout(
-        timeout,
-        onTimeout: () {
-          _broadcastWaiters.remove(completer);
-          return false;
-        },
-      );
+/// Synchronously records the just-rotated pair for a queued tab to adopt,
+/// keyed by the refresh token it REPLACED. Written to window.localStorage
+/// directly (not shared_preferences) so it is synchronous and cross-context
+/// live, and called before the lock is released so the next tab to acquire the
+/// lock reads it back deterministically.
+void writeHandoff(
+  String fromRefreshToken,
+  String accessToken,
+  String newRefreshToken,
+) {
+  web.window.localStorage.setItem(
+    _handoffKey,
+    jsonEncode({
+      'from': fromRefreshToken,
+      'access': accessToken,
+      'refresh': newRefreshToken,
+    }),
+  );
+}
+
+/// Returns the pair a peer produced by refreshing [fromRefreshToken], or null if
+/// no such handoff exists. The 'from' match is what makes this stale-safe: a
+/// leftover handoff from an unrelated refresh cycle has a different 'from' and
+/// is ignored, so only a peer that refreshed exactly the token we were about to
+/// use is adopted.
+({String accessToken, String refreshToken})? readHandoffFor(
+  String fromRefreshToken,
+) {
+  final raw = web.window.localStorage.getItem(_handoffKey);
+  if (raw == null) {
+    return null;
+  }
+  try {
+    final decoded = jsonDecode(raw) as Map<String, dynamic>;
+    if (decoded['from'] != fromRefreshToken) {
+      return null;
+    }
+    final access = decoded['access'];
+    final refresh = decoded['refresh'];
+    if (access is String && refresh is String) {
+      return (accessToken: access, refreshToken: refresh);
+    }
+  } on Object {
+    return null;
+  }
+  return null;
 }
