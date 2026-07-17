@@ -195,8 +195,16 @@ void main() {
         isNull,
         reason: 'a revoked session must land signed out, not silently resumed',
       );
+      // discoverSearchField (not discoverBrowseList) deliberately: the browse
+      // list only renders once the catalog fetch succeeds AND returns
+      // non-empty data (DiscoverScreen's _BrowseList.when — error/empty both
+      // render text instead), so it depends on seeded catalog fixtures this
+      // CI job doesn't provide. The search field is part of the screen's
+      // fixed chrome, built unconditionally regardless of catalog state —
+      // the right, environment-independent proof we landed on the normal
+      // discover shell rather than a stuck/blank/error screen.
       expect(
-        find.byKey(const Key('discoverBrowseList')),
+        find.byKey(const Key('discoverSearchField')),
         findsOneWidget,
         reason:
             'must land on the normal home shell (guest state), never a '
