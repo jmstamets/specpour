@@ -299,6 +299,24 @@ public sealed class OpenApiConformanceTests(ComposedHostFixture host)
     }
 
     [Fact]
+    public async Task GetAuthExternalProviders_conforms_to_its_schema_and_is_empty_when_none_are_configured()
+    {
+        // T173: same "no ExternalProviders:* credentials exist in any test
+        // environment" fact the neighboring test's own comment documents —
+        // this genuinely exercises the zero-providers-configured shape, not
+        // a mocked one.
+        var response = await host.Client.GetAsync(new Uri("/api/v1/auth/external/providers", UriKind.Relative));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("{\"providers\":[]}", body);
+
+        var result = await OpenApiResponseValidator.ValidateAsync("GET", "/api/v1/auth/external/providers", (int)response.StatusCode, body);
+
+        Assert.True(result.IsValid, DescribeErrors(result, body));
+    }
+
+    [Fact]
     public async Task GetAuthExternal_for_an_unconfigured_provider_conforms_to_its_400_schema()
     {
         // T049: no ExternalProviders:* credentials exist in any test environment (real

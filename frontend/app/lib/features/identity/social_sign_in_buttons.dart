@@ -3,6 +3,13 @@
 // backend's OAuth challenge endpoint — this is a real cross-origin redirect
 // handshake, not something Dio can drive; url_launcher's webOnlyWindowName:
 // '_self' does that navigation on web.
+//
+// T173: a provider's button only renders if it's actually configured
+// (IdentityModule only registers a provider's handler when its ClientId is
+// set) — GET /auth/external/providers is the source of truth, fetched once
+// per screen mount. Zero configured providers omits the whole section,
+// including the "or" divider, rather than showing a dead-end row of buttons
+// that would all 400 "unknown provider."
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -11,6 +18,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+
+final configuredExternalProvidersProvider =
+    FutureProvider.autoDispose<Set<String>>(
+      (ref) =>
+          ref.read(identityAuthServiceProvider).configuredExternalProviders(),
+    );
 
 class SocialSignInButtons extends ConsumerWidget {
   const SocialSignInButtons({super.key});
@@ -47,40 +60,63 @@ class SocialSignInButtons extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final providersAsync = ref.watch(configuredExternalProvidersProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            const Expanded(child: Divider()),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(l10n.socialSignInDivider),
+    return providersAsync.when(
+      // A transient loading/error state renders nothing rather than a flash
+      // of dead buttons — the section fades in once the real configured set
+      // is known, same "never show what might 400" rule as the empty-set
+      // case below.
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (providers) {
+        final buttons = <Widget>[
+          if (providers.contains('google'))
+            OutlinedButton(
+              key: const Key('socialSignInGoogleButton'),
+              onPressed: () => _launch(context, ref, 'google'),
+              child: Text(l10n.socialSignInGoogleButton),
             ),
-            const Expanded(child: Divider()),
+          if (providers.contains('apple'))
+            OutlinedButton(
+              key: const Key('socialSignInAppleButton'),
+              onPressed: () => _launch(context, ref, 'apple'),
+              child: Text(l10n.socialSignInAppleButton),
+            ),
+          if (providers.contains('microsoft'))
+            OutlinedButton(
+              key: const Key('socialSignInMicrosoftButton'),
+              onPressed: () => _launch(context, ref, 'microsoft'),
+              child: Text(l10n.socialSignInMicrosoftButton),
+            ),
+        ];
+
+        if (buttons.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Expanded(child: Divider()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(l10n.socialSignInDivider),
+                ),
+                const Expanded(child: Divider()),
+              ],
+            ),
+            const SizedBox(height: 12),
+            for (final (index, button) in buttons.indexed) ...[
+              if (index > 0) const SizedBox(height: 8),
+              button,
+            ],
           ],
-        ),
-        const SizedBox(height: 12),
-        OutlinedButton(
-          key: const Key('socialSignInGoogleButton'),
-          onPressed: () => _launch(context, ref, 'google'),
-          child: Text(l10n.socialSignInGoogleButton),
-        ),
-        const SizedBox(height: 8),
-        OutlinedButton(
-          key: const Key('socialSignInAppleButton'),
-          onPressed: () => _launch(context, ref, 'apple'),
-          child: Text(l10n.socialSignInAppleButton),
-        ),
-        const SizedBox(height: 8),
-        OutlinedButton(
-          key: const Key('socialSignInMicrosoftButton'),
-          onPressed: () => _launch(context, ref, 'microsoft'),
-          child: Text(l10n.socialSignInMicrosoftButton),
-        ),
-      ],
+        );
+      },
     );
   }
 }

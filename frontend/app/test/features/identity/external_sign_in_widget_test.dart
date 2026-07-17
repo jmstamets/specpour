@@ -20,16 +20,80 @@ import '../../support/no_raw_l10n_keys.dart';
 /// own doc comment and the Phase 4 progress memory for why that, and the real
 /// provider handshake, can't be tested without real provider credentials.
 void main() {
-  testWidgets('social sign-in buttons render on the sign-in screen', (
+  // T173: a provider's button renders only if GET /auth/external/providers
+  // names it — this drives that call with a fake Dio interceptor instead of
+  // the bare ProviderScope the two tests below used before T173 (which hit a
+  // real, doomed-to-fail network call in a plain widget test and made both
+  // tests fail once the buttons stopped rendering unconditionally).
+  Widget buildProvidersTestApp({
+    required List<String> configuredProviders,
+    required Widget home,
+  }) {
+    final identityDio = Dio(BaseOptions(baseUrl: 'http://test.invalid/api/v1'))
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.path == '/auth/external/providers') {
+              return handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {'providers': configuredProviders},
+                ),
+              );
+            }
+            return handler.reject(
+              DioException(
+                requestOptions: options,
+                response: Response(requestOptions: options, statusCode: 404),
+              ),
+            );
+          },
+        ),
+      );
+
+    return ProviderScope(
+      overrides: [
+        identityApiProvider.overrideWithValue(
+          IdentityApi(identityDio, standardSerializers),
+        ),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: home,
+      ),
+    );
+  }
+
+  testWidgets(
+    'T173: renders all three buttons when three providers are configured',
+    (tester) async {
+      await tester.pumpWidget(
+        buildProvidersTestApp(
+          configuredProviders: const ['google', 'apple', 'microsoft'],
+          home: const SignInScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('socialSignInGoogleButton')), findsOneWidget);
+      expect(find.byKey(const Key('socialSignInAppleButton')), findsOneWidget);
+      expect(
+        find.byKey(const Key('socialSignInMicrosoftButton')),
+        findsOneWidget,
+      );
+      expectNoRawLocalizationKeys(tester);
+    },
+  );
+
+  testWidgets('T173: renders all three buttons on the register screen too', (
     tester,
   ) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: SignInScreen(),
-        ),
+      buildProvidersTestApp(
+        configuredProviders: const ['google', 'apple', 'microsoft'],
+        home: const RegisterScreen(),
       ),
     );
     await tester.pumpAndSettle();
@@ -43,21 +107,45 @@ void main() {
     expectNoRawLocalizationKeys(tester);
   });
 
-  testWidgets('social sign-in buttons render on the register screen', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: RegisterScreen(),
+  testWidgets(
+    'T173: renders exactly one button when only one provider is configured',
+    (tester) async {
+      await tester.pumpWidget(
+        buildProvidersTestApp(
+          configuredProviders: const ['google'],
+          home: const SignInScreen(),
         ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('socialSignInGoogleButton')), findsOneWidget);
+      expect(find.byKey(const Key('socialSignInAppleButton')), findsNothing);
+      expect(
+        find.byKey(const Key('socialSignInMicrosoftButton')),
+        findsNothing,
+      );
+      // The divider is part of the section a zero-button state omits
+      // entirely — with exactly one button, the section (and its divider)
+      // must still be present.
+      expect(find.byType(Divider), findsWidgets);
+      expectNoRawLocalizationKeys(tester);
+    },
+  );
+
+  testWidgets('T173: renders nothing at all, including the divider, when zero '
+      'providers are configured', (tester) async {
+    await tester.pumpWidget(
+      buildProvidersTestApp(
+        configuredProviders: const [],
+        home: const SignInScreen(),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('socialSignInGoogleButton')), findsOneWidget);
+    expect(find.byKey(const Key('socialSignInGoogleButton')), findsNothing);
+    expect(find.byKey(const Key('socialSignInAppleButton')), findsNothing);
+    expect(find.byKey(const Key('socialSignInMicrosoftButton')), findsNothing);
+    expect(find.byType(Divider), findsNothing);
     expectNoRawLocalizationKeys(tester);
   });
 

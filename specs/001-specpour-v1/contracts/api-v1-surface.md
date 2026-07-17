@@ -23,6 +23,7 @@ Global conventions:
 |---|---|---|
 | POST `/auth/register` | Email/password registration (captures DOB) | anon |
 | POST `/auth/token` / `/auth/refresh` | Token issuance (OIDC code + refresh) | anon |
+| GET `/auth/external/providers` | Which social providers are configured — names only, no secrets (T173) | anon |
 | GET `/auth/external/{provider}` (+callback) | Social sign-in | anon |
 | POST `/auth/recovery` (+confirm) | Secure account recovery | anon |
 | GET/POST/DELETE `/me/mfa` | TOTP MFA enroll/disable | user |

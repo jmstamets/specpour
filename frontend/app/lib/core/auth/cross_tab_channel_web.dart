@@ -37,10 +37,20 @@ import 'dart:js_interop';
 
 import 'package:web/web.dart' as web;
 
+import 'token_store.dart' show refreshTokenKey;
+
 /// A well-known, app-specific name so only SpecPour's own tabs contend on it.
 const _lockName = 'specpour.refresh';
 const _channelName = 'specpour.auth';
 const _handoffKey = 'specpour.auth-handoff';
+
+/// The key `package:shared_preferences`' web backend actually writes
+/// [refreshTokenKey] under in `window.localStorage` — confirmed empirically
+/// (2026-07-17, temporary diagnostic dump of every localStorage key after a
+/// real sign-in, not assumed): `shared_preferences_web` prefixes every key
+/// with `flutter.` and JSON-encodes the value (so a String value is stored
+/// as a quoted JSON string, not the raw bytes) — see [liveReadPersistedRefreshToken].
+const _sharedPreferencesWebPrefix = 'flutter.';
 
 /// Orphan-cleanup rider (2026-07-17): if a handoff is older than this, no real
 /// contention burst could still be relying on it — a same-origin localStorage
@@ -236,4 +246,40 @@ void sweepOrphanedHandoff() {
     // Unparseable entry is itself orphaned/corrupt — fall through and clear it.
   }
   web.window.localStorage.removeItem(_handoffKey);
+}
+
+/// Frozen-tab hardening (2026-07-17, John's merge review of the T177 #100
+/// PR). A tab suspended by the browser in the background (Chrome's own
+/// resource-saving throttling, not something this app controls) misses the
+/// BroadcastChannel wake other tabs got when one of them rotated the
+/// session's refresh token; if the contention burst that rotation was part
+/// of has since fully drained, the handoff is already cleared too (by
+/// design — [maybeClearHandoffAfterDrain]). On resume, that tab's next 401
+/// would otherwise elect itself and present its STALE in-memory refresh
+/// token — already redeemed by another tab, long outside the 30s reuse
+/// leeway — tripping reuse detection and revoking the WHOLE session: the
+/// exact benign-race logout the election exists to prevent, just delayed by
+/// a suspend/resume instead of triggered by true simultaneity.
+///
+/// Reads the ACTUALLY-persisted refresh token directly from
+/// `window.localStorage`, synchronously — NEVER through
+/// `package:shared_preferences` (see `token_store.dart`'s `WebLocalTokenStore`
+/// maintainer note: its per-instance cache is the exact bug T177 #100 already
+/// found once, and reintroducing it here would silently defeat this fix).
+/// Returns null if nothing is persisted, or if the persisted value can't be
+/// decoded — callers must treat null as "no better information available"
+/// and fall back to their own in-memory token, never as an error.
+String? liveReadPersistedRefreshToken() {
+  final raw = web.window.localStorage.getItem(
+    '$_sharedPreferencesWebPrefix$refreshTokenKey',
+  );
+  if (raw == null) {
+    return null;
+  }
+  try {
+    final decoded = jsonDecode(raw);
+    return decoded is String ? decoded : null;
+  } on Object {
+    return null;
+  }
 }

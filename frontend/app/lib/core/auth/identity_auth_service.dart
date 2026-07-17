@@ -202,6 +202,14 @@ class IdentityAuthService {
     return uri.toString();
   }
 
+  /// T173: which social providers are actually configured — a login screen
+  /// renders a provider's button only if its key appears here, so it never
+  /// shows a button that would 400 "unknown provider" when tapped.
+  Future<Set<String>> configuredExternalProviders() async {
+    final response = await _identityApi.listExternalProviders();
+    return response.data!.providers.map((p) => p.name).toSet();
+  }
+
   /// The social callback route calls this once it sees requiresMfa=false and
   /// no needsDateOfBirth flag: the backend already established the real
   /// cookie session, so only the PKCE exchange itself remains.

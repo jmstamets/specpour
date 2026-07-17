@@ -38,3 +38,10 @@ Future<void> maybeClearHandoffAfterDrain() async {}
 
 /// Nothing to sweep on native.
 void sweepOrphanedHandoff() {}
+
+/// No change on native (T177 frozen-tab hardening is a web-only concern —
+/// native has no BroadcastChannel to miss, no second context to be stale
+/// relative to): always null, so refresh_coordinator.dart's fallback
+/// unconditionally keeps using its own in-memory token, same as before this
+/// fix existed.
+String? liveReadPersistedRefreshToken() => null;

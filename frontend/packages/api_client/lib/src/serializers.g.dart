@@ -32,6 +32,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(EquipmentPage.serializer)
       ..add(EquipmentRef.serializer)
       ..add(EquipmentSummary.serializer)
+      ..add(ExternalProviders.serializer)
+      ..add(ExternalProvidersProvidersEnum.serializer)
       ..add(GlossaryArticleDetail.serializer)
       ..add(GlossaryArticlePage.serializer)
       ..add(GlossaryArticleSummary.serializer)
@@ -92,6 +94,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(EquipmentSummary)]),
           () => ListBuilder<EquipmentSummary>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(ExternalProvidersProvidersEnum)]),
+          () => ListBuilder<ExternalProvidersProvidersEnum>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType(GlossaryArticleSummary)]),

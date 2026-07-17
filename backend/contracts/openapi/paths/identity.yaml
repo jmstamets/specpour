@@ -34,6 +34,27 @@ register:
             schema:
               $ref: '../openapi.yaml#/components/schemas/ProblemDetails'
 
+externalProviders:
+  get:
+    operationId: listExternalProviders
+    tags: [identity]
+    summary: Which social providers are configured (T173)
+    description: >-
+      Anonymous. IdentityModule registers a provider's handler only when its
+      ClientId is configured (T049) — a client renders a provider's sign-in
+      button only if its key appears in this list, so a login screen never
+      shows a button that would 400 "unknown provider" when tapped. Provider
+      keys only, never secrets or full config.
+    security:
+      - {}
+    responses:
+      '200':
+        description: The provider keys currently configured (a subset of google/apple/microsoft, possibly empty).
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalProviders'
+
 externalChallenge:
   get:
     operationId: challengeExternalSignIn
@@ -461,6 +482,13 @@ components:
         email: { type: string, format: email }
         displayName: { type: string }
       required: [userId, email, displayName]
+    ExternalProviders:
+      type: object
+      properties:
+        providers:
+          type: array
+          items: { type: string, enum: [google, apple, microsoft] }
+      required: [providers]
     CompleteExternalRegistrationRequest:
       type: object
       properties:
