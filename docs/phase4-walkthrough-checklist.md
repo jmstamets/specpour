@@ -169,10 +169,20 @@ anyone picking this back up:
   (`58ccad1`), plus a follow-through browser test for the register-path
   intent (`7a47453`).
 - **F3 (session not persisted across reload; orphan sessions in (e))** —
-  **STILL OPEN**, tracked as T177 (ADR → refresh-rotation/persistent-storage
-  implementation → acceptance set). Blocks re-walking (e)'s reload-duplicate-
-  session concern and (f)'s persistence check ("Unable to test - refresh logs
-  out user").
+  **FIXED, T177** (`35ee70d`→`8a72024` on branch `t177-session-persistence`,
+  PR #2). Reload now silently restores the same session (no re-login, no
+  duplicate Active-sessions entry) — proven by an automated browser-tier test
+  against the real docker stack (`web_session_persistence_test.dart`'s (a)),
+  not just reasoning. This unblocks BOTH (e)'s reload-duplicate-session
+  re-walk AND (f)'s persistence check ("Unable to test - refresh logs out
+  user") — **(f) is now mechanically verifiable**: reload no longer signs the
+  user out, so John's original steps (toggle Email on, reload, reopen, confirm
+  persisted) can actually be walked end-to-end for the first time. This note
+  confirms the BLOCKER is resolved and automated-tested; it is not a
+  substitute for John's own re-walk of (e) and (f) in a real browser — no
+  claim of PASS is made here on his behalf, per this project's standing rule
+  that MVP-checkpoint-style visual walkthroughs need human verification, not
+  just automated-test inference.
 - **F4 (data export must download a file, section (h))** — **STILL OPEN**,
   tracked as T178.
 - **Structural browser-tier growth** — ONGOING, T179. `web_auth_smoke_test.dart`
@@ -184,5 +194,5 @@ anyone picking this back up:
   social sign-in productionization)** — **STILL OPEN**, not started, last in
   John's sequence.
 
-Sign-off is gated on: T177 → T178 → the (c)/(f) re-walks → T170–T173, per
-John's 2026-07-15 sequencing.
+Sign-off is gated on: ~~T177~~ (DONE, 2026-07-17) → T178 → the (c)/(f)
+re-walks → T170–T173, per John's 2026-07-15 sequencing.
