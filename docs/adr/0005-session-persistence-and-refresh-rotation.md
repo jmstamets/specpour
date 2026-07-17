@@ -352,3 +352,32 @@ actually been added to the class — only described in the comment — and the g
 went unexercised until a second class adopted the same own-separate-factory
 pattern. Fixed by adding `[Collection("ReqnrollNonParallelizableFeatures")]`
 (Reqnroll's own generated collection name) to both classes.
+
+## Live 90-day-cap-expiry verification — a rejected option (T177 #101(c), 2026-07-17)
+
+The cap and reuse-detection scenarios have solid backend Acceptance coverage
+via `TestTimeProvider` (an in-process clock override, wired only into the
+xUnit test host — see `backend/tests/Acceptance/Support/TestClock.cs`). What
+they lacked was end-to-end confirmation through a real browser against the
+live docker-composed stack, which has no such clock override — `Program.cs`
+registers `SystemClock` unconditionally and says so explicitly ("production
+always gets real time").
+
+Closing that gap was considered along three lines. **A Development-gated
+clock-control HTTP endpoint (analogous to the #100 attempt-counter) is
+REJECTED PERMANENTLY** (John's ruling): unlike a read-only counter, a live
+clock-manipulation surface is reachable, mutable, and affects every
+time-dependent check in the app — an attack-surface-shaped object, and this
+investigation's own findings undercut its value: the client's reaction to a
+rejected refresh is a single code path (`silentlyRefreshTokens` failing
+cleanly), already proven end-to-end by T177 #101(b)'s explicit-revoke browser
+test. A live clock endpoint would only re-prove that same seam through a
+different trigger. **What was built instead**: a test-script-side Postgres
+backdate of the specific test session's `SessionDevices.CreatedAt`
+(`scripts/run-cap-expiry-test.sh` + `web_cap_expiry_test.dart`) — zero
+application code, zero new API surface, the mutation is entirely on the
+test-harness side of the boundary. Reuse-detection's live trigger was
+**accepted as covered without a dedicated live test**: it produces the exact
+same `TryRevokeAsync` + rejection shape the cap and explicit-revoke paths do,
+so (b)'s existing pass already covers the only client-observable seam reuse
+detection could break.
