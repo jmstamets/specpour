@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'auth/refresh_coordinator.dart';
 import 'auth/session_restore.dart';
 import 'l10n/gen/app_localizations.dart';
 import 'routing/app_router.dart';
@@ -29,6 +30,9 @@ class SpecPourApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(sessionRestoreProvider);
+    // ADR-0005 (T177): start listening for sibling tabs' refreshes so this tab
+    // adopts their rotated tokens instead of racing. No-op on native.
+    ref.watch(crossTabAuthSyncProvider);
 
     final router = ref.watch(appRouterProvider);
 

@@ -13,6 +13,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/api_client_provider.dart';
+import 'refresh_coordinator.dart';
 import 'token_store.dart';
 
 /// A platform storage read genuinely never taking this long in practice — this
@@ -46,5 +47,9 @@ final sessionRestoreProvider = FutureProvider<void>((ref) async {
     return;
   }
 
-  await silentlyRefreshTokens(ref, refreshToken: persisted);
+  // ADR-0005 (T177): restore through the cross-tab election too — if a sibling
+  // tab is booting/refreshing the same persisted session at the same moment
+  // (e.g. two tabs both cold-started from a shared localStorage token), only one
+  // redeems it; this one adopts rather than racing.
+  await coordinatedRefresh(ref, startingRefreshToken: persisted);
 });

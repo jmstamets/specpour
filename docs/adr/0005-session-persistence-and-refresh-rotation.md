@@ -239,3 +239,61 @@ decision blocks adopting it later behind the same `IdentityAuthService` seam.
 - **Not in scope**: true immediate mid-lifetime access-token invalidation for
   high-severity events remains T166 (launch-gated with T139). This ADR is about
   *session continuity*, not shortening the ≤10-minute revocation window T166 owns.
+
+## Cross-tab coordination — as built (T177 #100, 2026-07-16)
+
+**What was built.** The single-refresher election lives in
+`core/auth/refresh_coordinator.dart`'s `coordinatedRefresh`, which both refresh
+callers now go through instead of `silentlyRefreshTokens` directly
+(`TokenRefreshInterceptor`'s 401 recovery, and `sessionRestoreProvider`'s
+app-start restore). The web/native split is a conditional import
+(`cross_tab_channel_stub.dart` vs `cross_tab_channel_web.dart`, matching
+`web_authorize.dart`'s established pattern):
+
+- **Web**: `navigator.locks.request('specpour.refresh', …)` is the election —
+  exactly one tab holds the exclusive lock and does the refresh; queued tabs, on
+  acquiring the lock, see the rotated token already in storage and **adopt** it
+  rather than redeeming the now-stale one. The winner's fresh `{access, refresh}`
+  pair is distributed to the other tabs over a `BroadcastChannel('specpour.auth')`
+  (the access token is never persisted, so it must travel in the message); a
+  persistent listener (`crossTabAuthSyncProvider`, watched once at app start)
+  applies it to the other tabs' in-memory providers. The queued adopter waits on
+  that broadcast (bounded), with a documented fallback to a single refresh with
+  the fresh stored token only in the pathological "broadcast never arrives" case.
+- **Native**: the channel primitives are no-ops — a native app is single-context,
+  so the lock is always uncontended and `coordinatedRefresh` degenerates cleanly
+  to a plain `silentlyRefreshTokens`. Zero behavioural change off-web.
+
+**Leeway interplay (unchanged from the decision above, restated for the reader
+here).** OpenIddict's 30-second `RefreshTokenReuseLeeway` is the *safety net* that
+absorbs most near-simultaneous races; the election is the *design*. The mechanism
+test therefore asserts the mechanism (exactly one refresh **attempt** crosses the
+wire — see the counter rider below), not merely the outcome, because the leeway
+would make an outcome-only test ("both tabs stay signed in") pass even with the
+election entirely broken.
+
+**Harness fidelity — iframe vs tab (so this isn't re-litigated).** The existing
+headless-Chrome `flutter drive` tier is single-context. A probe that opened a
+second same-origin **tab** via `window.open()` from inside a driven test **wedged
+the entire run** (killed after 11 minutes): the driver controls exactly one tab,
+and a second tab/window handle hangs it. So two real *tabs* are not drivable in
+this harness. The chosen path is a same-origin **`<iframe>`** hosting a second
+agent: an iframe shares the origin's `LockManager` (Web Locks), its
+`BroadcastChannel`, and its `localStorage`/`storage` events with the top document,
+so the second agent exercises the *identical* cross-context coordination
+primitives — the assertion is about refresh coordination between two real agents,
+and the second agent runs unmodified production `coordinatedRefresh` code. One
+production nuance to note, not a fidelity hole: real browsers **throttle
+background tabs** (timers, rAF, and — on some engines — lock acquisition urgency)
+in ways a same-page iframe is not throttled; the coordination primitives are
+identical, only the timing/throttling environment differs slightly, and the
+election's correctness does not depend on timing (the lock serialises regardless).
+
+**Server-side attempt counter (test-only, Development-gated).** The mechanism
+assertion needs to count `refresh_token` *grant requests received* per
+authorization — **attempts, not successes**: if coordination is broken but both
+requests land inside the reuse leeway, both *succeed*, so a success counter would
+read a false-green "2 successes fine" while an attempt counter correctly reads "2
+attempts → FAIL." That counter's observable surface is **Development-environment
+only** (gated test endpoint/hook) — never a production surface, to avoid leaking
+grant telemetry.

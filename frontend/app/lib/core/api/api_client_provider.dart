@@ -11,6 +11,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../auth/refresh_coordinator.dart';
 import '../auth/token_store.dart';
 
 /// T047/ADR-0003: wires cookie support onto [dio] for the sign-in flow's
@@ -159,9 +160,13 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
       return;
     }
 
-    final refreshed = await silentlyRefreshTokens(
+    // ADR-0005 (T177): go through the cross-tab election, not silentlyRefreshTokens
+    // directly — on web, if another tab is already refreshing this session, this
+    // one waits for and adopts that tab's rotated token instead of presenting the
+    // now-redeemed one and tripping reuse detection.
+    final refreshed = await coordinatedRefresh(
       _ref,
-      refreshToken: refreshToken,
+      startingRefreshToken: refreshToken,
     );
     if (!refreshed) {
       handler.next(err);
