@@ -327,23 +327,99 @@ final identityAuthServiceProvider = Provider<IdentityAuthService>(
   ),
 );
 
-/// Extracts a human-readable message from a failed register/login call — the
-/// backend returns RFC 9457 problem+json (e.g. underage rejection, bad
-/// credentials); falls back to a generic message for anything unparseable.
-String describeIdentityError(Object error) {
+/// A friendly message plus (only for unexpected/server-side failures) a
+/// correlation ID the user can quote to support — see [describeApiError].
+class ApiErrorPresentation {
+  const ApiErrorPresentation({required this.message, this.correlationId});
+
+  final String message;
+  final String? correlationId;
+}
+
+const _genericServerErrorMessage =
+    'Something went wrong on our end. Please try again in a moment.';
+const _genericNetworkErrorMessage =
+    'Could not reach the server. Check your connection and try again.';
+
+/// T170 (Phase 4 walkthrough finding #2): raw exceptions must never render to
+/// users — the walkthrough caught Dio's internal `[connection error]` text
+/// rendering verbatim in the register form. The backend returns RFC 9457
+/// problem+json on every non-2xx response (`AddSpecPourProblemDetails`,
+/// always carrying a `correlationId` extension); this is the single funnel
+/// every screen's catch block already goes through.
+///
+/// 5xx (and anything without a parseable body — including a network-level
+/// failure with no response at all, or Development's
+/// `UseDeveloperExceptionPage` HTML page, which isn't JSON) is treated as an
+/// UNEXPECTED failure: never trust its body to be safe to show verbatim,
+/// always the generic message, with the correlation ID surfaced so a
+/// walkthrough/support report can be matched to server logs. 4xx responses
+/// are EXPECTED, actionable failures (bad password, underage, etc.) — their
+/// `detail`/`title` is already a friendly, specific message, and no
+/// correlation ID is shown for them (per this task's own scoping: unexpected
+/// failures get the ID, not routine validation).
+ApiErrorPresentation describeApiError(Object error) {
   if (error is DioException) {
-    final data = error.response?.data;
+    final response = error.response;
+    if (response == null) {
+      return const ApiErrorPresentation(message: _genericNetworkErrorMessage);
+    }
+
+    final status = response.statusCode ?? 0;
+    final data = response.data;
+    final correlationId = data is Map<String, dynamic>
+        ? data['correlationId'] as String?
+        : null;
+
+    if (status >= 500) {
+      return ApiErrorPresentation(
+        message: _genericServerErrorMessage,
+        correlationId: correlationId,
+      );
+    }
+
     if (data is Map<String, dynamic>) {
-      final detail = data['detail'];
-      final title = data['title'];
-      if (detail is String && detail.isNotEmpty) {
-        return detail;
+      final fieldMessages = _fieldErrorMessages(data['errors']);
+      if (fieldMessages != null) {
+        return ApiErrorPresentation(message: fieldMessages);
       }
+      final detail = data['detail'];
+      if (detail is String && detail.isNotEmpty) {
+        return ApiErrorPresentation(message: detail);
+      }
+      final title = data['title'];
       if (title is String && title.isNotEmpty) {
-        return title;
+        return ApiErrorPresentation(message: title);
       }
     }
   }
 
-  return error.toString();
+  return const ApiErrorPresentation(message: _genericServerErrorMessage);
+}
+
+/// ASP.NET Core's ValidationProblemDetails `errors` extension shape
+/// (`{field: [messages]}`) — no endpoint in this codebase populates it today
+/// (validation failures currently join into a single `detail` string
+/// instead), but this funnel handles it defensively since every screen
+/// already goes through it.
+String? _fieldErrorMessages(Object? errors) {
+  if (errors is! Map) {
+    return null;
+  }
+  final messages = errors.values
+      .whereType<List<dynamic>>()
+      .expand((list) => list.whereType<String>())
+      .toList();
+  return messages.isEmpty ? null : messages.join(' ');
+}
+
+/// String-returning convenience wrapper for existing call sites — the
+/// correlation ID (when present) is appended inline for now; a selectable/
+/// copyable presentation with its own copy button lands in T172.
+String describeIdentityError(Object error) {
+  final result = describeApiError(error);
+  if (result.correlationId case final id?) {
+    return '${result.message} (Reference: $id)';
+  }
+  return result.message;
 }
