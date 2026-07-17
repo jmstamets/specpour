@@ -32,3 +32,9 @@ void writeHandoff(
 ({String accessToken, String refreshToken})? readHandoffFor(
   String fromRefreshToken,
 ) => null;
+
+/// Nothing to clear on native — no handoff was ever written.
+Future<void> maybeClearHandoffAfterDrain() async {}
+
+/// Nothing to sweep on native.
+void sweepOrphanedHandoff() {}

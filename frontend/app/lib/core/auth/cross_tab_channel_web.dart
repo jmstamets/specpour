@@ -42,6 +42,12 @@ const _lockName = 'specpour.refresh';
 const _channelName = 'specpour.auth';
 const _handoffKey = 'specpour.auth-handoff';
 
+/// Orphan-cleanup rider (2026-07-17): if a handoff is older than this, no real
+/// contention burst could still be relying on it — a same-origin localStorage
+/// write/read/lock round trip is milliseconds, not seconds. Generous, not
+/// tuned to the happy path.
+const _handoffOrphanTtl = Duration(seconds: 30);
+
 web.BroadcastChannel? _channel;
 void Function(String accessToken, String refreshToken)? _onTokens;
 
@@ -145,6 +151,7 @@ void writeHandoff(
       'from': fromRefreshToken,
       'access': accessToken,
       'refresh': newRefreshToken,
+      'ts': DateTime.now().millisecondsSinceEpoch,
     }),
   );
 }
@@ -154,6 +161,14 @@ void writeHandoff(
 /// leftover handoff from an unrelated refresh cycle has a different 'from' and
 /// is ignored, so only a peer that refreshed exactly the token we were about to
 /// use is adopted.
+///
+/// Deliberately does NOT delete the entry itself (hygiene rider, 2026-07-17):
+/// with 3+ tabs racing, more than one queued tab can legitimately need to read
+/// the SAME handoff in turn as each acquires the lock — the first adopter
+/// deleting it would strand a third tab with nothing to adopt, forcing it to
+/// retry the already-redeemed original token and trip real reuse detection.
+/// Cleanup is handled separately by [maybeClearHandoffAfterDrain], called once
+/// the lock's queue is observed empty — see that function's doc comment.
 ({String accessToken, String refreshToken})? readHandoffFor(
   String fromRefreshToken,
 ) {
@@ -175,4 +190,50 @@ void writeHandoff(
     return null;
   }
   return null;
+}
+
+/// Hygiene rider (2026-07-17): called by whoever currently holds the refresh
+/// lock, right before releasing it, having just written or adopted a handoff.
+/// Clears the handoff ONLY if no other context is still queued on the lock —
+/// `navigator.locks.query()`'s `pending` list, read WHILE we still hold the
+/// lock, is exactly "who is waiting for me to release," so an empty list here
+/// means we are provably the last reader this contention burst will have. This
+/// is what makes "no handoff entries remain after the race completes" true
+/// immediately, without weakening the multi-tab correctness the un-conditional
+/// read in [readHandoffFor] depends on.
+Future<void> maybeClearHandoffAfterDrain() async {
+  final snapshot = await web.window.navigator.locks.query().toDart;
+  final stillPending = snapshot.pending.toDart.any(
+    (info) => info.name == _lockName,
+  );
+  if (!stillPending) {
+    web.window.localStorage.removeItem(_handoffKey);
+  }
+}
+
+/// Orphan-cleanup rider (2026-07-17), the backstop for [maybeClearHandoffAfterDrain]:
+/// a handoff can only ever be left behind if its writer's tab crashed/closed
+/// before its own drain check ran, or query() itself errored — call once at app
+/// start. Age is judged from the handoff's own 'ts', not wall-clock arithmetic
+/// on anything else, so this is safe to call even with nothing to clean up.
+void sweepOrphanedHandoff() {
+  final raw = web.window.localStorage.getItem(_handoffKey);
+  if (raw == null) {
+    return;
+  }
+  try {
+    final decoded = jsonDecode(raw) as Map<String, dynamic>;
+    final ts = decoded['ts'];
+    if (ts is int) {
+      final age = DateTime.now().difference(
+        DateTime.fromMillisecondsSinceEpoch(ts),
+      );
+      if (age <= _handoffOrphanTtl) {
+        return;
+      }
+    }
+  } on Object {
+    // Unparseable entry is itself orphaned/corrupt — fall through and clear it.
+  }
+  web.window.localStorage.removeItem(_handoffKey);
 }

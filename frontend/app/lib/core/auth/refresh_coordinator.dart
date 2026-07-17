@@ -37,6 +37,11 @@ Future<bool> coordinatedRefresh(
     if (adopted != null) {
       ref.read(authTokenProvider.notifier).set(adopted.accessToken);
       ref.read(refreshTokenProvider.notifier).set(adopted.refreshToken);
+      // Hygiene rider: clear the handoff once we're provably the last reader
+      // this contention burst will have (nobody else still queued) — see
+      // maybeClearHandoffAfterDrain's own doc comment for why this is safe
+      // even with 3+ tabs racing.
+      await maybeClearHandoffAfterDrain();
       return true;
     }
 
@@ -53,6 +58,9 @@ Future<bool> coordinatedRefresh(
       writeHandoff(startingRefreshToken, access, refresh);
       // ...and proactively wake passive tabs (best-effort optimisation).
       broadcastTokens(access, refresh);
+      // Same drain check: if nobody was ever queued behind us (a lone refresh,
+      // not a race), this clears immediately rather than waiting for the TTL.
+      await maybeClearHandoffAfterDrain();
     }
     return refreshed;
   });
@@ -61,9 +69,13 @@ Future<bool> coordinatedRefresh(
 /// Keeps THIS tab's in-memory auth state in sync with whichever tab last
 /// refreshed — watched once at app start (see app.dart). On native
 /// [startTokenBroadcastListener] is a no-op, so this harmlessly does nothing.
+/// Also sweeps any orphaned handoff left over from a tab that closed before
+/// its own drain-triggered cleanup could run (hygiene rider) — a no-op on
+/// native, and a no-op on web if nothing is orphaned.
 final crossTabAuthSyncProvider = Provider<void>((ref) {
   startTokenBroadcastListener((accessToken, refreshToken) {
     ref.read(authTokenProvider.notifier).set(accessToken);
     ref.read(refreshTokenProvider.notifier).set(refreshToken);
   });
+  sweepOrphanedHandoff();
 });

@@ -318,4 +318,37 @@ requests land inside the reuse leeway, both *succeed*, so a success counter woul
 read a false-green "2 successes fine" while an attempt counter correctly reads "2
 attempts → FAIL." That counter's observable surface is **Development-environment
 only** (gated test endpoint/hook) — never a production surface, to avoid leaking
-grant telemetry.
+grant telemetry. Verified inert under `Production`: the endpoint 404s (never
+mapped) and a real refresh completes normally with the increment skipped
+(`DevOnlyRefreshAttemptsEndpointTests.cs`).
+
+**Handoff hygiene (item 0(a), 2026-07-17).** The handoff entry above is
+deliberately *not* deleted by the reader that adopts it (`readHandoffFor`) — a
+concrete 3-tab scenario rules that out: A wins and writes, B adopts and (if it
+deleted) C would then find nothing and retry its own already-redeemed token,
+tripping real reuse detection for a session that was actually fine. Instead
+`maybeClearHandoffAfterDrain` — called by both the winner (after writing) and an
+adopter (after reading), right before releasing the lock — clears the entry only
+when `navigator.locks.query()` shows nobody else still queued on
+`'specpour.refresh'`, i.e. only whichever context is provably the *last* reader
+of a given contention burst clears it. A 30-second-TTL `sweepOrphanedHandoff`
+(judged from the handoff's own timestamp) backstops the case where a tab closes
+before its own drain check runs, wired into `crossTabAuthSyncProvider` so it
+fires on every app boot. `web_multitab_test.dart` asserts both: no handoff
+entry survives the mechanism test's own race, and an artificially-aged entry is
+swept on the next app start.
+
+**A real, pre-existing test-isolation gap found and fixed alongside this
+(2026-07-17).** Adding `DevOnlyRefreshAttemptsEndpointTests.cs` — which needs
+its own `SpecPourWebApplicationFactory` for the Production-environment
+assertions above — surfaced a genuine `DbUpdateConcurrencyException` in
+`RateLimitingTests`, reproduced 5/5 when the two classes ran together and 0/5
+when either ran alone: both independently boot `OpenIddictClientSeedingHostedService`,
+which syncs the seeded OpenIddict client's redirect URIs against the *same* row
+on every host start, and with no isolation between the two classes they raced
+to update it. `RateLimitingTests.cs`'s own doc comment already claimed a
+`[Collection]` attribute prevented exactly this, but the attribute had never
+actually been added to the class — only described in the comment — and the gap
+went unexercised until a second class adopted the same own-separate-factory
+pattern. Fixed by adding `[Collection("ReqnrollNonParallelizableFeatures")]`
+(Reqnroll's own generated collection name) to both classes.

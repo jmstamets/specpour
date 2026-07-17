@@ -31,6 +31,7 @@
 // this test isolates the election under guaranteed simultaneity.)
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:js_interop';
 
 import 'package:dio/dio.dart';
@@ -52,6 +53,12 @@ const _controlChannel = 'specpour.test-control';
 const _msgAgentReady = 'agent-ready';
 const _msgGo = 'go';
 const _msgResultPrefix = 'agent-result:';
+
+/// Mirrors cross_tab_channel_web.dart's private storage key — test-only
+/// knowledge of the handoff's on-disk format, used to assert hygiene (item
+/// 0(a)) directly against window.localStorage rather than through the
+/// library's own (deliberately non-inspecting) API.
+const _handoffKey = 'specpour.auth-handoff';
 
 /// Runs the production election with whatever refresh token is currently in
 /// shared storage — the single entry both the orchestrator and the iframe agent
@@ -290,6 +297,53 @@ void _runOrchestrator() {
             'exactly ONE refresh must cross the wire under a two-context race; '
             'got $attempts (2 ⇒ the single-refresher election is broken and the '
             'reuse leeway is silently covering for it).',
+      );
+
+      // Hygiene rider (item 0(a)): both coordinatedRefresh calls above already
+      // awaited their own maybeClearHandoffAfterDrain internally — the winner's
+      // drain-check ran first and saw the loser still queued (so it left the
+      // handoff for the loser to adopt), and the loser's own drain-check ran
+      // last, with nobody left queued, so it is the one that actually clears
+      // it. By the time both futures above have resolved, no handoff entry
+      // should remain.
+      expect(
+        web.window.localStorage.getItem(_handoffKey),
+        isNull,
+        reason:
+            'a handoff entry survived the race draining — the last reader '
+            'should have cleared it once nobody was left queued on the lock.',
+      );
+    },
+  );
+
+  testWidgets(
+    'T177 #100 hygiene: an orphaned handoff entry is swept on next app start',
+    (tester) async {
+      // Simulate a handoff a tab wrote just before crashing/closing, before its
+      // own drain-triggered cleanup could run — old enough that no genuine
+      // contention burst could still be relying on it (see
+      // sweepOrphanedHandoff's own TTL doc comment).
+      web.window.localStorage.setItem(
+        _handoffKey,
+        jsonEncode({
+          'from': 'stale-token',
+          'access': 'stale-access',
+          'refresh': 'stale-refresh',
+          'ts': DateTime.now()
+              .subtract(const Duration(minutes: 5))
+              .millisecondsSinceEpoch,
+        }),
+      );
+
+      await tester.pumpWidget(const ProviderScope(child: SpecPourApp()));
+      await tester.pumpAndSettle();
+
+      expect(
+        web.window.localStorage.getItem(_handoffKey),
+        isNull,
+        reason:
+            'an orphaned handoff older than the TTL must be swept on app '
+            'start (sweepOrphanedHandoff, wired via crossTabAuthSyncProvider).',
       );
     },
   );
