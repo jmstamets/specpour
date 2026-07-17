@@ -21,12 +21,27 @@ class RegisterScreen extends ConsumerStatefulWidget {
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
+/// T171: mirrors IdentityModule's actual server-side policy exactly
+/// (`AddIdentityCore`: `RequiredLength = 12`; Require Digit/Lowercase/
+/// Uppercase/NonAlphanumeric all disabled per T047's NIST-800-63B
+/// relaxation) — the only client-side rule to show/enforce is length. Keep
+/// this in lockstep with the backend so the two can't drift.
+const _minimumPasswordLength = 12;
+
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _displayNameController = TextEditingController();
   DateTime? _dateOfBirth;
   String? _errorMessage;
+  // T171: bound to the password field specifically (TextField.errorText),
+  // distinct from _errorMessage's form-level display — either a local
+  // pre-submit length check, or a server error whose text names the
+  // password (the backend joins all IdentityResult errors into one `detail`
+  // string, not a field-keyed shape, so this is a text-match heuristic, not
+  // a structural guarantee; see describeApiError's own doc comment, T170).
+  String? _passwordFieldError;
+  bool _obscurePassword = true;
   bool _submitting = false;
 
   @override
@@ -62,9 +77,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
+    // T171: mirrors the server policy locally so a too-short password never
+    // needs a round trip to discover — the field-level error, not a generic
+    // form-level one, since the failure is specifically about this field.
+    if (_passwordController.text.length < _minimumPasswordLength) {
+      setState(() => _passwordFieldError = l10n.registerPasswordPolicyHint);
+      return;
+    }
+
     setState(() {
       _submitting = true;
       _errorMessage = null;
+      _passwordFieldError = null;
     });
 
     try {
@@ -94,7 +118,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _errorMessage = describeIdentityError(error));
+      final message = describeIdentityError(error);
+      // T171: a heuristic, not a structural field-binding — the backend
+      // joins all IdentityResult errors into one `detail` string rather than
+      // a field-keyed shape (see describeApiError's own doc comment, T170).
+      // Routes it to the password field specifically when the message names
+      // the password, so "Passwords must be at least 12 characters." lands
+      // where the user is looking instead of in a form-level banner.
+      if (message.toLowerCase().contains('password')) {
+        setState(() => _passwordFieldError = message);
+      } else {
+        setState(() => _errorMessage = message);
+      }
     } finally {
       if (mounted) {
         setState(() => _submitting = false);
@@ -125,8 +160,31 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _passwordController,
               decoration: InputDecoration(
                 labelText: l10n.registerPasswordLabel,
+                // T171: shown before first failure, not only after — the
+                // walkthrough's own finding was that the 12-char minimum
+                // was discoverable only by a 400.
+                helperText: l10n.registerPasswordPolicyHint,
+                errorText: _passwordFieldError,
+                suffixIcon: IconButton(
+                  key: const Key('registerPasswordRevealToggle'),
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                  ),
+                  tooltip: _obscurePassword
+                      ? l10n.registerPasswordRevealTooltip
+                      : l10n.registerPasswordHideTooltip,
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
+                ),
               ),
-              obscureText: true,
+              obscureText: _obscurePassword,
+              onChanged: (_) {
+                if (_passwordFieldError != null) {
+                  setState(() => _passwordFieldError = null);
+                }
+              },
             ),
             const SizedBox(height: 16),
             TextField(

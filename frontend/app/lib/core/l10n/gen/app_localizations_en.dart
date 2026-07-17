@@ -227,6 +227,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerPasswordLabel => 'Password';
 
   @override
+  String get registerPasswordPolicyHint => 'At least 12 characters';
+
+  @override
+  String get registerPasswordRevealTooltip => 'Show password';
+
+  @override
+  String get registerPasswordHideTooltip => 'Hide password';
+
+  @override
   String get registerDisplayNameLabel => 'Display name';
 
   @override

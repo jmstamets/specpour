@@ -508,6 +508,24 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get registerPasswordLabel;
 
+  /// T171: password field helper text, shown before first failure — mirrors the actual server policy exactly (IdentityModule.AddIdentityCore: RequiredLength=12, no composition requirements).
+  ///
+  /// In en, this message translates to:
+  /// **'At least 12 characters'**
+  String get registerPasswordPolicyHint;
+
+  /// T171: tooltip/semantic label for the password reveal toggle when the password is currently hidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get registerPasswordRevealTooltip;
+
+  /// T171: tooltip/semantic label for the password reveal toggle when the password is currently shown.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get registerPasswordHideTooltip;
+
   /// T055 registration screen: display name field label.
   ///
   /// In en, this message translates to:

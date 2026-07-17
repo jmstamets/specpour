@@ -257,6 +257,18 @@
   "@registerPasswordLabel": {
     "description": "T055 registration screen: password field label."
   },
+  "registerPasswordPolicyHint": "At least 12 characters",
+  "@registerPasswordPolicyHint": {
+    "description": "T171: password field helper text, shown before first failure — mirrors the actual server policy exactly (IdentityModule.AddIdentityCore: RequiredLength=12, no composition requirements)."
+  },
+  "registerPasswordRevealTooltip": "Show password",
+  "@registerPasswordRevealTooltip": {
+    "description": "T171: tooltip/semantic label for the password reveal toggle when the password is currently hidden."
+  },
+  "registerPasswordHideTooltip": "Hide password",
+  "@registerPasswordHideTooltip": {
+    "description": "T171: tooltip/semantic label for the password reveal toggle when the password is currently shown."
+  },
   "registerDisplayNameLabel": "Display name",
   "@registerDisplayNameLabel": {
     "description": "T055 registration screen: display name field label."
