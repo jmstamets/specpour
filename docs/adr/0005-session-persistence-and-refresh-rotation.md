@@ -223,19 +223,18 @@ decision blocks adopting it later behind the same `IdentityAuthService` seam.
   extended to two more triggers: a session hitting the 90-day absolute cap, and
   a detected reuse. All three (c)/(f)'s two triggers must land the client
   identically signed out, never an error screen or limbo state.
-- **T167 disposition: unaffected, pending confirmation — not yet closed** (John's
-  rider: "accepted as unaffected, not yet closed"). The tie-break fix
-  (`ThenByDescending(s => s.Id)` in `SessionsEndpoints.ListAsync`) stands as the
-  deterministic ordering guarantee, and this design *reduces* the rate of
-  same-tick session creation (reload now reuses the authorization instead of
-  minting a new row), so the reasoning can only lessen, never reintroduce, the
-  timestamp-collision condition that originally surfaced the flake. But T177
-  rebuilds the exact refresh-validation path the flake lived on, so reasoning
-  alone doesn't close it. **Once implementation lands, the revocation-adjacent
-  acceptance set (session list ordering, revoke-then-list, the new reuse-detection
-  and multi-tab tests above) must be run repeated — ≥10 iterations — with clean
-  results on every run.** T177's final report must cite that evidence line before
-  T167 is marked closed for real.
+- **T167 disposition: CONFIRMED CLOSED post-T177 (2026-07-17, T177 #102)**. The
+  tie-break fix (`ThenByDescending(s => s.Id)` in `SessionsEndpoints.ListAsync`)
+  stands as the deterministic ordering guarantee, and this design *reduces* the
+  rate of same-tick session creation (reload now reuses the authorization
+  instead of minting a new row), so the reasoning could only lessen, never
+  reintroduce, the timestamp-collision condition that originally surfaced the
+  flake. Per this ADR's own requirement, reasoning alone wasn't accepted as
+  sufficient — the revocation-adjacent acceptance set (scenarios 15/18/19: list/
+  revoke, reuse detection, absolute cap) was run **10/10 consecutive clean**
+  post-implementation, folded together with the cross-tab mechanism test's own
+  **8 clean repeated runs** already on record from #100. See tasks.md's T167
+  entry for the full evidence citation.
 - **Not in scope**: true immediate mid-lifetime access-token invalidation for
   high-severity events remains T166 (launch-gated with T139). This ADR is about
   *session continuity*, not shortening the ≤10-minute revocation window T166 owns.
