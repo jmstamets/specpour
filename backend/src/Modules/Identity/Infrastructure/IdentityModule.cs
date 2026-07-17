@@ -79,6 +79,12 @@ public sealed class IdentityModule : IModule
         services.AddScoped<Contracts.IAgePredicatePort, AgePredicateAdapter>();
         services.AddScoped<AccountDeletionService>();
 
+        // ADR-0005 (T177 #100) test-only refresh-attempt telemetry. Registered
+        // unconditionally (a tiny empty singleton), but only INCREMENTED and only
+        // READABLE in Development (see TokenEndpoints + the /dev/refresh-attempts
+        // endpoint's env gates) — never an observable production surface.
+        services.AddSingleton<RefreshAttemptCounter>();
+
         // FR-003: "operator-configurable grace period" — config-bound (falls back to
         // LifecycleOptions' in-class defaults, same style as SmtpEmailOptions).
         services.Configure<LifecycleOptions>(configuration.GetSection("Identity:Lifecycle"));
@@ -223,6 +229,21 @@ public sealed class IdentityModule : IModule
                 // high-severity cases (deactivation, staff suspension, sign-out-everywhere)
                 // is tracked separately as T166, launch-gated alongside T139.
                 options.SetAccessTokenLifetime(TimeSpan.FromMinutes(10));
+
+                // ADR-0005 (T177): rolling refresh tokens and sliding expiration are
+                // BOTH already on by default in OpenIddict (DisableRollingRefreshTokens/
+                // DisableSlidingRefreshTokenExpiration are opt-OUT flags, and neither is
+                // called here) — every refresh already rotates the token and resets its
+                // expiry window. What was never set is the lifetime itself, silently
+                // inheriting OpenIddict's own internal default. Made explicit per John's
+                // ruling that a session's lifetime must be a stated decision, not an
+                // inherited one: 14 days of sliding inactivity (an actively-used session
+                // never surprise-expires). The complementary 90-day ABSOLUTE cap
+                // (regardless of activity) has no equivalent OpenIddict setting — sliding
+                // expiration alone would let a session live forever — so it's enforced
+                // separately in TokenEndpoints.HandleTokenAsync against SessionDevice.
+                // CreatedAt.
+                options.SetRefreshTokenLifetime(TimeSpan.FromDays(14));
 
                 // Ephemeral dev keys: containers have no durable certificate store.
                 // Production deployments must configure real signing/encryption

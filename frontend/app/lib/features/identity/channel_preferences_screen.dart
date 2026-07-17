@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/api_client_provider.dart';
 import '../../core/auth/identity_auth_service.dart' show describeIdentityError;
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 
 final channelPreferencesProvider =
     FutureProvider.autoDispose<ChannelPreferences>((ref) async {
@@ -96,10 +97,9 @@ class _ChannelPreferencesScreenState
     return ListView(
       children: [
         if (_errorMessage case final error?) ...[
-          Text(
-            error,
-            key: const Key('channelPreferencesErrorMessage'),
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ApiErrorDisplay(
+            message: error,
+            messageKey: const Key('channelPreferencesErrorMessage'),
           ),
           const SizedBox(height: 16),
         ],

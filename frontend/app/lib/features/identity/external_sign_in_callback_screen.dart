@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/guest_gate/guest_gate.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 
 class ExternalSignInCallbackScreen extends ConsumerStatefulWidget {
   const ExternalSignInCallbackScreen({
@@ -83,7 +84,10 @@ class _ExternalSignInCallbackScreenState
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(error, key: const Key('externalCallbackErrorMessage')),
+                  ApiErrorDisplay(
+                    message: error,
+                    messageKey: const Key('externalCallbackErrorMessage'),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => context.go('/sign-in'),

@@ -164,6 +164,14 @@ jobs:
           exit 1
       - name: Run the browser-context auth smoke set
         run: scripts/run-web-integration-tests.sh
+      - name: Run the cross-tab election mechanism test (T177 #100)
+        run: scripts/run-web-integration-tests.sh integration_test/web_multitab_test.dart
+      - name: Run session-persistence + revocation-linkage tests (T177 #101)
+        run: scripts/run-web-integration-tests.sh integration_test/web_session_persistence_test.dart
+      - name: Run 90-day-cap-expiry test (T177 #101(c))
+        run: scripts/run-cap-expiry-test.sh
+      - name: Run data-export download test (T178)
+        run: scripts/run-export-download-test.sh
       - name: Docker logs (always, for diagnosis)
         if: always()
         run: docker compose logs

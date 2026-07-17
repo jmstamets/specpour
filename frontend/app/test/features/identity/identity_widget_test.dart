@@ -171,6 +171,93 @@ void main() {
     },
   );
 
+  testWidgets('T171: the password reveal toggle shows and hides the password', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        identityInterceptor: _FakeIdentityInterceptor(),
+        authInterceptor: _FakeAuthInterceptor(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    TextField passwordField() => tester.widget<TextField>(
+      find.byKey(const Key('registerPasswordField')),
+    );
+
+    expect(passwordField().obscureText, isTrue);
+
+    await tester.tap(find.byKey(const Key('registerPasswordRevealToggle')));
+    await tester.pump();
+
+    expect(passwordField().obscureText, isFalse);
+
+    await tester.tap(find.byKey(const Key('registerPasswordRevealToggle')));
+    await tester.pump();
+
+    expect(passwordField().obscureText, isTrue);
+  });
+
+  testWidgets('T171: the password policy hint is shown before any failure', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        identityInterceptor: _FakeIdentityInterceptor(),
+        authInterceptor: _FakeAuthInterceptor(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Visible immediately — not only after a failed attempt (the
+    // walkthrough's own finding: the 12-char minimum was discoverable
+    // only by a 400).
+    expect(find.text('At least 12 characters'), findsOneWidget);
+  });
+
+  testWidgets(
+    'T171: a too-short password is rejected locally, no network call made',
+    (tester) async {
+      final identityInterceptor = _FakeIdentityInterceptor();
+
+      await tester.pumpWidget(
+        buildTestApp(
+          identityInterceptor: identityInterceptor,
+          authInterceptor: _FakeAuthInterceptor(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const Key('registerEmailField')),
+        'new-user@example.test',
+      );
+      await tester.enterText(
+        find.byKey(const Key('registerPasswordField')),
+        'short',
+      );
+      await tester.enterText(
+        find.byKey(const Key('registerDisplayNameField')),
+        'New User',
+      );
+      await enterDateOfBirth(tester, const Key('registerDateOfBirthButton'));
+
+      await tester.tap(find.byKey(const Key('registerSubmitButton')));
+      await tester.pumpAndSettle();
+
+      expect(
+        identityInterceptor.registerCallCount,
+        0,
+        reason:
+            'a too-short password must be rejected locally, mirroring the '
+            'server policy, not discovered only by a round trip',
+      );
+      expect(find.text('At least 12 characters'), findsOneWidget);
+      expect(find.byKey(const Key('registerScreen')), findsOneWidget);
+    },
+  );
+
   testWidgets(
     'signing in with valid credentials signs the user in and navigates home',
     (tester) async {

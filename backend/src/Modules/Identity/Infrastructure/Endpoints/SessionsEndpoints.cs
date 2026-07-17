@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 using SpecPour.BuildingBlocks.Http;
+using SpecPour.BuildingBlocks.Time;
 using SpecPour.Modules.Identity.Domain;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -36,8 +37,18 @@ public static class SessionsEndpoints
         group.MapDelete("/me/sessions/{id:guid}", RevokeAsync).RequireAuthorization(bearerOnly);
     }
 
+    /// <summary>ADR-0005 (T177): must match IdentityModule.cs's SetRefreshTokenLifetime —
+    /// a session whose LastSeenAt is older than this has necessarily expired (OpenIddict's
+    /// own sliding-refresh-token lifetime elapsed with no activity), so its refresh-token
+    /// family is dead even though nothing explicitly revoked it.</summary>
+    private static readonly TimeSpan RefreshTokenSlidingLifetime = TimeSpan.FromDays(14);
+
     private static async Task<Ok<SessionListResponse>> ListAsync(
-        ClaimsPrincipal user, IdentityDbContext db, CancellationToken cancellationToken)
+        ClaimsPrincipal user,
+        IdentityDbContext db,
+        IOpenIddictTokenManager tokenManager,
+        IClock clock,
+        CancellationToken cancellationToken)
     {
         var userId = CurrentUserId(user);
         // T167 root cause: LastSeenAt alone is not a unique sort key — two
@@ -48,14 +59,68 @@ public static class SessionsEndpoints
         // values is unspecified — it can vary run to run. Id is a second,
         // always-unique key that makes the ordering fully deterministic
         // regardless of timestamp collisions, in both the real system and tests.
-        var sessions = await db.SessionDevices
+        var candidates = await db.SessionDevices
             .Where(s => s.UserId == userId && s.RevokedAt == null)
             .OrderByDescending(s => s.LastSeenAt)
             .ThenByDescending(s => s.Id)
             .ToListAsync(cancellationToken);
 
+        // ADR-0005 (T177) orphan hygiene: a session must not render "active" just
+        // because OUR OWN RevokedAt column is still null — that column only reflects
+        // revocations WE explicitly performed (SessionsEndpoints.RevokeAsync's own
+        // call, or the absolute-cap check in TokenEndpoints.HandleTokenAsync). Two
+        // checks, neither trusting RevokedAt alone: (a) LastSeenAt older than the
+        // sliding lifetime means the refresh-token family has necessarily expired
+        // regardless of any revocation; (b) whether a live (Statuses.Valid) refresh
+        // token still exists for the authorization. (b) is checked at the TOKEN level,
+        // not the authorization level — confirmed empirically (two temporary
+        // diagnostics, 2026-07-16, T167-precedent style) that (i) OpenIddict's
+        // rolling-refresh-token reuse detection revokes the individual TOKENS on a
+        // detected reuse but leaves the AUTHORIZATION's own status at "valid" (it's
+        // the overarching grant record, not a token-lifecycle field) — checking
+        // authorizationManager.GetStatusAsync would have missed every reuse-detection
+        // revocation; and (ii) a token's stored Type is the full RFC 8693 URI
+        // (`urn:ietf:params:oauth:token-type:refresh_token`), NOT the bare RFC 7009
+        // token_type_hint string (`TokenTypeHints.RefreshToken` = "refresh_token") —
+        // comparing against the wrong constant silently matched zero tokens and
+        // filtered every session out.
+        var live = new List<SessionDevice>(candidates.Count);
+        foreach (var session in candidates)
+        {
+            if (clock.UtcNow - session.LastSeenAt > RefreshTokenSlidingLifetime)
+            {
+                continue;
+            }
+
+            // Standing rule (John, 2026-07-16, after the TokenTypeIdentifiers-vs-
+            // TokenTypeHints mistake below): any filter against a provider-internal
+            // string constant like this one MUST be guarded by a positive-match
+            // acceptance test (a known-live session actually appears), not only a
+            // negative one (a dead session is excluded) — the wrong constant silently
+            // matches zero tokens, which a negative-only assertion can't distinguish
+            // from correct filtering. See US02_Identity.feature scenario 18's
+            // "the session is no longer active" step for the positive-match test.
+            var hasValidRefreshToken = false;
+            await foreach (var token in tokenManager.FindByAuthorizationIdAsync(session.AuthorizationId, cancellationToken))
+            {
+                if (await tokenManager.GetTypeAsync(token, cancellationToken) == TokenTypeIdentifiers.RefreshToken
+                    && await tokenManager.GetStatusAsync(token, cancellationToken) == Statuses.Valid)
+                {
+                    hasValidRefreshToken = true;
+                    break;
+                }
+            }
+
+            if (!hasValidRefreshToken)
+            {
+                continue;
+            }
+
+            live.Add(session);
+        }
+
         return TypedResults.Ok(new SessionListResponse(
-            [.. sessions.Select(s => new SessionResponse(s.Id, s.DeviceDescription, s.CreatedAt, s.LastSeenAt))]));
+            [.. live.Select(s => new SessionResponse(s.Id, s.DeviceDescription, s.CreatedAt, s.LastSeenAt))]));
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> RevokeAsync(

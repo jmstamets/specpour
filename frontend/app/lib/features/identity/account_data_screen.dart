@@ -1,14 +1,21 @@
 // T053: export account data and delete the account. Not yet reachable from
 // any navigation chrome (same flagged gap as mfa_settings_screen.dart, T161)
 // but a real, complete, directly-routable screen at /account/data.
+//
+// T178 (FR-003a): the export deliverable is a downloadable JSON artifact —
+// the on-screen rendering below is a courtesy view, not the deliverable.
 
 import 'package:api_client/api_client.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/auth/identity_auth_service.dart';
+import '../../core/download/file_download_stub.dart'
+    if (dart.library.js_interop) '../../core/download/file_download_web.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 
 class AccountDataScreen extends ConsumerStatefulWidget {
   const AccountDataScreen({super.key});
@@ -32,6 +39,19 @@ class _AccountDataScreenState extends ConsumerState<AccountDataScreen> {
       final export = await ref
           .read(identityAuthServiceProvider)
           .exportAccountData();
+      // FR-003a: the download IS the deliverable — the on-screen state below
+      // is only ever a courtesy view of a subset of the same payload.
+      // Web-only for V1 (file_download_stub.dart's own doc comment); gated on
+      // the kIsWeb runtime check, not just the conditional import, so native
+      // callers (and this screen's own widget tests, which run on the Dart
+      // VM where kIsWeb is also false) skip it rather than hitting the
+      // stub's deliberate UnsupportedError.
+      if (kIsWeb) {
+        downloadJsonFile(
+          filename: 'specpour-data-export-${export.userId}.json',
+          jsonContent: standardSerializers.toJson(MeExport.serializer, export),
+        );
+      }
       if (mounted) {
         setState(() => _export = export);
       }
@@ -105,10 +125,9 @@ class _AccountDataScreenState extends ConsumerState<AccountDataScreen> {
         child: ListView(
           children: [
             if (_errorMessage case final error?) ...[
-              Text(
-                error,
-                key: const Key('accountDataErrorMessage'),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ApiErrorDisplay(
+                message: error,
+                messageKey: const Key('accountDataErrorMessage'),
               ),
               const SizedBox(height: 16),
             ],

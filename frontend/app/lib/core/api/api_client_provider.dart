@@ -2,12 +2,17 @@
 // is the app's only coupling to the backend — every feature calls through this
 // provider, never constructs its own Dio/ApiClient.
 
+import 'dart:async' show unawaited;
+
 import 'package:api_client/api_client.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../auth/refresh_coordinator.dart';
+import '../auth/token_store.dart';
 
 /// T047/ADR-0003: wires cookie support onto [dio] for the sign-in flow's
 /// register/login → cookie → /connect/authorize handoff, correctly per platform.
@@ -81,6 +86,48 @@ const _bearerSchemeName = 'bearerAuth';
 /// — same value identity_auth_service.dart's `_clientId` names for the same reason.
 const _refreshClientId = 'specpour-app';
 
+/// ADR-0005 (T177): the one place that actually performs a refresh_token
+/// grant — shared by [TokenRefreshInterceptor] (mid-session, reactive to a
+/// 401) and the app-start silent-restore flow (session_restore.dart), so both
+/// consumers get identical, honest success/failure handling. On success,
+/// updates both token providers (which [apiClientProvider]'s persistence
+/// listener below then writes to [TokenStore]) and returns true. On failure
+/// (expired, consumed, or revoked refresh token — including a detected reuse
+/// or the 90-day absolute-cap rejection, both plain refresh_token-grant
+/// failures with no distinct error shape to special-case), clears both
+/// providers and returns false. Callers must NEVER surface a false return as
+/// an error to the user — it always means "this session is over, start
+/// signed out," the same outcome a fully expired session already produces.
+Future<bool> silentlyRefreshTokens(
+  Ref ref, {
+  required String refreshToken,
+}) async {
+  try {
+    final authDio = ref.read(authDioProvider);
+    final response = await authDio.post<Map<String, dynamic>>(
+      '/connect/token',
+      data: {
+        'grant_type': 'refresh_token',
+        'refresh_token': refreshToken,
+        'client_id': _refreshClientId,
+      },
+      options: Options(contentType: Headers.formUrlEncodedContentType),
+    );
+
+    final newAccessToken = response.data!['access_token'] as String;
+    final newRefreshToken = response.data!['refresh_token'] as String?;
+    ref.read(authTokenProvider.notifier).set(newAccessToken);
+    ref
+        .read(refreshTokenProvider.notifier)
+        .set(newRefreshToken ?? refreshToken);
+    return true;
+  } on Object {
+    ref.read(authTokenProvider.notifier).set(null);
+    ref.read(refreshTokenProvider.notifier).set(null);
+    return false;
+  }
+}
+
 /// T052 follow-on (2026-07-14): the backend's access-token lifetime was
 /// shortened to 10 minutes to bound the post-revocation exposure window (see
 /// IdentityModule.cs's SetAccessTokenLifetime comment), which makes refresh a
@@ -113,34 +160,28 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
       return;
     }
 
+    // ADR-0005 (T177): go through the cross-tab election, not silentlyRefreshTokens
+    // directly — on web, if another tab is already refreshing this session, this
+    // one waits for and adopts that tab's rotated token instead of presenting the
+    // now-redeemed one and tripping reuse detection.
+    final refreshed = await coordinatedRefresh(
+      _ref,
+      startingRefreshToken: refreshToken,
+    );
+    if (!refreshed) {
+      handler.next(err);
+      return;
+    }
+
+    final newAccessToken = _ref.read(authTokenProvider)!;
+    final retryOptions = err.requestOptions;
+    retryOptions.extra['tokenRefreshRetried'] = true;
+    retryOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+
     try {
-      final authDio = _ref.read(authDioProvider);
-      final response = await authDio.post<Map<String, dynamic>>(
-        '/connect/token',
-        data: {
-          'grant_type': 'refresh_token',
-          'refresh_token': refreshToken,
-          'client_id': _refreshClientId,
-        },
-        options: Options(contentType: Headers.formUrlEncodedContentType),
-      );
-
-      final newAccessToken = response.data!['access_token'] as String;
-      final newRefreshToken = response.data!['refresh_token'] as String?;
-      _ref.read(authTokenProvider.notifier).set(newAccessToken);
-      _ref
-          .read(refreshTokenProvider.notifier)
-          .set(newRefreshToken ?? refreshToken);
-
-      final retryOptions = err.requestOptions;
-      retryOptions.extra['tokenRefreshRetried'] = true;
-      retryOptions.headers['Authorization'] = 'Bearer $newAccessToken';
-
       final retryResponse = await _apiDio.fetch<dynamic>(retryOptions);
       handler.resolve(retryResponse);
     } on Object {
-      _ref.read(authTokenProvider.notifier).set(null);
-      _ref.read(refreshTokenProvider.notifier).set(null);
       handler.next(err);
     }
   }
@@ -166,6 +207,26 @@ final apiClientProvider = Provider<ApiClient>((ref) {
   ref.listen<String?>(authTokenProvider, (_, next) => syncToken(next));
 
   return client;
+});
+
+/// ADR-0005 (T177): the single place that keeps [TokenStore] in sync with
+/// [refreshTokenProvider], regardless of which code path changed it — sign-in/
+/// register (identity_auth_service.dart's _completeTokenExchange),
+/// [silentlyRefreshTokens] (mid-session refresh or app-start restore), or an
+/// explicit sign-out (deleteAccount). A reactive listener here is more robust
+/// than persisting at every individual call site — a future call site can't
+/// forget to persist. session_restore.dart's [sessionRestoreProvider]
+/// `ref.watch`es this FIRST, before attempting its own refresh, so the
+/// listener is guaranteed wired before anything it would need to persist.
+final refreshTokenPersistenceProvider = Provider<void>((ref) {
+  final tokenStore = ref.watch(tokenStoreProvider);
+  ref.listen<String?>(refreshTokenProvider, (_, next) {
+    if (next == null) {
+      unawaited(tokenStore.clearRefreshToken());
+    } else {
+      unawaited(tokenStore.writeRefreshToken(next));
+    }
+  });
 });
 
 final authorizationApiProvider = Provider<AuthorizationApi>(

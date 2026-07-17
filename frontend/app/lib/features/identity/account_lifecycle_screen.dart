@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 
 class AccountLifecycleScreen extends ConsumerStatefulWidget {
   const AccountLifecycleScreen({super.key});
@@ -131,10 +132,9 @@ class _AccountLifecycleScreenState
               const SizedBox(height: 16),
             ],
             if (_errorMessage case final error?) ...[
-              Text(
-                error,
-                key: const Key('accountLifecycleErrorMessage'),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ApiErrorDisplay(
+                message: error,
+                messageKey: const Key('accountLifecycleErrorMessage'),
               ),
               const SizedBox(height: 16),
             ],

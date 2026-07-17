@@ -16,7 +16,23 @@ namespace SpecPour.Tests.Acceptance;
 /// doesn't run in parallel with them (Reqnroll's xUnit plugin runs the feature as
 /// its own collection; a plain [Fact] would otherwise run concurrently and could
 /// still race for the container). It shares only the DB, not the rate limiter.
+///
+/// CORRECTNESS NOTE (found 2026-07-17, T177 #100 item 0(b)): this class never
+/// actually carried the [Collection] attribute the comment above describes —
+/// only the doc comment existed, not the code. It went unnoticed because
+/// RateLimitingTests was the only test in the project that boots its own
+/// separate SpecPourWebApplicationFactory outside AcceptanceHooks.Factory, so
+/// there was nothing else running concurrently that also reboots
+/// OpenIddictClientSeedingHostedService (which syncs the seeded OpenIddict
+/// client's redirect URIs against the shared Testcontainers row on every host
+/// start). Adding DevOnlyRefreshAttemptsEndpointTests — which needs its own
+/// Production-configured factory for the same reason — exposed it: two
+/// concurrently-booting hosts race to UpdateAsync the same application row and
+/// one loses to a DbUpdateConcurrencyException. The attribute below (matching
+/// Reqnroll's generated "ReqnrollNonParallelizableFeatures" collection name) is
+/// the fix now actually applied, not just documented.
 /// </summary>
+[Collection("ReqnrollNonParallelizableFeatures")]
 public sealed class RateLimitingTests
 {
     [Fact]

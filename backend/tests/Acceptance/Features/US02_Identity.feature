@@ -101,6 +101,21 @@ Feature: US2 - Create an account and manage identity
     Then only the second session remains active
     And the first device's session can no longer be refreshed
 
+  Scenario: 18 - A redeemed refresh token cannot be reused (T177, ADR-0005)
+    Given a registered adult user
+    When the user acquires a refresh token
+    And the refresh token is redeemed once
+    And time passes beyond the refresh-token reuse leeway
+    Then the second redemption of the same refresh token is rejected
+    And the session is no longer active
+
+  Scenario: 19 - A session older than the absolute cap must re-authenticate (T177, ADR-0005)
+    Given a registered adult user
+    When the user acquires a refresh token
+    And the user refreshes the session every 10 days until the absolute cap is reached
+    Then the refresh token is rejected
+    And the session is no longer active
+
   Scenario: 16 - A user can deactivate and reactivate their account (T052, FR-003)
     Given a registered adult user
     When the user deactivates their account

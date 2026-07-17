@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:specpour_app/core/api/api_client_provider.dart';
 import 'package:specpour_app/core/app.dart';
 import 'package:specpour_app/core/routing/app_router.dart';
@@ -27,6 +28,20 @@ void main() {
   // "fewer cases ran than expected" into a real, reported test failure.
   const expectedCaseCount = 4;
   var executedCaseCount = 0;
+
+  // ADR-0005 (T177): all cases in this file share one real Chrome page/
+  // localStorage across the whole `flutter drive` run (unlike isolated
+  // `flutter test` widget tests) — a real, empirically-confirmed consequence
+  // of persistence now genuinely working: without this, a later case's fresh
+  // pumpWidget silently inherits an EARLIER case's persisted refresh token via
+  // sessionRestoreProvider's auto-restore, landing already-signed-in instead
+  // of the guest state most of these cases assume. Each case starts from a
+  // clean slate.
+  setUp(() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  });
+
   tearDownAll(() {
     expect(
       executedCaseCount,
