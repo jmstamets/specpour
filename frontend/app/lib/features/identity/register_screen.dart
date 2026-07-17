@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/guest_gate/guest_gate.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 import 'social_sign_in_buttons.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -211,10 +212,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
             if (_errorMessage case final error?) ...[
               const SizedBox(height: 16),
-              Text(
-                error,
-                key: const Key('registerErrorMessage'),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ApiErrorDisplay(
+                message: error,
+                messageKey: const Key('registerErrorMessage'),
               ),
             ],
             const SizedBox(height: 24),

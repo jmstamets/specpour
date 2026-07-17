@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 
 final sessionsProvider = FutureProvider.autoDispose<List<Session>>(
   (ref) => ref.watch(identityAuthServiceProvider).listSessions(),
@@ -78,10 +79,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       key: const Key('sessionsList'),
       children: [
         if (_errorMessage case final error?) ...[
-          Text(
-            error,
-            key: const Key('sessionsErrorMessage'),
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ApiErrorDisplay(
+            message: error,
+            messageKey: const Key('sessionsErrorMessage'),
           ),
           const SizedBox(height: 16),
         ],

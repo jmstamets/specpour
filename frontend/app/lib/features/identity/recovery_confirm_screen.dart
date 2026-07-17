@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 
 class RecoveryConfirmScreen extends ConsumerStatefulWidget {
   const RecoveryConfirmScreen({super.key});
@@ -112,10 +113,9 @@ class _RecoveryConfirmScreenState extends ConsumerState<RecoveryConfirmScreen> {
             ),
             if (_errorMessage case final error?) ...[
               const SizedBox(height: 16),
-              Text(
-                error,
-                key: const Key('recoveryConfirmErrorMessage'),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ApiErrorDisplay(
+                message: error,
+                messageKey: const Key('recoveryConfirmErrorMessage'),
               ),
             ],
             const SizedBox(height: 24),

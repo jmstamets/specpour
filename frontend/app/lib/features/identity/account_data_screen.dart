@@ -15,6 +15,7 @@ import '../../core/auth/identity_auth_service.dart';
 import '../../core/download/file_download_stub.dart'
     if (dart.library.js_interop) '../../core/download/file_download_web.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 
 class AccountDataScreen extends ConsumerStatefulWidget {
   const AccountDataScreen({super.key});
@@ -124,10 +125,9 @@ class _AccountDataScreenState extends ConsumerState<AccountDataScreen> {
         child: ListView(
           children: [
             if (_errorMessage case final error?) ...[
-              Text(
-                error,
-                key: const Key('accountDataErrorMessage'),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ApiErrorDisplay(
+                message: error,
+                messageKey: const Key('accountDataErrorMessage'),
               ),
               const SizedBox(height: 16),
             ],

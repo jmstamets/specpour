@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/guest_gate/guest_gate.dart';
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/widgets/api_error_display.dart';
 import 'social_sign_in_buttons.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
@@ -110,10 +111,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             ),
             if (_errorMessage case final error?) ...[
               const SizedBox(height: 16),
-              Text(
-                error,
-                key: const Key('signInErrorMessage'),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ApiErrorDisplay(
+                message: error,
+                messageKey: const Key('signInErrorMessage'),
               ),
             ],
             const SizedBox(height: 24),
