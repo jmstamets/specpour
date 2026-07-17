@@ -1,8 +1,10 @@
 # Phase 4 (US2 Identity) — human visual-verification walkthrough
 
-Green test suites (backend Unit 35/35, Integration 1/1, Contract 35/35, Acceptance
-41/41; frontend `flutter analyze` clean, `flutter test` 58/58) cover every scenario's
-_logic_. This checklist is the human step for what they can't: whether the identity
+Green test suites (backend Unit 35/35, Integration 1/1, Contract 37/37, Acceptance
+46/46; frontend `flutter analyze` clean, `flutter test` 77/77; plus the full
+headless-Chrome browser tier, including the new frozen-tab test — as of
+2026-07-17, branch `phase4-signoff`) cover every scenario's _logic_. This
+checklist is the human step for what they can't: whether the identity
 feature actually feels reachable and clear as a real person clicking through it — no
 US2 surface has had a human walkthrough before this checkpoint (Phase 3's walkthrough
 was scoped to US1/Discover only). The crux item is (a): four of these five screens
@@ -35,16 +37,25 @@ Two processes: the backend stack (docker-compose) and the built Flutter web app.
    **Build freshness**: verify the served bundle matches what's on disk —
    `sha256sum main.dart.js` on disk must match `curl -s
 http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this build
-   (2026-07-15, includes re-walk fixes #1/F1/F2 — T169/T175/T176):
-   `e4badd9baa251af153f63e82e60b0259128b609b2b85d5ea48128db8a5e73c02`.
+   (2026-07-17, includes every fix through T183 — the full Phase 4 sign-off queue):
+   `c31733e43820e33ee05ab29d9353fe6f9e0c6e9da991e759b17e67f892d79cbb`.
 
-   **Re-walk note (2026-07-15):** finding #1 (registration failing in a real browser)
-   is fixed and now guarded by a headless-Chrome integration test
-   (`scripts/run-web-integration-tests.sh`). The stale error _presentation_ (raw
-   exception text, no reveal toggle / password-policy hint, uncopyable errors) is
-   tracked as T170-T172; session persistence (reload logs you out) is T177 — NONE yet fixed — so on this re-walk, registration should
-   _succeed and land signed in_, but a deliberately-bad input (short password,
-   underage DOB) will still show terse/technical copy until those land.
+   **Branch note (2026-07-17):** this build is from branch `phase4-signoff`
+   (PR #3: https://github.com/jmstamets/specpour/pull/3), not yet merged to
+   `main` — per this project's solo-dev merge model, only John merges PRs, and
+   this walkthrough is the pre-merge verification gate for that PR's contents
+   (T183, T173, and everything below), not a re-walk of already-merged code.
+   `docker compose build api` was re-run against this branch tip before this
+   build so the backend under test matches it too (confirm via `git log -1
+--oneline` on the checked-out branch if re-running this walkthrough later).
+
+   **Round 3 note (2026-07-17):** every item tracked as open at the end of
+   Round 2 (T170-T173, plus a newly-discovered frozen-tab refresh bug found
+   during PR #2's review, filed and fixed as T183) is now code-complete and
+   green on every automated suite — see the Round 3 disposition at the bottom
+   of this document for the full rundown, including which items are
+   mechanically verified (no human step needed) versus which still need your
+   own click-through below.
 
 ## Verify
 
@@ -69,10 +80,32 @@ http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this bui
   a known, already-tracked gap, not something to flag here); to test sign-in
   separately, use a second browser profile or clear site data, then sign in with the
   account just registered.
+- [ ] **T171 — password UX**: on the registration screen, confirm (1) a reveal/hide
+  eye icon on the password field (no separate confirm field — reveal replaces it);
+  (2) the hint "At least 12 characters" is visible *before* you type anything or
+  submit, not only after a failure; (3) typing fewer than 12 characters and tapping
+  submit shows the error bound to the field itself (red text under the field), not a
+  form-level banner, and happens instantly with no network delay.
+- [ ] **T170 — error presentation**: sign in with a wrong password. Confirm the
+  error reads as plain, friendly copy (e.g. "Invalid email or password"), never raw
+  exception/stack-trace text, and a short correlation ID is visible somewhere in or
+  near the error (for reporting a bug against a specific attempt).
+- [ ] **T172 — selectable/copyable errors**: on that same sign-in error, try to
+  drag-select the error text (should work, unlike the original bug report) and tap
+  the copy icon next to it — paste somewhere to confirm the clipboard now holds the
+  exact error text including the correlation ID.
 
 ### (c) T050/T163 — MFA enrollment, backup codes, disable
 
-- [FAIL] From the Account menu, open **Two-factor authentication** → **Set up
+**Still open** — the underlying 500 error the first bullet below originally caught
+is fixed (T175, `06067a7`), so its [FAIL] tag is stale (kept here only as the
+original bug record, not a claim it's still broken). Nobody has walked this section
+with a real/simulated TOTP code since that fix, so every item below is genuinely
+unverified, not a re-walk — this is the one section of the checklist still needing
+a first real pass.
+
+- [ ] (was [FAIL], root cause fixed by T175 — needs re-verification) From the
+  Account menu, open **Two-factor authentication** → **Set up
   two-factor authentication**. A secret key is shown for manual entry into an
   authenticator app (a real TOTP code is needed to confirm — use an authenticator app
   or a TOTP calculator against the shown secret).
@@ -100,17 +133,31 @@ http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this bui
 ### (e) T051 — sessions
 
 - [PASS with comment] Open **Active sessions** from the Account menu. The current session appears with a device description and a last-active time that reads as a real, human-parseable date (not an ISO timestamp).
-  NOTE: Active sessions: displays current session, however refreshing the browser requires the user to re-login, and that results in a new entry in Active sessions
+  NOTE (Round 1): refreshing the browser required re-login and created a new
+  Active-sessions entry — **FIXED, T177** (`8a72024`, PR #2). Re-verify: reload
+  the page while on this screen — it should silently restore the *same* session
+  (no re-login, no new entry appears; last-active time bumps instead).
 - [PASS] Sign in from a second browser/incognito window with the same account, then
   refresh the sessions list in the first — two sessions now appear.
 - [PASS] Revoke one session — it disappears from the list immediately.
+- [ ] **T183 — frozen-tab refresh hardening**: no human step needed here. This
+  fix (a background tab that Chrome froze/suspended missing the cross-tab
+  refresh handoff, then presenting a stale token and tripping reuse detection —
+  logging every tab out) is mechanically verified by an automated browser-tier
+  test (`web_frozen_tab_test.dart`, green in CI on every push to this PR) that
+  simulates the exact frozen-tab race. Nothing to click through; listed here
+  only so this checklist has a record of it.
 
 ### (f) T151 — notification preferences
 
 - [PASS] Open **Notification preferences**. Both Email and Push rows appear, both off
   by default.
-- [Unable to test - refresh logs out user] Toggle Email on — the switch updates immediately; reload the page and reopen
-  the screen to confirm the change actually persisted (not just local UI state).
+- [ ] Toggle Email on — the switch updates immediately; reload the page and
+  reopen the screen to confirm the change actually persisted (not just local
+  UI state). **This is now testable** — Round 1 marked it "Unable to test,
+  refresh logs out user"; T177 (above) means reload no longer signs you out,
+  so this can finally be walked end-to-end. Not self-certified as PASS here —
+  genuinely needs your click-through.
 
 ### (g) T052 — account lifecycle
 
@@ -126,6 +173,14 @@ http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this bui
   appears on screen (this is the _only_ screen anywhere in the app that should ever
   show a raw date of birth — worth confirming no other screen visited during this
   walkthrough ever showed it).
+- [ ] **T178 — real download, `fa661fc`**: tapping **Export my data** should now
+  *also* trigger a browser download of a `specpour-data-export-{userId}.json`
+  file (check your Downloads folder). Open the downloaded file and confirm its
+  contents match what's shown on screen (userId, email, sessions present) —
+  this is mechanically verified by an automated browser test that checks the
+  real file on disk (`web_export_download_test.dart`), but confirm the actual
+  UX here: is a download this easy to miss, does the browser's download
+  indicator make it obvious something happened?
 - [PASS] Tap **Delete my account** — a confirmation dialog appears first, with wording that makes clear this is permanent. Cancelling it should leave the account intact (don't confirm delete unless you're fine losing this walkthrough's test account — deleting it ends the session and returns to Discover).
 
 ### Not visually verifiable in this build
@@ -194,12 +249,46 @@ anyone picking this back up:
   project's standing human-visual-verification rule.
 - **Structural browser-tier growth** — ONGOING, T179. `web_auth_smoke_test.dart`
   now covers register, sign-in fail-then-succeed, MFA enroll, and the
-  register-path preserve-intent case; still needs MFA confirm/disable,
-  reload-restores-session (after T177), export-download (after T178), and
-  wiring into a real CI pipeline (T168 — see that task for current status).
-- **T170–T173 (error presentation, password UX, selectable/copyable errors,
-  social sign-in productionization)** — **STILL OPEN**, not started, last in
-  John's sequence.
+  register-path preserve-intent case; still needs MFA confirm/disable and
+  wiring into a real CI pipeline as a *required* check for that specific file
+  (T168 closed the broader CI-provisioning gap and wired the whole browser
+  tier in as required — see T168 for status; growing this one file's own
+  scenario coverage remains open).
+- **T170 (error presentation)** — **FIXED**, `44a802c`. Explicit checklist
+  item added to section (b) above.
+- **T171 (password UX)** — **FIXED**, `085f187`. Explicit checklist item
+  added to section (b) above.
+- **T172 (selectable/copyable errors)** — **FIXED**, `745a61c`. Explicit
+  checklist item added to section (b) above.
+- **T173 (social sign-in productionization)** — **FIXED**, `5f773dd`. No
+  checklist item added: this build has zero OAuth providers configured (no
+  real Google/Microsoft/Apple credentials exist in any environment this
+  codebase has run in — see `docs/oauth-provider-setup.md` for when you
+  register them), so the correct, verified-in-CI behavior is that the sign-in
+  and register screens show **no social buttons and no divider at all** — if
+  you see any social button in this build, that itself is the bug to report.
+- **T183 (frozen-tab refresh hardening, found during PR #2 review)** —
+  **FIXED**, `6edbf8f`. Explicit note added to section (e) above — no human
+  step needed, mechanically verified in CI.
 
-Sign-off is gated on: ~~T177~~ (DONE, 2026-07-17) → T178 → the (c)/(f)
-re-walks → T170–T173, per John's 2026-07-15 sequencing.
+### Round 3 disposition (2026-07-17 — this session, PR #3: `phase4-signoff`)
+
+Every item that was open at the end of Round 2 is now code-complete, and every
+automated suite is green on this branch (backend all four suites; frontend
+`flutter analyze` clean, `flutter test` 77/77; the full browser tier including
+the new frozen-tab test; NuGet vulnerability scan clean; zero generated-client
+drift). What's left is **entirely human verification**, in two shapes:
+
+1. **Re-confirm fixes that are already mechanically proven** (T177's reload
+   persistence in section (e), T183's frozen-tab hardening, T178's export
+   download) — low-risk, these have real automated browser tests behind them,
+   but this project's standing rule is that a human still walks the actual UX,
+   not just trusts the test suite.
+2. **A genuinely new first pass** on section (c) (MFA backup-code UX) and the
+   three new T170-T172 checklist items in section (b) — these have widget-test
+   coverage but have never been looked at by a human in a real browser.
+
+Sign-off is gated on: this walkthrough, all sections, run once against the
+build described above (`c31733e4...79cbb`, branch `phase4-signoff`). No task
+is scheduled to remain open after this walkthrough closes except whatever new
+findings it surfaces.
