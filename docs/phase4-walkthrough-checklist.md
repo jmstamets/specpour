@@ -183,8 +183,15 @@ anyone picking this back up:
   claim of PASS is made here on his behalf, per this project's standing rule
   that MVP-checkpoint-style visual walkthroughs need human verification, not
   just automated-test inference.
-- **F4 (data export must download a file, section (h))** — **STILL OPEN**,
-  tracked as T178.
+- **F4 (data export must download a file, section (h))** — **FIXED, T178**
+  (2026-07-17). Tapping **Export my data** now also downloads a real
+  `specpour-data-export-{userId}.json` file (the full export payload) —
+  confirmed via an automated browser-tier test that checks the actual
+  downloaded file on disk, not just that a function ran. The on-screen
+  date-of-birth rendering is unchanged (still the only screen that shows a
+  raw DOB), now genuinely a courtesy view alongside the real deliverable.
+  Flagged for John's own re-walk of (h), not self-certified as PASS, per this
+  project's standing human-visual-verification rule.
 - **Structural browser-tier growth** — ONGOING, T179. `web_auth_smoke_test.dart`
   now covers register, sign-in fail-then-succeed, MFA enroll, and the
   register-path preserve-intent case; still needs MFA confirm/disable,

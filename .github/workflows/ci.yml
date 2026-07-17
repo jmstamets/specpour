@@ -170,6 +170,8 @@ jobs:
         run: scripts/run-web-integration-tests.sh integration_test/web_session_persistence_test.dart
       - name: Run 90-day-cap-expiry test (T177 #101(c))
         run: scripts/run-cap-expiry-test.sh
+      - name: Run data-export download test (T178)
+        run: scripts/run-export-download-test.sh
       - name: Docker logs (always, for diagnosis)
         if: always()
         run: docker compose logs
