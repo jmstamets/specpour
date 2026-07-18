@@ -10,5 +10,7 @@
   { "key": "rich-simple-syrup", "name": "Rich Simple Syrup", "categoryKey": "category.syrup", "description": "Sugar syrup at a 2:1 sugar-to-water ratio." },
   { "key": "simple-syrup", "name": "Simple Syrup", "categoryKey": "category.syrup", "description": "Sugar syrup at a 1:1 sugar-to-water ratio." },
   { "key": "angostura-bitters", "name": "Angostura Bitters", "categoryKey": "category.bitters", "abvPercent": 44.7, "description": "Aromatic bitters used in dash quantities." },
-  { "key": "whole-egg", "name": "Whole Egg", "categoryKey": "category.dairyAndEgg", "description": "A whole raw egg, used for texture and body.", "allergenKeys": ["egg"] }
+  { "key": "whole-egg", "name": "Whole Egg", "categoryKey": "category.dairyAndEgg", "description": "A whole raw egg, used for texture and body.", "allergenKeys": ["egg"] },
+  { "key": "london-dry-gin", "name": "London Dry Gin", "categoryKey": "category.spirit", "description": "A style of gin defined by production method (all flavoring added during distillation) rather than origin." },
+  { "key": "beefeater", "name": "Beefeater", "categoryKey": "category.spirit", "abvPercent": 47, "sources": ["London, England"], "description": "A classic London Dry Gin, distilled in the City of London since 1863.", "parentKey": "london-dry-gin" }
 ]

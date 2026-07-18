@@ -32,6 +32,12 @@ at `.specify/memory/constitution.md`.
 # Start local infrastructure (Postgres+PostGIS, MinIO, otel-collector, API)
 docker compose up -d
 
+# Optional: load the curated catalog content (recipes/ingredients/equipment/
+# glossary/concepts) so Discover etc. have real data to browse. Not started
+# automatically by `up -d` (it's profile-gated — see docker-compose.yml's
+# seeder service); idempotent, safe to re-run.
+docker compose run --rm seeder
+
 # Backend
 cd backend
 dotnet build
@@ -49,12 +55,14 @@ See `specs/001-specpour-v1/quickstart.md` for end-to-end validation scenarios.
 
 ## Local CI gate
 
-No CI provisioning exists yet for this repo (T168 — a repo-hosting decision,
-not made yet), so `.github/workflows/ci.yml`'s gates don't run anywhere on
-their own. Run `scripts/install-git-hooks.sh` once per clone to install a
-local pre-commit/pre-push hook (`scripts/pre-push-checks.sh`) that runs the
-same checks CI would: the four backend test suites, frontend analyze/format/
-test, the generated-client drift check, and a NuGet vulnerable-package scan.
-(Frontend `integration_test` on an Android emulator and the Trivy container
-scan aren't included — impractical for a local hook — and remain CI-only
-once CI exists.) Skip a one-off run with `SKIP_LOCAL_CI_GATE=1 git commit ...`.
+Real CI is live (`.github/workflows/ci.yml`, GitHub Actions, required status
+checks on `main` — see T168). Run `scripts/install-git-hooks.sh` once per
+clone to also install a local pre-commit/pre-push hook
+(`scripts/pre-push-checks.sh`) that runs the same checks locally, as an early
+backstop before pushing: the four backend test suites, frontend analyze/
+format/test, the generated-client drift check, and a NuGet vulnerable-package
+scan. (Frontend `integration_test` on an Android emulator, the Trivy container
+scan, and T190's coverage collection + non-regression ratchet aren't included
+— impractical for a local hook — and stay CI-only; see
+`scripts/check-coverage-ratchet.sh` to run the coverage ratchet manually if
+ever needed.) Skip a one-off local run with `SKIP_LOCAL_CI_GATE=1 git commit ...`.

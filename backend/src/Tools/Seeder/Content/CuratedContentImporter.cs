@@ -111,6 +111,7 @@ public sealed class CuratedContentImporter(
         var records = await ReadAsync<IngredientRecord>(contentDirectory, "ingredients.json", cancellationToken);
         var keyToId = new Dictionary<string, Guid>();
         var allergenIdByKey = await ingredientsDb.Allergens.ToDictionaryAsync(a => a.Key, a => a.Id, cancellationToken);
+        var newlyAddedByKey = new Dictionary<string, Ingredient>();
 
         foreach (var record in records)
         {
@@ -122,7 +123,7 @@ public sealed class CuratedContentImporter(
                 continue;
             }
 
-            ingredientsDb.Ingredients.Add(new Ingredient
+            var ingredient = new Ingredient
             {
                 Id = id,
                 OwnerType = OwnerType.System,
@@ -133,7 +134,9 @@ public sealed class CuratedContentImporter(
                 Description = record.Description,
                 AbvPercent = record.AbvPercent,
                 Visibility = ContentVisibility.Public,
-            });
+            };
+            ingredientsDb.Ingredients.Add(ingredient);
+            newlyAddedByKey[record.Key] = ingredient;
 
             foreach (var allergenKey in record.AllergenKeys ?? [])
             {
@@ -144,6 +147,22 @@ public sealed class CuratedContentImporter(
                     Certainty = AllergenCertainty.Certain,
                 });
             }
+        }
+
+        // T181: resolve hierarchy (FR-012) as a second pass over the same batch —
+        // a child can be declared before or after its parent in the JSON array, so
+        // ParentId can only be set once every record in this run has an id.
+        foreach (var record in records)
+        {
+            if (record.ParentKey is null || !newlyAddedByKey.TryGetValue(record.Key, out var ingredient))
+            {
+                continue;
+            }
+
+            ingredient.ParentId = keyToId.TryGetValue(record.ParentKey, out var parentId)
+                ? parentId
+                : throw new InvalidOperationException(
+                    $"Ingredient '{record.Key}' declares parentKey '{record.ParentKey}', which was not found in ingredients.json.");
         }
 
         await ingredientsDb.SaveChangesAsync(cancellationToken);
@@ -298,7 +317,7 @@ internal sealed record IngredientCategoryRecord(string Key, string NameKey, stri
 
 internal sealed record IngredientRecord(
     string Key, string Name, string CategoryKey, decimal? AbvPercent, IReadOnlyList<string>? Sources,
-    string? Description, IReadOnlyList<string>? AllergenKeys);
+    string? Description, IReadOnlyList<string>? AllergenKeys, string? ParentKey = null);
 
 internal sealed record GlossaryTermRecord(string Key, string Term, IReadOnlyList<string> Definitions);
 
