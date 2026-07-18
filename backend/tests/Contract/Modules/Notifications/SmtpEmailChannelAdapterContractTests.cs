@@ -46,10 +46,18 @@ public sealed class SmtpEmailChannelAdapterContractTests : EmailChannelAdapterCo
     /// never was — a genuine gap, fixed with the same ArgumentException guard
     /// used elsewhere in this file. Covers it directly: a Username configured
     /// without a Password must fail loudly, before ever attempting to
-    /// authenticate, not silently connect-then-crash.
+    /// authenticate, not silently connect-then-crash. The guard (and so this
+    /// test) lives at SendAsync, not construction: the adapter is DI-constructed
+    /// with IOptions, whose Value is deliberately not read until send time, so
+    /// send time is the earliest point the bad config is observable (T185:
+    /// blank-password variants folded in alongside null — ThrowIfNullOrWhiteSpace
+    /// rejects all three, each now pinned by its own case).
     /// </summary>
-    [Fact]
-    public async Task SendAsync_rejects_a_configured_username_with_no_password()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task SendAsync_rejects_a_configured_username_with_a_null_or_blank_password(string? password)
     {
         var options = new SmtpEmailOptions
         {
@@ -57,7 +65,7 @@ public sealed class SmtpEmailChannelAdapterContractTests : EmailChannelAdapterCo
             Port = _smtp4dev.GetMappedPublicPort(SmtpPort),
             FromAddress = "noreply@specpour.local",
             Username = "someone",
-            Password = null,
+            Password = password,
         };
         var adapter = new SmtpEmailChannelAdapter(Options.Create(options));
 

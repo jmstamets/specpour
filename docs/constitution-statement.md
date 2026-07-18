@@ -92,6 +92,10 @@ Identity and authenticity mechanisms are platform infrastructure: business claim
 
 Third-party operational data (e.g., POS sales) enters the platform only through the adapter layer (Principle 3) into an ingestion module that normalizes to platform entities via stable identifiers. Ingested data is clearly provenance-tagged (in-app signal vs. manual entry vs. integrated source) end-to-end, including in every analytics display. The platform never becomes a system of record for a venue's financial data; it stores only what its analytics features require.
 
+## 18. Fail-Closed Verification
+
+Every automated check, gate, scan, or test in the development and deployment pipeline must fail loudly on its own inability to run. A verification step that cannot complete, cannot reach its data source, unexpectedly matches zero items, or has its failure signal swallowed (e.g., by shell pipeline semantics) must report failure — never success. "Pass" is reserved exclusively for "checked and verified," never for "could not check." Where inconclusiveness is expected and acceptable, that acceptance must be explicit and visible (a distinct skipped/warned state), not a silent pass. Scripts composing checks must propagate failure across pipelines (e.g., pipefail alongside errexit). Every new check is reviewed against this principle at introduction, and the question asked of any verification is not "does it catch the bad case?" but "what does it do when it cannot tell?"
+
 ---
 
 _Assumptions encoded above (veto any):_ current .NET LTS at project start; OCI/Docker as the container standard; S3-compatible abstraction for media even on Azure (via compatible layer or storage abstraction); GDPR-grade privacy posture even if initial market is US; WCAG 2.1 AA as accessibility bar; client-side geofencing as the default verification mechanism; license documents retained only until verification completes plus a short audit window; strictest-applicable-rule default for age gating.

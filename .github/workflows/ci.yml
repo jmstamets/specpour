@@ -11,6 +11,17 @@ env:
   DOTNET_NOLOGO: "true"
   DOTNET_CLI_TELEMETRY_OPTOUT: "true"
 
+# T184 (fail-open sweep): GitHub's DEFAULT Linux shell for run steps is
+# `bash -e {0}` — WITHOUT pipefail — so `cmd | tee log` masks cmd's failure
+# behind tee's success (confirmed empirically: `false | tee` exits 0 under
+# the default, 1 under explicit `shell: bash`, which GH invokes as
+# `bash --noprofile --norc -eo pipefail {0}`). The two piped steps here
+# (backend-tests, dependency-scan) were surviving on their grep guards alone;
+# this makes the pipeline exit code itself load-bearing again everywhere.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   # --- Backend: build (analyzers + treat-warnings-as-errors are enforced via
   # backend/Directory.Build.props, so a clean build already gates code style). ---
