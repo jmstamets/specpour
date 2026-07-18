@@ -1,5 +1,10 @@
 # Phase 4 (US2 Identity) — human visual-verification walkthrough
 
+> **STATUS: SIGNED OFF ✅ (John, 2026-07-18).** All items walked in a real
+> browser and passed across Rounds 1–4. See the Round 4 disposition at the
+> bottom for the final confirmations. This document is the Phase 4 walkthrough
+> record.
+
 Green test suites (backend Unit 35/35, Integration 1/1, Contract 37/37, Acceptance
 46/46; frontend `flutter analyze` clean, `flutter test` 77/77; plus the full
 headless-Chrome browser tier, including the new frozen-tab test — as of
@@ -93,14 +98,13 @@ http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this bui
 
 ### (c) T050/T163/T187 — MFA enrollment, backup codes, disable
 
-**Round 4 partial confirmation (2026-07-18)** — the enrollment UX is now
-QR-first (T187, `43dbd93`): a scannable QR code, scan instructions, and the
-manual key grouped in fours beneath. **John confirmed QR enrollment with a real
-authenticator, and observed regenerate** (marked [PASS] below). Two boxes remain
-**OPEN for John** per his sign-off directive: the codes-don't-reappear check and
-disable-restores-enroll. (Backup-code wording: John's walkthrough judgment
-produced T195, which appended "Without these codes or your authenticator app,
-you could lose access to your account." — visible after the next bundle rebuild.)
+**CONFIRMED by John (2026-07-18)** — the enrollment UX is QR-first (T187,
+`43dbd93`): a scannable QR code, scan instructions, and the manual key grouped
+in fours beneath. John walked the whole section — QR enrollment with a real
+authenticator, backup-code display, "I've saved these codes", regenerate, and
+disable — all pass. (Backup-code wording: John's walkthrough judgment produced
+T195, which appended "Without these codes or your authenticator app, you could
+lose access to your account." — now in the served bundle.)
 
 - [PASS] From the Account menu, open **Two-factor authentication** → **Set up
   two-factor authentication**. A **QR code** appears with scan instructions and
@@ -113,13 +117,14 @@ you could lose access to your account." — visible after the next bundle rebuil
   _(Wording judged during the walkthrough → T195 appended the "you could lose
   access to your account" consequence sentence; the updated copy shows after the
   next bundle rebuild.)_
-- [ ] **OPEN for John** — Tap **"I've saved these codes"** — the codes disappear
-      and do not reappear on navigating away and back to this screen.
+- [PASS] Tap **"I've saved these codes"** — the codes disappear and do not
+  reappear on navigating away and back to this screen. _(Confirmed by John,
+  2026-07-18.)_
 - [PASS] Tap **Regenerate backup codes** — a fresh set appears with the same
   one-time framing; dismiss it the same way. _(Observed, 2026-07-18.)_
-- [ ] **OPEN for John** — Tap **Turn off two-factor authentication** — status
-      updates to reflect it's off, and the regenerate/disable buttons are replaced by
-      the enroll button again.
+- [PASS] Tap **Turn off two-factor authentication** — status updates to reflect
+  it's off, and the regenerate/disable buttons are replaced by the enroll button
+  again. _(Confirmed by John, 2026-07-18.)_
 
 ### (d) T050 — account recovery
 
@@ -221,26 +226,27 @@ pass").
 
 ## Sign-off
 
-### Round 4 disposition (2026-07-18) — the current gate
+### Round 4 disposition (2026-07-18) — PHASE 4 SIGNED OFF ✅
 
-Phase 4 is **not yet formally signed off** — held pending John's confirmation of
-the last two open items below. Everything else has been walked and passed across
-Rounds 1–4.
+**Phase 4 (US2 Identity) is formally signed off.** Every checklist item across
+Rounds 1–4 has been walked by John in a real browser and passed; nothing remains
+open. This checklist is the Phase 4 walkthrough record.
 
-- **Confirmed this round (John):** (c) QR MFA enrollment with a real
-  authenticator; (c) regenerate backup codes; (e) sessions-list polish (T189
-  "This device" badge + humanized descriptions); **(i) all four sign-out checks
-  (T188 — confirmed 2026-07-18: "all tests pass")**. Plus all of
-  (a),(b),(d),(f),(g),(h) from prior rounds.
-- **Still OPEN for John (the whole remaining gate — two boxes in section (c)):**
-  - (c) "I've saved these codes" → codes don't reappear.
-  - (c) Turn off two-factor → status flips and the enroll button returns.
-- **Rides along, not a gate:** the T195 backup-codes copy addition ("…you could
-  lose access to your account.") is now in the served bundle (rebuilt this batch).
+John's final-round confirmations (2026-07-18), in his own words:
 
-**On John's confirmation of the open items**, this checklist is committed as the
-Phase 4 walkthrough record and Phase 4 is formally signed off; T190 (coverage
-baseline) then executes at Phase 5 entry per its schedule.
+- MFA authenticator (third-party) successfully enrolls with the QR code.
+- Regenerate backup codes functions as expected.
+- "This device" badge + humanized descriptions polish.
+- "I've saved these codes" → codes don't reappear.
+- Turn off two-factor behaves appropriately.
+
+Plus, earlier this round: (i) all four T188 sign-out checks ("all tests pass"),
+and prior rounds' (a),(b),(d),(e),(f),(g),(h).
+
+**Next:** T190 (coverage baseline + non-regression ratchet) executes at Phase 5
+entry per its schedule. Deferred identity work parked as filed: T182
+(sign-out-everywhere), T193 (mobile biometric app-unlock), T194 (passkeys/
+WebAuthn), plus the launch-gated T139/T166 and T165 (fake-OAuth harness).
 
 ---
 
