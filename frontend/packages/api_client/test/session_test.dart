@@ -27,5 +27,10 @@ void main() {
       // TODO
     });
 
+    // bool isCurrent
+    test('to test the property `isCurrent`', () async {
+      // TODO
+    });
+
   });
 }

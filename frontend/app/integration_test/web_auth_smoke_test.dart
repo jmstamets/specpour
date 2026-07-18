@@ -320,35 +320,61 @@ void main() {
     );
   });
 
-  testWidgets('T175: MFA enrollment shows the secret in a real browser', (
-    tester,
-  ) async {
-    executedCaseCount++;
-    final ref = await pumpAndRegister(tester, 'webmfa');
-    expect(
-      ref.read(authTokenProvider),
-      isNotNull,
-      reason: 'must be signed in first',
-    );
+  testWidgets(
+    'T175/T187: MFA enrollment shows the QR + well-formed otpauth URI in a '
+    'real browser',
+    (tester) async {
+      executedCaseCount++;
+      final ref = await pumpAndRegister(tester, 'webmfa');
+      expect(
+        ref.read(authTokenProvider),
+        isNotNull,
+        reason: 'must be signed in first',
+      );
 
-    ref.read(appRouterProvider).go('/account/mfa');
-    await tester.pumpAndSettle();
+      ref.read(appRouterProvider).go('/account/mfa');
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('mfaSettingsEnrollButton')));
-    // Real POST /me/mfa with no body — the exact call that raised the raw
-    // minimal-API "Implicit body inferred" error in the browser before F1.
-    await tester.pumpAndSettle(const Duration(seconds: 5));
+      await tester.tap(find.byKey(const Key('mfaSettingsEnrollButton')));
+      // Real POST /me/mfa with no body — the exact call that raised the raw
+      // minimal-API "Implicit body inferred" error in the browser before F1.
+      await tester.pumpAndSettle(const Duration(seconds: 5));
 
-    final errorFinder = find.byKey(const Key('mfaSettingsErrorMessage'));
-    final onScreenError = errorFinder.evaluate().isNotEmpty
-        ? tester.widget<Text>(errorFinder).data
-        : '(no error widget)';
+      final errorFinder = find.byKey(const Key('mfaSettingsErrorMessage'));
+      final onScreenError = errorFinder.evaluate().isNotEmpty
+          ? tester.widget<Text>(errorFinder).data
+          : '(no error widget)';
 
-    expect(
-      find.byKey(const Key('mfaSettingsSecretText')),
-      findsOneWidget,
-      reason:
-          'enroll should show the TOTP secret; onScreenError=[$onScreenError]',
-    );
-  });
+      // T175: enrollment succeeded (the manual-key fallback still renders).
+      expect(
+        find.byKey(const Key('mfaSettingsSecretText')),
+        findsOneWidget,
+        reason:
+            'enroll should show the TOTP secret; onScreenError=[$onScreenError]',
+      );
+
+      // T187 (e): the page renders a scannable QR code, and the otpauth:// URI
+      // it encodes (exposed for the test via the offstage seam, since it's
+      // otherwise locked in the QR bitmap) is well-formed — carrying the secret
+      // and SpecPour issuer, the exact string a real authenticator would scan.
+      expect(
+        find.byKey(const Key('mfaSettingsQrCode')),
+        findsOneWidget,
+        reason: 'enrollment must render a QR',
+      );
+      final otpauthUri = tester
+          .widget<Text>(
+            find.byKey(const Key('mfaSettingsOtpAuthUri'), skipOffstage: false),
+          )
+          .data!;
+      expect(
+        otpauthUri,
+        startsWith('otpauth://totp/SpecPour:'),
+        reason:
+            'QR must encode a SpecPour-issuer otpauth URI; was [$otpauthUri]',
+      );
+      expect(otpauthUri, contains('secret='));
+      expect(otpauthUri, contains('issuer=SpecPour'));
+    },
+  );
 }

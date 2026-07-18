@@ -185,6 +185,8 @@ jobs:
         run: scripts/run-export-download-test.sh
       - name: Run frozen-tab refresh hardening test (T177 follow-up)
         run: scripts/run-web-integration-tests.sh integration_test/web_frozen_tab_test.dart
+      - name: Run sign-out (current session) tests (T188)
+        run: scripts/run-web-integration-tests.sh integration_test/web_sign_out_test.dart
       - name: Docker logs (always, for diagnosis)
         if: always()
         run: docker compose logs

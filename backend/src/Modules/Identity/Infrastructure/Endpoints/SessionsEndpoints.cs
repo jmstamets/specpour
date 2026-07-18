@@ -51,6 +51,13 @@ public static class SessionsEndpoints
         CancellationToken cancellationToken)
     {
         var userId = CurrentUserId(user);
+        // T188: which of these rows is the CALLER's own session. TokenEndpoints
+        // stamps each SessionDevice with the OpenIddict authorization id at
+        // issuance (GetAuthorizationId()); the caller's access token carries that
+        // same id, so this is a reliable "this device" match. Powers both the
+        // sign-out-current-session flow (the client revokes this id via the
+        // existing DELETE path) and T189's "This device" list indicator.
+        var currentAuthorizationId = user.GetAuthorizationId();
         // T167 root cause: LastSeenAt alone is not a unique sort key — two
         // sessions created close enough together (the same clock tick; in the
         // acceptance suite, TestClock doesn't advance between two rapid token
@@ -120,7 +127,12 @@ public static class SessionsEndpoints
         }
 
         return TypedResults.Ok(new SessionListResponse(
-            [.. live.Select(s => new SessionResponse(s.Id, s.DeviceDescription, s.CreatedAt, s.LastSeenAt))]));
+            [.. live.Select(s => new SessionResponse(
+                s.Id,
+                s.DeviceDescription,
+                s.CreatedAt,
+                s.LastSeenAt,
+                IsCurrent: s.AuthorizationId == currentAuthorizationId))]));
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> RevokeAsync(
@@ -153,6 +165,6 @@ public static class SessionsEndpoints
     private static Guid CurrentUserId(ClaimsPrincipal user) => Guid.Parse(user.GetClaim(Claims.Subject)!);
 }
 
-public sealed record SessionResponse(Guid Id, string DeviceDescription, DateTimeOffset CreatedAt, DateTimeOffset LastSeenAt);
+public sealed record SessionResponse(Guid Id, string DeviceDescription, DateTimeOffset CreatedAt, DateTimeOffset LastSeenAt, bool IsCurrent);
 
 public sealed record SessionListResponse(IReadOnlyList<SessionResponse> Sessions);

@@ -17,6 +17,9 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/api_client_provider.dart';
+import 'cross_tab_channel_stub.dart'
+    if (dart.library.js_interop) 'cross_tab_channel_web.dart';
+import 'token_store.dart';
 import 'web_authorize_stub.dart'
     if (dart.library.js_interop) 'web_authorize.dart';
 
@@ -36,6 +39,7 @@ class IdentityAuthService {
     this._authToken,
     this._refreshToken,
     this._apiHostBaseUrl,
+    this._tokenStore,
   );
 
   final IdentityApi _identityApi;
@@ -43,6 +47,7 @@ class IdentityAuthService {
   final AuthToken _authToken;
   final RefreshToken _refreshToken;
   final String _apiHostBaseUrl;
+  final TokenStore _tokenStore;
 
   Future<void> register({
     required String email,
@@ -137,6 +142,43 @@ class IdentityAuthService {
   /// does and doesn't guarantee about an already-issued access token).
   Future<void> revokeSession({required String sessionId}) async {
     await _identityApi.revokeMySession(id: sessionId);
+  }
+
+  /// T188: signs out of THE CURRENT session only. Finds the caller's own
+  /// session (Session.isCurrent, stamped server-side from the request token's
+  /// authorization id) and revokes it via the existing per-session revoke path,
+  /// then clears local auth state and tells sibling tabs to do the same.
+  ///
+  /// The server-side revoke is best-effort: sign-out's contract with the user is
+  /// "this device is now signed out", so local state is always cleared even if
+  /// the revoke call fails (a stranded server session still ages out via the
+  /// sliding refresh-token lifetime). Sign-out-everywhere is a separate action
+  /// (T182); this deliberately revokes only the one current session.
+  Future<void> signOutCurrentSession() async {
+    try {
+      final sessions = await listSessions();
+      final current = sessions.where((s) => s.isCurrent);
+      if (current.isNotEmpty) {
+        await _identityApi.revokeMySession(id: current.first.id);
+      }
+    } on Object {
+      // Best-effort: fall through to clearing local state regardless.
+    }
+
+    await _clearLocalAuthState();
+    // Tell other tabs to drop their auth state too (no-op on native).
+    broadcastSignedOut();
+  }
+
+  /// Clears in-memory auth state and awaits the persisted-token clear so a
+  /// caller can navigate/reload immediately afterward and be deterministically
+  /// signed out. Setting [_refreshToken] to null also triggers
+  /// refreshTokenPersistenceProvider's reactive clear, but that write is
+  /// unawaited — this awaits its own clear so nothing races a reload.
+  Future<void> _clearLocalAuthState() async {
+    _authToken.set(null);
+    _refreshToken.set(null);
+    await _tokenStore.clearRefreshToken();
   }
 
   /// T052: signs the account out of every active session/device immediately;
@@ -332,6 +374,7 @@ final identityAuthServiceProvider = Provider<IdentityAuthService>(
     ref.watch(authTokenProvider.notifier),
     ref.watch(refreshTokenProvider.notifier),
     ref.watch(apiHostBaseUrlProvider),
+    ref.watch(tokenStoreProvider),
   ),
 );
 

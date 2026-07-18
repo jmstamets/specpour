@@ -646,12 +646,6 @@ abstract class AppLocalizations {
   /// **'Set up two-factor authentication'**
   String get mfaSettingsEnrollButton;
 
-  /// T050 MFA settings screen: label above the issued TOTP secret for manual entry.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter this key in your authenticator app:'**
-  String get mfaSettingsSecretLabel;
-
   /// T050 MFA settings screen: label for the confirmation code field.
   ///
   /// In en, this message translates to:
@@ -892,6 +886,48 @@ abstract class AppLocalizations {
   /// **'Revoke'**
   String get sessionsRevokeButton;
 
+  /// T189 sessions screen: badge marking the caller's own current session.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get sessionsThisDevice;
+
+  /// T189 sessions screen: the current session's revoke button says 'Sign out' since revoking your own session signs you out.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get sessionsSignOutButton;
+
+  /// T189 sessions screen: expandable row revealing the raw user-agent string.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection details'**
+  String get sessionsDetailsLabel;
+
+  /// T189 sessions screen: relative last-active time under a minute ago.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get sessionsRelativeJustNow;
+
+  /// T189 sessions screen: relative last-active time in minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 minute ago} other{{count} minutes ago}}'**
+  String sessionsRelativeMinutesAgo(int count);
+
+  /// T189 sessions screen: relative last-active time in hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 hour ago} other{{count} hours ago}}'**
+  String sessionsRelativeHoursAgo(int count);
+
+  /// T189 sessions screen: relative last-active time in days.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day ago} other{{count} days ago}}'**
+  String sessionsRelativeDaysAgo(int count);
+
   /// T052 account lifecycle screen title.
   ///
   /// In en, this message translates to:
@@ -1000,6 +1036,12 @@ abstract class AppLocalizations {
   /// **'Account'**
   String get accountMenuTitle;
 
+  /// T188 account menu: signs out of the current session and returns to Discover.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get accountMenuSignOutButton;
+
   /// T151 channel-preferences screen title.
   ///
   /// In en, this message translates to:
@@ -1017,6 +1059,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Push notifications'**
   String get channelPreferencesPushLabel;
+
+  /// T187 MFA settings screen: instructions shown above the enrollment QR code.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan with any authenticator app (such as Google Authenticator, Microsoft Authenticator, or 1Password), then enter the 6-digit code it shows.'**
+  String get mfaSettingsScanInstructions;
+
+  /// T187 MFA settings screen: label above the manual-entry secret shown as a fallback beneath the QR code.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t scan the code? Enter this key manually instead:'**
+  String get mfaSettingsManualKeyLabel;
 }
 
 class _AppLocalizationsDelegate

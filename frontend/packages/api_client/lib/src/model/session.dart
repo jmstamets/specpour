@@ -8,13 +8,14 @@ import 'package:built_value/serializer.dart';
 
 part 'session.g.dart';
 
-/// deviceDescription is the raw User-Agent header captured at token issuance — best-effort, not a parsed device/OS model.
+/// deviceDescription is the raw User-Agent header captured at token issuance — best-effort, not a parsed device/OS model. isCurrent (T188) marks the caller's own session — the one backing the request's access token — so the client can offer \"sign out (this device)\" and flag \"This device\" in the list.
 ///
 /// Properties:
 /// * [id] 
 /// * [deviceDescription] 
 /// * [createdAt] 
 /// * [lastSeenAt] 
+/// * [isCurrent] 
 @BuiltValue()
 abstract class Session implements Built<Session, SessionBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -28,6 +29,9 @@ abstract class Session implements Built<Session, SessionBuilder> {
 
   @BuiltValueField(wireName: r'lastSeenAt')
   DateTime get lastSeenAt;
+
+  @BuiltValueField(wireName: r'isCurrent')
+  bool get isCurrent;
 
   Session._();
 
@@ -71,6 +75,11 @@ class _$SessionSerializer implements PrimitiveSerializer<Session> {
     yield serializers.serialize(
       object.lastSeenAt,
       specifiedType: const FullType(DateTime),
+    );
+    yield r'isCurrent';
+    yield serializers.serialize(
+      object.isCurrent,
+      specifiedType: const FullType(bool),
     );
   }
 
@@ -122,6 +131,13 @@ class _$SessionSerializer implements PrimitiveSerializer<Session> {
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.lastSeenAt = valueDes;
+          break;
+        case r'isCurrent':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.isCurrent = valueDes;
           break;
         default:
           unhandled.add(key);

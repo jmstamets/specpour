@@ -14,6 +14,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/api_client_provider.dart';
+import '../routing/app_router.dart';
 import 'cross_tab_channel_stub.dart'
     if (dart.library.js_interop) 'cross_tab_channel_web.dart';
 
@@ -140,9 +141,19 @@ Future<bool> coordinatedRefresh(
 /// its own drain-triggered cleanup could run (hygiene rider) — a no-op on
 /// native, and a no-op on web if nothing is orphaned.
 final crossTabAuthSyncProvider = Provider<void>((ref) {
-  startTokenBroadcastListener((accessToken, refreshToken) {
-    ref.read(authTokenProvider.notifier).set(accessToken);
-    ref.read(refreshTokenProvider.notifier).set(refreshToken);
-  });
+  startTokenBroadcastListener(
+    (accessToken, refreshToken) {
+      ref.read(authTokenProvider.notifier).set(accessToken);
+      ref.read(refreshTokenProvider.notifier).set(refreshToken);
+    },
+    // T188: a sibling tab signed out. Drop this tab's auth state (the
+    // persistence listener clears the shared store reactively on the null) and
+    // send it back to Discover, so this tab visibly lands signed out too.
+    onSignedOut: () {
+      ref.read(authTokenProvider.notifier).set(null);
+      ref.read(refreshTokenProvider.notifier).set(null);
+      ref.read(appRouterProvider).go('/');
+    },
+  );
   sweepOrphanedHandoff();
 });

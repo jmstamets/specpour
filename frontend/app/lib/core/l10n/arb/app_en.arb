@@ -349,10 +349,6 @@
   "@mfaSettingsEnrollButton": {
     "description": "T050 MFA settings screen: start-enrollment button."
   },
-  "mfaSettingsSecretLabel": "Enter this key in your authenticator app:",
-  "@mfaSettingsSecretLabel": {
-    "description": "T050 MFA settings screen: label above the issued TOTP secret for manual entry."
-  },
   "mfaSettingsEnterCodeLabel": "Enter the code it shows",
   "@mfaSettingsEnterCodeLabel": {
     "description": "T050 MFA settings screen: label for the confirmation code field."
@@ -516,6 +512,43 @@
   "@sessionsRevokeButton": {
     "description": "T051 sessions screen: per-session revoke button."
   },
+  "sessionsThisDevice": "This device",
+  "@sessionsThisDevice": {
+    "description": "T189 sessions screen: badge marking the caller's own current session."
+  },
+  "sessionsSignOutButton": "Sign out",
+  "@sessionsSignOutButton": {
+    "description": "T189 sessions screen: the current session's revoke button says 'Sign out' since revoking your own session signs you out."
+  },
+  "sessionsDetailsLabel": "Connection details",
+  "@sessionsDetailsLabel": {
+    "description": "T189 sessions screen: expandable row revealing the raw user-agent string."
+  },
+  "sessionsRelativeJustNow": "just now",
+  "@sessionsRelativeJustNow": {
+    "description": "T189 sessions screen: relative last-active time under a minute ago."
+  },
+  "sessionsRelativeMinutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@sessionsRelativeMinutesAgo": {
+    "description": "T189 sessions screen: relative last-active time in minutes.",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "sessionsRelativeHoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@sessionsRelativeHoursAgo": {
+    "description": "T189 sessions screen: relative last-active time in hours.",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "sessionsRelativeDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@sessionsRelativeDaysAgo": {
+    "description": "T189 sessions screen: relative last-active time in days.",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "accountLifecycleTitle": "Deactivate account",
   "@accountLifecycleTitle": {
     "description": "T052 account lifecycle screen title."
@@ -594,6 +627,10 @@
   "@accountMenuTitle": {
     "description": "T161 account menu screen title, and the tooltip/gated-action label for the AppBar entry point that opens it."
   },
+  "accountMenuSignOutButton": "Sign out",
+  "@accountMenuSignOutButton": {
+    "description": "T188 account menu: signs out of the current session and returns to Discover."
+  },
   "channelPreferencesTitle": "Notification preferences",
   "@channelPreferencesTitle": {
     "description": "T151 channel-preferences screen title."
@@ -605,5 +642,13 @@
   "channelPreferencesPushLabel": "Push notifications",
   "@channelPreferencesPushLabel": {
     "description": "T151 channel-preferences screen: push channel row label (modeled in V1, no delivery until Phase 2)."
+  },
+  "mfaSettingsScanInstructions": "Scan with any authenticator app (such as Google Authenticator, Microsoft Authenticator, or 1Password), then enter the 6-digit code it shows.",
+  "@mfaSettingsScanInstructions": {
+    "description": "T187 MFA settings screen: instructions shown above the enrollment QR code."
+  },
+  "mfaSettingsManualKeyLabel": "Can't scan the code? Enter this key manually instead:",
+  "@mfaSettingsManualKeyLabel": {
+    "description": "T187 MFA settings screen: label above the manual-entry secret shown as a fallback beneath the QR code."
   }
 }

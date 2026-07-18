@@ -57,9 +57,17 @@ public static class ExportEndpoints
             cancellationToken);
 
         var mfaEnabled = await db.MfaEnrollments.AnyAsync(m => m.UserId == userId && m.EnabledAt != null, cancellationToken);
+        // T188: isCurrent is now part of SessionResponse — in an export snapshot it
+        // marks the session this export was requested from (the caller's own token).
+        var currentAuthorizationId = user.GetAuthorizationId();
         var sessions = await db.SessionDevices
             .Where(s => s.UserId == userId && s.RevokedAt == null)
-            .Select(s => new SessionResponse(s.Id, s.DeviceDescription, s.CreatedAt, s.LastSeenAt))
+            .Select(s => new SessionResponse(
+                s.Id,
+                s.DeviceDescription,
+                s.CreatedAt,
+                s.LastSeenAt,
+                s.AuthorizationId == currentAuthorizationId))
             .ToListAsync(cancellationToken);
         var externalLogins = await userManager.GetLoginsAsync(account);
 

@@ -111,7 +111,7 @@ namespace SpecPour.Tests.Acceptance.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US02_Identity.feature.ndjson", 21);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US02_Identity.feature.ndjson", 22);
         }
         
         async global::System.Threading.Tasks.Task global::Xunit.IAsyncLifetime.InitializeAsync()
@@ -712,15 +712,18 @@ namespace SpecPour.Tests.Acceptance.Features
             await this.ScenarioCleanupAsync();
         }
         
-        [global::Xunit.SkippableFactAttribute(DisplayName="18 - A redeemed refresh token cannot be reused (T177, ADR-0005)")]
+        [global::Xunit.SkippableFactAttribute(DisplayName="20 - The session list marks exactly the caller\'s own session as current (T188, FR" +
+            "-001b)")]
         [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
-        [global::Xunit.TraitAttribute("Description", "18 - A redeemed refresh token cannot be reused (T177, ADR-0005)")]
-        public async global::System.Threading.Tasks.Task _18_ARedeemedRefreshTokenCannotBeReusedT177ADR_0005()
+        [global::Xunit.TraitAttribute("Description", "20 - The session list marks exactly the caller\'s own session as current (T188, FR" +
+            "-001b)")]
+        public async global::System.Threading.Tasks.Task _20_TheSessionListMarksExactlyTheCallersOwnSessionAsCurrentT188FR_001B()
         {
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "15";
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("18 - A redeemed refresh token cannot be reused (T177, ADR-0005)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("20 - The session list marks exactly the caller\'s own session as current (T188, FR" +
+                    "-001b)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
 #line 104
@@ -737,18 +740,55 @@ namespace SpecPour.Tests.Acceptance.Features
     await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 106
-    await testRunner.WhenAsync("the user acquires a refresh token", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+    await testRunner.WhenAsync("the user signs in from two devices", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
 #line 107
-    await testRunner.AndAsync("the refresh token is redeemed once", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+    await testRunner.ThenAsync("exactly one listed session is marked as the current device", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
 #line 108
+    await testRunner.AndAsync("each device sees a different session as its own current device", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="18 - A redeemed refresh token cannot be reused (T177, ADR-0005)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US2 - Create an account and manage identity")]
+        [global::Xunit.TraitAttribute("Description", "18 - A redeemed refresh token cannot be reused (T177, ADR-0005)")]
+        public async global::System.Threading.Tasks.Task _18_ARedeemedRefreshTokenCannotBeReusedT177ADR_0005()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "16";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("18 - A redeemed refresh token cannot be reused (T177, ADR-0005)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 110
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 111
+    await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 112
+    await testRunner.WhenAsync("the user acquires a refresh token", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 113
+    await testRunner.AndAsync("the refresh token is redeemed once", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 114
     await testRunner.AndAsync("time passes beyond the refresh-token reuse leeway", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 109
+#line 115
     await testRunner.ThenAsync("the second redemption of the same refresh token is rejected", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 110
+#line 116
     await testRunner.AndAsync("the session is no longer active", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
@@ -762,11 +802,11 @@ namespace SpecPour.Tests.Acceptance.Features
         {
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
-            string pickleIndex = "16";
+            string pickleIndex = "17";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("19 - A session older than the absolute cap must re-authenticate (T177, ADR-0005)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 112
+#line 118
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -776,19 +816,19 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 113
+#line 119
     await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 114
+#line 120
     await testRunner.WhenAsync("the user acquires a refresh token", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 115
+#line 121
     await testRunner.AndAsync("the user refreshes the session every 10 days until the absolute cap is reached", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 116
+#line 122
     await testRunner.ThenAsync("the refresh token is rejected", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 117
+#line 123
     await testRunner.AndAsync("the session is no longer active", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
@@ -802,11 +842,11 @@ namespace SpecPour.Tests.Acceptance.Features
         {
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
-            string pickleIndex = "17";
+            string pickleIndex = "18";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("16 - A user can deactivate and reactivate their account (T052, FR-003)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 119
+#line 125
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -816,22 +856,22 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 120
+#line 126
     await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 121
+#line 127
     await testRunner.WhenAsync("the user deactivates their account", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 122
+#line 128
     await testRunner.ThenAsync("the account is deactivated", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 123
+#line 129
     await testRunner.AndAsync("the session can no longer be refreshed", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 124
+#line 130
     await testRunner.WhenAsync("the user reactivates their account", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 125
+#line 131
     await testRunner.ThenAsync("the account is active again", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -847,12 +887,12 @@ namespace SpecPour.Tests.Acceptance.Features
         {
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
-            string pickleIndex = "18";
+            string pickleIndex = "19";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("17 - A deactivated account is warned before its grace period expires, then automa" +
                     "tically deleted (T052, FR-003)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 127
+#line 133
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -862,22 +902,22 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 128
+#line 134
     await testRunner.GivenAsync("a registered adult user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 129
+#line 135
     await testRunner.WhenAsync("the user deactivates their account", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 130
+#line 136
     await testRunner.AndAsync("time passes to the deactivation warning window", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 131
+#line 137
     await testRunner.ThenAsync("the user receives a deactivation-expiry-warning notification", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 132
+#line 138
     await testRunner.WhenAsync("time passes past the deactivation grace period", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 133
+#line 139
     await testRunner.ThenAsync("the account no longer exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

@@ -6,10 +6,24 @@
 import 'package:api_client/api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../core/auth/identity_auth_service.dart';
 import '../../core/l10n/gen/app_localizations.dart';
 import '../../core/widgets/api_error_display.dart';
+
+/// T187: formats a base32 TOTP secret in groups of four for legible manual
+/// entry ("ABCD EFGH IJKL ..."), the standard authenticator-app fallback layout
+/// when a QR code can't be scanned.
+String _groupSecretInFours(String secret) {
+  final groups = <String>[];
+  for (var i = 0; i < secret.length; i += 4) {
+    groups.add(
+      secret.substring(i, i + 4 > secret.length ? secret.length : i + 4),
+    );
+  }
+  return groups.join(' ');
+}
 
 final mfaStatusProvider = FutureProvider.autoDispose<MfaStatus>(
   (ref) => ref.watch(identityAuthServiceProvider).mfaStatus(),
@@ -247,10 +261,36 @@ class _MfaSettingsScreenState extends ConsumerState<MfaSettingsScreen> {
             child: Text(l10n.mfaSettingsEnrollButton),
           ),
         ] else ...[
-          Text(l10n.mfaSettingsSecretLabel),
+          // T187: enrollment is QR-first. The backend returns a standard
+          // otpauth:// URI (algorithm/digits/period confirmed SHA1/6/30 against
+          // the server's own verify path); render it as a scannable code with
+          // instructions above and the manual key beneath as the fallback.
+          Text(l10n.mfaSettingsScanInstructions),
+          const SizedBox(height: 16),
+          if (pending.otpAuthUri case final uri?) ...[
+            Center(
+              child: QrImageView(
+                key: const Key('mfaSettingsQrCode'),
+                data: uri,
+                version: QrVersions.auto,
+                size: 200,
+                // A fixed white quiet-zone background so the code stays scannable
+                // regardless of the app's (light/dark) theme surface behind it.
+                backgroundColor: Colors.white,
+              ),
+            ),
+            // T187 (e): the otpauth:// URI is otherwise encoded only inside the
+            // QR bitmap, unreadable by the browser-tier test. This offstage node
+            // (not laid out, not painted, no a11y surface) exposes the exact URI
+            // the backend returned so the test can assert it's well-formed
+            // (issuer + secret) end-to-end against the real server.
+            Offstage(child: Text(uri, key: const Key('mfaSettingsOtpAuthUri'))),
+          ],
+          const SizedBox(height: 16),
+          Text(l10n.mfaSettingsManualKeyLabel),
           const SizedBox(height: 8),
           SelectableText(
-            pending.secret ?? '',
+            _groupSecretInFours(pending.secret ?? ''),
             key: const Key('mfaSettingsSecretText'),
             style: Theme.of(
               context,

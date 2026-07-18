@@ -77,6 +77,12 @@ dependencies:
   # on native, never a WebView, which providers discourage/block for sign-in).
   url_launcher: ^6.3.2
 
+  # T187: renders the MFA enrollment otpauth:// URI as a scannable QR code
+  # (CustomPainter-based, works on every target incl. web/CanvasKit). The
+  # backend already returns the otpauth URI; this just makes it scannable
+  # instead of forcing manual secret entry.
+  qr_flutter: ^4.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

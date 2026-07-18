@@ -37,25 +37,26 @@ Two processes: the backend stack (docker-compose) and the built Flutter web app.
    **Build freshness**: verify the served bundle matches what's on disk —
    `sha256sum main.dart.js` on disk must match `curl -s
 http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this build
-   (2026-07-17, includes every fix through T183 — the full Phase 4 sign-off queue):
-   `c31733e43820e33ee05ab29d9353fe6f9e0c6e9da991e759b17e67f892d79cbb`.
+   (2026-07-18, Round 4 — includes T187 QR-first MFA enrollment, T188 sign out,
+   T189 sessions-list polish):
+   `b23cb962db12f371e7a2332b5d7247d29bb5fde794bb4116a7a58b3edb3398a5`.
 
-   **Branch note (2026-07-17):** this build is from branch `phase4-signoff`
-   (PR #3: https://github.com/jmstamets/specpour/pull/3), not yet merged to
-   `main` — per this project's solo-dev merge model, only John merges PRs, and
-   this walkthrough is the pre-merge verification gate for that PR's contents
-   (T183, T173, and everything below), not a re-walk of already-merged code.
-   `docker compose build api` was re-run against this branch tip before this
-   build so the backend under test matches it too (confirm via `git log -1
---oneline` on the checked-out branch if re-running this walkthrough later).
+   **Branch note (2026-07-18):** this build is from branch
+   `phase4-round3-mfa-signout` (the Round 3 walkthrough-findings batch), not yet
+   merged to `main` — per this project's solo-dev merge model, only John merges
+   PRs, and this walkthrough is the pre-merge verification gate for that PR's
+   contents. The `docker compose` API image was rebuilt against this branch tip
+   (T188's `isCurrent` backend field) before this build so the backend under
+   test matches it.
 
-   **Round 3 note (2026-07-17):** every item tracked as open at the end of
-   Round 2 (T170-T173, plus a newly-discovered frozen-tab refresh bug found
-   during PR #2's review, filed and fixed as T183) is now code-complete and
-   green on every automated suite — see the Round 3 disposition at the bottom
-   of this document for the full rundown, including which items are
-   mechanically verified (no human step needed) versus which still need your
-   own click-through below.
+   **Round 4 note (2026-07-18):** the Round 3 walkthrough surfaced three
+   findings, now delivered: MFA enrollment is QR-first and scannable (T187 —
+   section (c), RE-OPENED for your real-authenticator scan), a Sign out action
+   exists (T188 — new section (i)), and the sessions list is humanized with a
+   "This device" badge (T189 — folded into section (e)). Everything is green on
+   the automated + browser tiers; what's left below is the human verification
+   those tiers can't do (a real authenticator scan; the backup-code wording
+   judgment; eyeballing the sign-out and sessions UX).
 
 ## Verify
 
@@ -95,30 +96,34 @@ http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this bui
   the copy icon next to it — paste somewhere to confirm the clipboard now holds the
   exact error text including the correlation ID.
 
-### (c) T050/T163 — MFA enrollment, backup codes, disable
+### (c) T050/T163/T187 — MFA enrollment, backup codes, disable
 
-**Still open** — the underlying 500 error the first bullet below originally caught
-is fixed (T175, `06067a7`), so its [FAIL] tag is stale (kept here only as the
-original bug record, not a claim it's still broken). Nobody has walked this section
-with a real/simulated TOTP code since that fix, so every item below is genuinely
-unverified, not a re-walk — this is the one section of the checklist still needing
-a first real pass.
+**RE-OPENED for Round 4 (2026-07-18)** — the enrollment UX is now QR-first
+(T187, `43dbd93`): the screen shows a scannable QR code, instructions ("Scan
+with any authenticator app…"), and the manual key grouped in fours beneath as a
+fallback. The QR encodes a standard `otpauth://` URI whose SHA1/6-digit/30s
+parameters were empirically confirmed to match the server's own verification
+(T187(a)), and the browser tier asserts the URI is well-formed — but a **real
+authenticator-app scan is the human step only John can do**. Every box below is
+genuinely unverified (never walked with a real/simulated TOTP code since the
+T175 500-fix); this is the section still needing a first real pass.
 
-- [ ] (was [FAIL], root cause fixed by T175 — needs re-verification) From the
-  Account menu, open **Two-factor authentication** → **Set up
-  two-factor authentication**. A secret key is shown for manual entry into an
-  authenticator app (a real TOTP code is needed to confirm — use an authenticator app
-  or a TOTP calculator against the shown secret).
-- [-] After confirming with a valid code: a **backup-code list** appears with clear
-  wording that these are shown once and won't be shown again. Read the wording —
-  does it actually read as urgent/clear to a first-time user, not just technically
-  present?
-- [-] Tap **"I've saved these codes"** — the codes disappear and do not reappear on
-  navigating away and back to this screen.
-- [-] Tap **Regenerate backup codes** — a fresh set appears with the same one-time
-  framing; dismiss it the same way.
-- [-] Tap **Turn off two-factor authentication** — status updates to reflect it's
-  off, and the regenerate/disable buttons are replaced by the enroll button again.
+- [ ] From the Account menu, open **Two-factor authentication** → **Set up
+  two-factor authentication**. A **QR code** appears with scan instructions and
+  a manual key beneath. **Scan it with a real authenticator app** (Google/
+  Microsoft Authenticator, 1Password, …) — it should add a "SpecPour" entry
+  showing a 6-digit code. Enter that code to confirm; enrollment succeeds.
+- [ ] After confirming with a valid code: a **backup-code list** appears with
+  clear wording that these are shown once and won't be shown again. Read the
+  wording — does it actually read as urgent/clear to a first-time user, not just
+  technically present? (This is the backup-codes wording judgment.)
+- [ ] Tap **"I've saved these codes"** — the codes disappear and do not reappear
+  on navigating away and back to this screen.
+- [ ] Tap **Regenerate backup codes** — a fresh set appears with the same
+  one-time framing; dismiss it the same way.
+- [ ] Tap **Turn off two-factor authentication** — status updates to reflect
+  it's off, and the regenerate/disable buttons are replaced by the enroll button
+  again.
 
 ### (d) T050 — account recovery
 
@@ -140,6 +145,13 @@ a first real pass.
 - [PASS] Sign in from a second browser/incognito window with the same account, then
   refresh the sessions list in the first — two sessions now appear.
 - [PASS] Revoke one session — it disappears from the list immediately.
+- [ ] **T189 — sessions list polish (2026-07-18)**: the current session now
+  shows a **"This device"** badge; device rows read as "{Browser} on {OS}"
+  (e.g. "Edge on Windows") with a **Connection details** toggle revealing the
+  raw user agent; last-active is relative ("2 hours ago"). Confirm the two open
+  sessions from the step above: exactly one is badged "This device", and the
+  descriptions are human-readable, not raw UA strings. (Revoking the "This
+  device" session is a **Sign out** — see section (i).)
 - [ ] **T183 — frozen-tab refresh hardening**: no human step needed here. This
   fix (a background tab that Chrome froze/suspended missing the cross-tab
   refresh handoff, then presenting a stale token and tripping reuse detection —
@@ -182,6 +194,23 @@ a first real pass.
   UX here: is a download this easy to miss, does the browser's download
   indicator make it obvious something happened?
 - [PASS] Tap **Delete my account** — a confirmation dialog appears first, with wording that makes clear this is permanent. Cancelling it should leave the account intact (don't confirm delete unless you're fine losing this walkthrough's test account — deleting it ends the session and returns to Discover).
+
+### (i) T188 — sign out (current session) — NEW (2026-07-18)
+
+- [ ] The Account menu has a **Sign out** entry (below the five destinations,
+  under a divider).
+- [ ] Tap **Sign out** — it returns to Discover, signed out (tapping the account
+  icon now shows the sign-in prompt again, not the account menu).
+- [ ] **Signed out survives reload**: after signing out, reload the page — you
+  stay signed out (the persisted token was cleared; you are not silently
+  restored). *(Mechanically covered by `web_sign_out_test.dart`, but worth an
+  eyeball.)*
+- [ ] **Second tab signs out too**: open the app in two tabs, both signed in;
+  sign out in one — the other also lands signed out (on Discover). *(Also
+  mechanically covered by the browser tier's second-tab iframe test.)*
+- [ ] From **Active sessions**, revoking the row badged **"This device"** (its
+  button reads **Sign out**) does the same thing — signs you out and returns to
+  Discover. Revoking any *other* session just drops it from the list.
 
 ### Not visually verifiable in this build
 

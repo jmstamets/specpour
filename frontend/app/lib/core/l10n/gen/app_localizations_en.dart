@@ -298,10 +298,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mfaSettingsEnrollButton => 'Set up two-factor authentication';
 
   @override
-  String get mfaSettingsSecretLabel =>
-      'Enter this key in your authenticator app:';
-
-  @override
   String get mfaSettingsEnterCodeLabel => 'Enter the code it shows';
 
   @override
@@ -437,6 +433,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionsRevokeButton => 'Revoke';
 
   @override
+  String get sessionsThisDevice => 'This device';
+
+  @override
+  String get sessionsSignOutButton => 'Sign out';
+
+  @override
+  String get sessionsDetailsLabel => 'Connection details';
+
+  @override
+  String get sessionsRelativeJustNow => 'just now';
+
+  @override
+  String sessionsRelativeMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes ago',
+      one: '1 minute ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sessionsRelativeHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sessionsRelativeDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get accountLifecycleTitle => 'Deactivate account';
 
   @override
@@ -502,6 +543,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountMenuTitle => 'Account';
 
   @override
+  String get accountMenuSignOutButton => 'Sign out';
+
+  @override
   String get channelPreferencesTitle => 'Notification preferences';
 
   @override
@@ -509,4 +553,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get channelPreferencesPushLabel => 'Push notifications';
+
+  @override
+  String get mfaSettingsScanInstructions =>
+      'Scan with any authenticator app (such as Google Authenticator, Microsoft Authenticator, or 1Password), then enter the 6-digit code it shows.';
+
+  @override
+  String get mfaSettingsManualKeyLabel =>
+      'Can\'t scan the code? Enter this key manually instead:';
 }

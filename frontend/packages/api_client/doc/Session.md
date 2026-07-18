@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **deviceDescription** | **String** |  | 
 **createdAt** | [**DateTime**](DateTime.md) |  | 
 **lastSeenAt** | [**DateTime**](DateTime.md) |  | 
+**isCurrent** | **bool** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
