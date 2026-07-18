@@ -166,10 +166,22 @@ void main() {
       await tester.tap(find.byKey(const Key('mfaSettingsEnrollButton')));
       await tester.pumpAndSettle();
 
+      // T187: QR-first enrollment. The otpauth URI renders as a scannable QR
+      // code, with the secret shown beneath grouped in fours as the manual
+      // fallback (JBSWY3DPEHPK3PXP -> "JBSW Y3DP EHPK 3PXP").
+      expect(find.byKey(const Key('mfaSettingsQrCode')), findsOneWidget);
       expect(find.byKey(const Key('mfaSettingsSecretText')), findsOneWidget);
-      expect(find.text('JBSWY3DPEHPK3PXP'), findsOneWidget);
+      expect(find.text('JBSW Y3DP EHPK 3PXP'), findsOneWidget);
       expectNoRawLocalizationKeys(tester);
 
+      // T187: the enrollment view is a ListView and the QR code makes it taller
+      // than the test viewport, so the code field + confirm button below it are
+      // lazily un-built until scrolled into view.
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('mfaSettingsConfirmButton')),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.enterText(
         find.byKey(const Key('mfaSettingsCodeField')),
         '123456',

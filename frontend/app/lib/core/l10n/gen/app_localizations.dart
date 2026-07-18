@@ -646,12 +646,6 @@ abstract class AppLocalizations {
   /// **'Set up two-factor authentication'**
   String get mfaSettingsEnrollButton;
 
-  /// T050 MFA settings screen: label above the issued TOTP secret for manual entry.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter this key in your authenticator app:'**
-  String get mfaSettingsSecretLabel;
-
   /// T050 MFA settings screen: label for the confirmation code field.
   ///
   /// In en, this message translates to:
@@ -1017,6 +1011,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Push notifications'**
   String get channelPreferencesPushLabel;
+
+  /// T187 MFA settings screen: instructions shown above the enrollment QR code.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan with any authenticator app (such as Google Authenticator, Microsoft Authenticator, or 1Password), then enter the 6-digit code it shows.'**
+  String get mfaSettingsScanInstructions;
+
+  /// T187 MFA settings screen: label above the manual-entry secret shown as a fallback beneath the QR code.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t scan the code? Enter this key manually instead:'**
+  String get mfaSettingsManualKeyLabel;
 }
 
 class _AppLocalizationsDelegate

@@ -349,10 +349,6 @@
   "@mfaSettingsEnrollButton": {
     "description": "T050 MFA settings screen: start-enrollment button."
   },
-  "mfaSettingsSecretLabel": "Enter this key in your authenticator app:",
-  "@mfaSettingsSecretLabel": {
-    "description": "T050 MFA settings screen: label above the issued TOTP secret for manual entry."
-  },
   "mfaSettingsEnterCodeLabel": "Enter the code it shows",
   "@mfaSettingsEnterCodeLabel": {
     "description": "T050 MFA settings screen: label for the confirmation code field."
@@ -605,5 +601,13 @@
   "channelPreferencesPushLabel": "Push notifications",
   "@channelPreferencesPushLabel": {
     "description": "T151 channel-preferences screen: push channel row label (modeled in V1, no delivery until Phase 2)."
+  },
+  "mfaSettingsScanInstructions": "Scan with any authenticator app (such as Google Authenticator, Microsoft Authenticator, or 1Password), then enter the 6-digit code it shows.",
+  "@mfaSettingsScanInstructions": {
+    "description": "T187 MFA settings screen: instructions shown above the enrollment QR code."
+  },
+  "mfaSettingsManualKeyLabel": "Can't scan the code? Enter this key manually instead:",
+  "@mfaSettingsManualKeyLabel": {
+    "description": "T187 MFA settings screen: label above the manual-entry secret shown as a fallback beneath the QR code."
   }
 }
