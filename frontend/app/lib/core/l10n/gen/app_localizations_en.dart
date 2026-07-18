@@ -319,7 +319,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mfaSettingsBackupCodesLabel =>
-      'Save these backup codes somewhere safe. Each can be used once to sign in if you lose access to your authenticator app. They won\'t be shown again.';
+      'Save these backup codes somewhere safe. Each can be used once to sign in if you lose access to your authenticator app. They won\'t be shown again. Without these codes or your authenticator app, you could lose access to your account.';
 
   @override
   String get mfaSettingsBackupCodesSavedButton => 'I\'ve saved these codes';

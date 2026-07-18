@@ -682,10 +682,10 @@ abstract class AppLocalizations {
   /// **'Please enter the code.'**
   String get mfaSettingsMissingCodeError;
 
-  /// T163 MFA settings screen: label above the issued backup-code set, shown exactly once after enrollment confirmation or regeneration.
+  /// T163/T195 MFA settings screen: label above the issued backup-code set, shown exactly once after enrollment confirmation or regeneration. T195 (John's walkthrough wording judgment) appended the lose-access consequence sentence.
   ///
   /// In en, this message translates to:
-  /// **'Save these backup codes somewhere safe. Each can be used once to sign in if you lose access to your authenticator app. They won\'t be shown again.'**
+  /// **'Save these backup codes somewhere safe. Each can be used once to sign in if you lose access to your authenticator app. They won\'t be shown again. Without these codes or your authenticator app, you could lose access to your account.'**
   String get mfaSettingsBackupCodesLabel;
 
   /// T163 MFA settings screen: dismisses the one-time backup-code display.

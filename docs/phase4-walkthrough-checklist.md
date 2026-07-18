@@ -37,17 +37,16 @@ Two processes: the backend stack (docker-compose) and the built Flutter web app.
    **Build freshness**: verify the served bundle matches what's on disk —
    `sha256sum main.dart.js` on disk must match `curl -s
 http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this build
-   (2026-07-18, Round 4 — includes T187 QR-first MFA enrollment, T188 sign out,
-   T189 sessions-list polish):
-   `b23cb962db12f371e7a2332b5d7247d29bb5fde794bb4116a7a58b3edb3398a5`.
+   (2026-07-18, Round 4 refresh — T187 QR-first MFA enrollment, T188 sign out,
+   T189 sessions-list polish, plus T195's backup-codes copy addition):
+   `200a6b46c1be25e8f4385a5a8b55c4f6520f6779f5616f43fdc216c682562a0d`.
 
-   **Branch note (2026-07-18):** this build is from branch
-   `phase4-round3-mfa-signout` (the Round 3 walkthrough-findings batch), not yet
-   merged to `main` — per this project's solo-dev merge model, only John merges
-   PRs, and this walkthrough is the pre-merge verification gate for that PR's
-   contents. The `docker compose` API image was rebuilt against this branch tip
-   (T188's `isCurrent` backend field) before this build so the backend under
-   test matches it.
+   **Branch note (2026-07-18):** T187-T189 merged to `main` via PR #5; this
+   refreshed build is from branch `phase4-biometric-recovery-docs` (the
+   biometric/recovery-docs + T195 follow-up batch), which adds only the T195
+   backup-codes copy on the frontend (the rest of that branch is docs). The
+   `docker compose` API image from the PR #5 line already carries T188's
+   `isCurrent` field — no backend change in this batch.
 
    **Round 4 note (2026-07-18):** the Round 3 walkthrough surfaced three
    findings, now delivered: MFA enrollment is QR-first and scannable (T187 —
@@ -77,53 +76,50 @@ http://localhost:8080/main.dart.js | sha256sum`. Confirmed matching for this bui
 
 - [PASS] Register with an underage DOB (e.g., 10 years ago) — rejected with a clear
   error message, and the form does not silently clear the other fields.
-- [N/A] Sign out is not yet wired to any button in this build (no sign-out UI exists —
-  a known, already-tracked gap, not something to flag here); to test sign-in
-  separately, use a second browser profile or clear site data, then sign in with the
-  account just registered.
-- [ ] **T171 — password UX**: on the registration screen, confirm (1) a reveal/hide
-  eye icon on the password field (no separate confirm field — reveal replaces it);
-  (2) the hint "At least 12 characters" is visible *before* you type anything or
+- [PASS] Sign out; to test sign-in separately, use a second browser profile or clear site data, then sign in with the account just registered.
+- [PASS] **T171 — password UX**: on the registration screen, confirm (1) a reveal/hide eye icon on the password field (no separate confirm field — reveal replaces it);
+  (2) the hint "At least 12 characters" is visible _before_ you type anything or
   submit, not only after a failure; (3) typing fewer than 12 characters and tapping
   submit shows the error bound to the field itself (red text under the field), not a
   form-level banner, and happens instantly with no network delay.
-- [ ] **T170 — error presentation**: sign in with a wrong password. Confirm the
+- [PASS] **T170 — error presentation**: sign in with a wrong password. Confirm the
   error reads as plain, friendly copy (e.g. "Invalid email or password"), never raw
   exception/stack-trace text, and a short correlation ID is visible somewhere in or
   near the error (for reporting a bug against a specific attempt).
-- [ ] **T172 — selectable/copyable errors**: on that same sign-in error, try to
+- [PASS] **T172 — selectable/copyable errors**: on that same sign-in error, try to
   drag-select the error text (should work, unlike the original bug report) and tap
   the copy icon next to it — paste somewhere to confirm the clipboard now holds the
   exact error text including the correlation ID.
 
 ### (c) T050/T163/T187 — MFA enrollment, backup codes, disable
 
-**RE-OPENED for Round 4 (2026-07-18)** — the enrollment UX is now QR-first
-(T187, `43dbd93`): the screen shows a scannable QR code, instructions ("Scan
-with any authenticator app…"), and the manual key grouped in fours beneath as a
-fallback. The QR encodes a standard `otpauth://` URI whose SHA1/6-digit/30s
-parameters were empirically confirmed to match the server's own verification
-(T187(a)), and the browser tier asserts the URI is well-formed — but a **real
-authenticator-app scan is the human step only John can do**. Every box below is
-genuinely unverified (never walked with a real/simulated TOTP code since the
-T175 500-fix); this is the section still needing a first real pass.
+**Round 4 partial confirmation (2026-07-18)** — the enrollment UX is now
+QR-first (T187, `43dbd93`): a scannable QR code, scan instructions, and the
+manual key grouped in fours beneath. **John confirmed QR enrollment with a real
+authenticator, and observed regenerate** (marked [PASS] below). Two boxes remain
+**OPEN for John** per his sign-off directive: the codes-don't-reappear check and
+disable-restores-enroll. (Backup-code wording: John's walkthrough judgment
+produced T195, which appended "Without these codes or your authenticator app,
+you could lose access to your account." — visible after the next bundle rebuild.)
 
-- [ ] From the Account menu, open **Two-factor authentication** → **Set up
+- [PASS] From the Account menu, open **Two-factor authentication** → **Set up
   two-factor authentication**. A **QR code** appears with scan instructions and
   a manual key beneath. **Scan it with a real authenticator app** (Google/
   Microsoft Authenticator, 1Password, …) — it should add a "SpecPour" entry
   showing a 6-digit code. Enter that code to confirm; enrollment succeeds.
-- [ ] After confirming with a valid code: a **backup-code list** appears with
-  clear wording that these are shown once and won't be shown again. Read the
-  wording — does it actually read as urgent/clear to a first-time user, not just
-  technically present? (This is the backup-codes wording judgment.)
-- [ ] Tap **"I've saved these codes"** — the codes disappear and do not reappear
-  on navigating away and back to this screen.
-- [ ] Tap **Regenerate backup codes** — a fresh set appears with the same
-  one-time framing; dismiss it the same way.
-- [ ] Tap **Turn off two-factor authentication** — status updates to reflect
-  it's off, and the regenerate/disable buttons are replaced by the enroll button
-  again.
+  *(Confirmed with a real authenticator, 2026-07-18.)*
+- [PASS with note] After confirming with a valid code: a **backup-code list**
+  appears with clear wording that these are shown once and won't be shown again.
+  *(Wording judged during the walkthrough → T195 appended the "you could lose
+  access to your account" consequence sentence; the updated copy shows after the
+  next bundle rebuild.)*
+- [ ] **OPEN for John** — Tap **"I've saved these codes"** — the codes disappear
+  and do not reappear on navigating away and back to this screen.
+- [PASS] Tap **Regenerate backup codes** — a fresh set appears with the same
+  one-time framing; dismiss it the same way. *(Observed, 2026-07-18.)*
+- [ ] **OPEN for John** — Tap **Turn off two-factor authentication** — status
+  updates to reflect it's off, and the regenerate/disable buttons are replaced by
+  the enroll button again.
 
 ### (d) T050 — account recovery
 
@@ -140,19 +136,19 @@ T175 500-fix); this is the section still needing a first real pass.
 - [PASS with comment] Open **Active sessions** from the Account menu. The current session appears with a device description and a last-active time that reads as a real, human-parseable date (not an ISO timestamp).
   NOTE (Round 1): refreshing the browser required re-login and created a new
   Active-sessions entry — **FIXED, T177** (`8a72024`, PR #2). Re-verify: reload
-  the page while on this screen — it should silently restore the *same* session
+  the page while on this screen — it should silently restore the _same_ session
   (no re-login, no new entry appears; last-active time bumps instead).
 - [PASS] Sign in from a second browser/incognito window with the same account, then
   refresh the sessions list in the first — two sessions now appear.
 - [PASS] Revoke one session — it disappears from the list immediately.
-- [ ] **T189 — sessions list polish (2026-07-18)**: the current session now
+- [PASS] **T189 — sessions list polish (2026-07-18)**: the current session now
   shows a **"This device"** badge; device rows read as "{Browser} on {OS}"
   (e.g. "Edge on Windows") with a **Connection details** toggle revealing the
   raw user agent; last-active is relative ("2 hours ago"). Confirm the two open
   sessions from the step above: exactly one is badged "This device", and the
   descriptions are human-readable, not raw UA strings. (Revoking the "This
   device" session is a **Sign out** — see section (i).)
-- [ ] **T183 — frozen-tab refresh hardening**: no human step needed here. This
+- [NA] **T183 — frozen-tab refresh hardening**: no human step needed here. This
   fix (a background tab that Chrome froze/suspended missing the cross-tab
   refresh handoff, then presenting a stale token and tripping reuse detection —
   logging every tab out) is mechanically verified by an automated browser-tier
@@ -164,7 +160,7 @@ T175 500-fix); this is the section still needing a first real pass.
 
 - [PASS] Open **Notification preferences**. Both Email and Push rows appear, both off
   by default.
-- [ ] Toggle Email on — the switch updates immediately; reload the page and
+- [PASS] Toggle Email on — the switch updates immediately; reload the page and
   reopen the screen to confirm the change actually persisted (not just local
   UI state). **This is now testable** — Round 1 marked it "Unable to test,
   refresh logs out user"; T177 (above) means reload no longer signs you out,
@@ -181,12 +177,12 @@ T175 500-fix); this is the section still needing a first real pass.
 
 ### (h) T053 — data export and deletion
 
-- [PASS with note: cannot select, copy or export] Open **Your data**. Tap **Export my data** — the caller's date of birth
+- [PASS] Open **Your data**. Tap **Export my data** — the caller's date of birth
   appears on screen (this is the _only_ screen anywhere in the app that should ever
   show a raw date of birth — worth confirming no other screen visited during this
   walkthrough ever showed it).
-- [ ] **T178 — real download, `fa661fc`**: tapping **Export my data** should now
-  *also* trigger a browser download of a `specpour-data-export-{userId}.json`
+- [PASS] **T178 — real download, `fa661fc`**: tapping **Export my data** should now
+  _also_ trigger a browser download of a `specpour-data-export-{userId}.json`
   file (check your Downloads folder). Open the downloaded file and confirm its
   contents match what's shown on screen (userId, email, sessions present) —
   this is mechanically verified by an automated browser test that checks the
@@ -195,7 +191,11 @@ T175 500-fix); this is the section still needing a first real pass.
   indicator make it obvious something happened?
 - [PASS] Tap **Delete my account** — a confirmation dialog appears first, with wording that makes clear this is permanent. Cancelling it should leave the account intact (don't confirm delete unless you're fine losing this walkthrough's test account — deleting it ends the session and returns to Discover).
 
-### (i) T188 — sign out (current session) — NEW (2026-07-18)
+### (i) T188 — sign out (current session) — OPEN for John (2026-07-18)
+
+All four are mechanically covered by the browser tier (`web_sign_out_test.dart`,
+green in CI) but **left open for John's own eyeball per his sign-off directive** —
+this section had no human pass yet.
 
 - [ ] The Account menu has a **Sign out** entry (below the five destinations,
   under a divider).
@@ -203,14 +203,14 @@ T175 500-fix); this is the section still needing a first real pass.
   icon now shows the sign-in prompt again, not the account menu).
 - [ ] **Signed out survives reload**: after signing out, reload the page — you
   stay signed out (the persisted token was cleared; you are not silently
-  restored). *(Mechanically covered by `web_sign_out_test.dart`, but worth an
-  eyeball.)*
+  restored). _(Mechanically covered by `web_sign_out_test.dart`, but worth an
+  eyeball.)_
 - [ ] **Second tab signs out too**: open the app in two tabs, both signed in;
-  sign out in one — the other also lands signed out (on Discover). *(Also
-  mechanically covered by the browser tier's second-tab iframe test.)*
+  sign out in one — the other also lands signed out (on Discover). _(Also
+  mechanically covered by the browser tier's second-tab iframe test.)_
 - [ ] From **Active sessions**, revoking the row badged **"This device"** (its
   button reads **Sign out**) does the same thing — signs you out and returns to
-  Discover. Revoking any *other* session just drops it from the list.
+  Discover. Revoking any _other_ session just drops it from the list.
 
 ### Not visually verifiable in this build
 
@@ -223,8 +223,35 @@ T175 500-fix); this is the section still needing a first real pass.
 
 ## Sign-off
 
-- [ ] All items above walked through and passed.
-- [ ] Any failures noted here with enough detail to reproduce:
+### Round 4 disposition (2026-07-18) — the current gate
+
+Phase 4 is **not yet formally signed off** — held pending John's confirmation of
+the last open items below. Everything else has been walked and passed across
+Rounds 1–4.
+
+- **Confirmed this round (John):** (c) QR MFA enrollment with a real
+  authenticator; (c) regenerate backup codes; (e) sessions-list polish (T189
+  "This device" badge + humanized descriptions). Plus all of (a),(b),(d),(f),(g),
+  (h) from prior rounds.
+- **Still OPEN for John (this is the whole remaining gate):**
+  - (i) all four sign-out checks — menu entry; sign out → Discover; signed-out
+    survives reload; second tab lands signed out; current-session revoke from the
+    sessions list. (Mechanically green in the browser tier; needs John's eyeball.)
+  - (c) "I've saved these codes" → codes don't reappear.
+  - (c) Turn off two-factor → status flips and the enroll button returns.
+- **Rides along, not a gate:** the T195 backup-codes copy addition ("…you could
+  lose access to your account.") shows after the next bundle rebuild.
+
+**On John's confirmation of the open items**, this checklist is committed as the
+Phase 4 walkthrough record and Phase 4 is formally signed off; T190 (coverage
+baseline) then executes at Phase 5 entry per its schedule.
+
+---
+
+_Historical (Round 1–2) sign-off notes, kept as record:_
+
+- [superseded] All items above walked through and passed.
+- [superseded] Any failures noted here with enough detail to reproduce:
 
 Two-factor authentication:
 
@@ -279,7 +306,7 @@ anyone picking this back up:
 - **Structural browser-tier growth** — ONGOING, T179. `web_auth_smoke_test.dart`
   now covers register, sign-in fail-then-succeed, MFA enroll, and the
   register-path preserve-intent case; still needs MFA confirm/disable and
-  wiring into a real CI pipeline as a *required* check for that specific file
+  wiring into a real CI pipeline as a _required_ check for that specific file
   (T168 closed the broader CI-provisioning gap and wired the whole browser
   tier in as required — see T168 for status; growing this one file's own
   scenario coverage remains open).
