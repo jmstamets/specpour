@@ -178,6 +178,16 @@ and technique conforming to professional craft-cocktail standards."
   hadn't caught up. → A: FR-003a added, matching the source statement's wording
   verbatim; canonical-source chain intact (FR-001a precedent). T178 already tracks
   the implementation (download-a-file); this reconciliation only adds the FR itself.
+- Q: (Round-3 follow-up, 2026-07-18) The `docs/specification-statement.md` §1
+  accounts/authentication bullet was revised (reviewer edit, committed verbatim) to
+  (a) reword the MFA-gate rule as "password reset must never silently bypass an MFA
+  gate at sign-in," (b) add an optional mobile biometric app-unlock (biometrics gate
+  the persisted session; storing/releasing the account password via biometrics
+  prohibited), and (c) name passkeys/WebAuthn as the deferred strategic-successor
+  method. spec.md's FR list didn't reflect these. → A: FR-001a reworded to match;
+  FR-001c (biometric app-unlock, deferred → T193) and FR-001d (passkeys/WebAuthn,
+  deferred → T194) added; canonical-source chain intact (same resolution shape as
+  FR-001b/FR-003a). Both new FRs are recording-only/deferred — no V1 implementation.
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -759,10 +769,10 @@ action, target, timestamp, and before/after state.
 - **FR-001**: System MUST support email/password registration with modern credential
   handling, social sign-in via established external identity providers, optional
   multi-factor authentication, secure account recovery, and session/device management.
-- **FR-001a**: Password recovery MUST NOT bypass an enabled MFA gate — a user who
-  resets their password via account recovery still MUST complete the MFA challenge
-  to sign in, the same as any other sign-in method. Loss of the MFA factor itself
-  MUST NOT result in permanent account lockout: the system MUST provide a
+- **FR-001a**: Password recovery MUST NOT silently bypass an enabled MFA gate at
+  sign-in — a user who resets their password via account recovery still MUST complete
+  the MFA challenge to sign in, the same as any other sign-in method. Loss of the MFA
+  factor itself MUST NOT result in permanent account lockout: the system MUST provide a
   self-service recovery path (e.g., one-time backup codes issued at enrollment) not
   contingent on possessing the lost factor, escalating to a staff-assisted,
   audit-logged reset (FR-065) when self-service recovery is also unavailable.
@@ -770,6 +780,17 @@ action, target, timestamp, and before/after state.
   per-session revocation, and a single-action "sign out everywhere" that revokes all of
   a user's active sessions/devices at once. (Sign-out of the current session added
   2026-07-18 to match `docs/specification-statement.md` §1; delivered by T188.)
+- **FR-001c** (mobile, deferred — T193): On mobile clients, the system SHOULD offer an
+  optional biometric app-unlock in which platform biometrics gate use of the locally
+  persisted session for password-free day-to-day access. This MUST NOT weaken the
+  underlying authentication: the account password is never stored for, nor released by,
+  biometrics — biometrics gate use of the already-persisted session only. Scheduled with
+  the mobile-platform phase (mobile targets not yet built).
+- **FR-001d** (strategic successor, deferred — T194): Passkeys/WebAuthn are the
+  anticipated successor authentication method, including biometric re-authentication
+  after session expiry (true passwordless sign-in, distinct from FR-001c's live-session
+  unlock). The MFA enrollment model already accommodates additional method types, so
+  adding a passkey credential type requires no schema redesign. Post-V1.
 - **FR-002**: System MUST capture and store date of birth at registration; V1 enforces
   no mandatory age gating on its informational surfaces (per-surface configuration per
   FR-002a), but the data must exist for future age-gated features without
