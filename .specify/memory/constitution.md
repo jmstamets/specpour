@@ -1,48 +1,37 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.4.0 → 1.5.0 (amendment from revised docs/constitution-statement.md,
-T177 docs batch C1: Engineering Standards' "Code quality" bullet amended — literal
-"peer review required for all merges" replaced with a review gate that actually holds
-in this project's solo-developer operating mode (documented human review of
-AI-authored changes, or independent higher-tier AI review of human-authored changes,
-plus the full CI gate set; unreviewed direct merges remain prohibited in either mode).
-Recorded as ADR-0006.
-Prior amendments: 1.3.0 → 1.4.0 (anti-gamification guardrail added to Principle XIII);
-1.2.0 → 1.3.0 (sensitive-PII data classification in Engineering
+Version change: 1.5.0 → 1.6.0 (amendment from revised docs/constitution-statement.md,
+2026-07-17, T186: source Principle 18 — Fail-Closed Verification — mapped into this
+document's numbering as new Principle XVI. Codifies a pattern found empirically three
+separate times before being written down: (1) the NuGet dependency scan silently
+passing on an incomplete advisory-feed query, hiding a real MailKit/MimeKit CVE pair
+for weeks (T168); (2) the orphan-hygiene token-type filter matching zero rows and
+reading as success (T177); (3) `cmd | tee log` masking cmd's exit status behind tee's,
+found a third time during T173's local gate run and again latent in ci.yml's run
+steps, whose GitHub-default shell lacks pipefail (fixed in T184, whose verdict table
+is this principle's first compliance audit). New check-introduction review duty: ask
+"what does it do when it cannot tell?", not just "does it catch the bad case?")
+Prior amendments: 1.4.0 → 1.5.0 (solo-developer review gate in Engineering Standards'
+"Code quality" bullet, ADR-0006); 1.3.0 → 1.4.0 (anti-gamification guardrail added to
+Principle XIII); 1.2.0 → 1.3.0 (sensitive-PII data classification in Engineering
 Standards); 1.1.0 → 1.2.0 (platform-administration governance in Principle XIV);
 1.0.0 → 1.1.0 (network-era principles ahead of the Phase 2 addendum)
-Modified principles:
-  - III. Architecture: Modular Monolith, Extraction-Ready — added explicit Clean
-    Architecture paragraph: absolute dependency rule; every external integration
-    (LLM, POS, object storage, notification channels, map/geocoding, identity- and
-    business-verification, retailer, payment/subscription) behind a port/adapter pair;
-    contract tests per port.
-  - VI. Authorization and Tier-Gating Infrastructure from Day One — replaced
-    "super-admin-equivalent" default-tier framing with "unlocks all end-user
-    capabilities"; tier display names are localizable configuration while identifiers
-    are stable keys; tiers, platform-staff roles, and scope-bound roles are three
-    independent authorization axes.
+Modified principles: none
 Added sections:
-  - X. Multi-Sided Platform Boundaries
-  - XI. Communications and Notification Infrastructure
-  - XII. Geolocation Privacy
-  - XIII. Regulated-Industry Posture (Alcohol)
-  - XIV. Trust, Verification, and Content Integrity
-  - XV. Analytics and External Data Ingestion
-  - Governance: three new encoded assumptions (client-side geofencing default;
-    license-document retention window; strictest-applicable-rule age gating)
+  - XVI. Fail-Closed Verification (maps source constitution's Principle 18)
 Removed sections: none
 Templates:
-  - .specify/templates/plan-template.md ✅ updated (Constitution Check gates III and VI
-    expanded; new gates X–XV added)
-  - .specify/templates/spec-template.md ✅ aligned (no new mandatory spec sections)
+  - .specify/templates/plan-template.md ✅ updated (new Constitution Check gate XVI)
+  - .specify/templates/spec-template.md ✅ aligned (no new mandatory spec sections —
+    the principle governs pipeline/gate construction, not feature specs)
   - .specify/templates/tasks-template.md ✅ aligned (ATDD mandate unchanged)
   - .specify/templates/checklist-template.md ✅ aligned (no principle-specific content)
   - .specify/templates/commands/ — directory does not exist; check skipped
 Specs:
-  - specs/001-specpour-v1/spec.md ✅ already consistent (FR-004a/FR-004b
-    encode the three-axis authorization model; new principles govern Phase 2 surfaces)
+  - specs/001-specpour-v1/spec.md ✅ already consistent (no FR touches pipeline
+    verification semantics; T184's ci.yml/gate-script audit is the implementation-side
+    compliance pass)
 Follow-up TODOs: none
 -->
 
@@ -258,6 +247,20 @@ vs. manual entry vs. integrated source) end-to-end, including in every analytics
 display. The platform never becomes a system of record for a venue's financial data; it
 stores only what its analytics features require.
 
+### XVI. Fail-Closed Verification
+
+Every automated check, gate, scan, or test in the development and deployment pipeline
+MUST fail loudly on its own inability to run. A verification step that cannot complete,
+cannot reach its data source, unexpectedly matches zero items, or has its failure signal
+swallowed (e.g., by shell pipeline semantics) MUST report failure — never success.
+"Pass" is reserved exclusively for "checked and verified," never for "could not check."
+Where inconclusiveness is expected and acceptable, that acceptance MUST be explicit and
+visible (a distinct skipped/warned state), not a silent pass. Scripts composing checks
+MUST propagate failure across pipelines (e.g., `pipefail` alongside `errexit`). Every
+new check is reviewed against this principle at introduction, and the question asked of
+any verification is not "does it catch the bad case?" but "what does it do when it
+cannot tell?"
+
 ## Technology Foundation & Constraints
 
 - **Backend**: C# / .NET (current LTS), containerized (OCI images), stateless service
@@ -328,4 +331,4 @@ plan-template Constitution Check is a hard gate before design work proceeds.
   the default verification mechanism; license documents retained only until verification
   completes plus a short audit window; strictest-applicable-rule default for age gating.
 
-**Version**: 1.5.0 | **Ratified**: 2026-07-10 | **Last Amended**: 2026-07-17
+**Version**: 1.6.0 | **Ratified**: 2026-07-10 | **Last Amended**: 2026-07-17

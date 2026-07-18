@@ -94,6 +94,12 @@ FAIL (with justification in Complexity Tracking), or N/A:
 - [ ] **XV. Analytics & Ingestion**: External operational data enters only via
       adapters into the ingestion module; provenance-tagged end-to-end; platform never
       the financial system of record.
+- [ ] **XVI. Fail-Closed Verification**: Every automated check/gate/scan this plan adds
+      fails loudly on its own inability to run — no silent pass on incomplete scans,
+      zero-match filters, or swallowed pipeline failure signals (`pipefail` alongside
+      `errexit` in gate scripts); expected inconclusiveness surfaces as a distinct
+      skipped/warned state, never success. Ask of each new check: "what does it do when
+      it cannot tell?"
 - [ ] **Technology & Standards**: Stack constraints (C#/.NET LTS, PostgreSQL, Flutter,
       S3-compatible media, cloud-agnostic) and engineering standards (observability,
       security, WCAG 2.1 AA, semver, ADRs) upheld; sensitive PII (DOB, verification
