@@ -512,6 +512,43 @@
   "@sessionsRevokeButton": {
     "description": "T051 sessions screen: per-session revoke button."
   },
+  "sessionsThisDevice": "This device",
+  "@sessionsThisDevice": {
+    "description": "T189 sessions screen: badge marking the caller's own current session."
+  },
+  "sessionsSignOutButton": "Sign out",
+  "@sessionsSignOutButton": {
+    "description": "T189 sessions screen: the current session's revoke button says 'Sign out' since revoking your own session signs you out."
+  },
+  "sessionsDetailsLabel": "Connection details",
+  "@sessionsDetailsLabel": {
+    "description": "T189 sessions screen: expandable row revealing the raw user-agent string."
+  },
+  "sessionsRelativeJustNow": "just now",
+  "@sessionsRelativeJustNow": {
+    "description": "T189 sessions screen: relative last-active time under a minute ago."
+  },
+  "sessionsRelativeMinutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@sessionsRelativeMinutesAgo": {
+    "description": "T189 sessions screen: relative last-active time in minutes.",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "sessionsRelativeHoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@sessionsRelativeHoursAgo": {
+    "description": "T189 sessions screen: relative last-active time in hours.",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "sessionsRelativeDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@sessionsRelativeDaysAgo": {
+    "description": "T189 sessions screen: relative last-active time in days.",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "accountLifecycleTitle": "Deactivate account",
   "@accountLifecycleTitle": {
     "description": "T052 account lifecycle screen title."

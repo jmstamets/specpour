@@ -433,6 +433,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionsRevokeButton => 'Revoke';
 
   @override
+  String get sessionsThisDevice => 'This device';
+
+  @override
+  String get sessionsSignOutButton => 'Sign out';
+
+  @override
+  String get sessionsDetailsLabel => 'Connection details';
+
+  @override
+  String get sessionsRelativeJustNow => 'just now';
+
+  @override
+  String sessionsRelativeMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes ago',
+      one: '1 minute ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sessionsRelativeHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sessionsRelativeDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get accountLifecycleTitle => 'Deactivate account';
 
   @override
