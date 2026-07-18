@@ -16,6 +16,31 @@ equipment:
           application/json:
             schema:
               $ref: '#/components/schemas/EquipmentPage'
+  post:
+    operationId: createEquipment
+    tags: [equipment]
+    summary: Author an equipment item in the caller's personal or bar library (T060, FR-024)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateEquipmentRequest'
+    responses:
+      '201':
+        description: The created equipment item.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipmentAuthor'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '403':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
 equipmentById:
   get:
@@ -37,6 +62,52 @@ equipmentById:
           application/json:
             schema:
               $ref: '#/components/schemas/EquipmentDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  put:
+    operationId: updateEquipmentItem
+    tags: [equipment]
+    summary: Update one of the caller's own authored equipment items (T060, FR-024)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateEquipmentRequest'
+    responses:
+      '200':
+        description: The updated equipment item.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipmentAuthor'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  delete:
+    operationId: deleteEquipmentItem
+    tags: [equipment]
+    summary: Delete one of the caller's own authored equipment items (T060)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '204':
+        description: The equipment item was deleted.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
       '404':
         $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
@@ -68,3 +139,43 @@ components:
         usageGuidance: { type: [string, "null"] }
         typicalApplications: { type: array, items: { type: string } }
       required: [id, name, category, typicalApplications]
+    CreateEquipmentRequest:
+      type: object
+      description: >-
+        T060, FR-024. libraryScope "bar" requires venueId, verified as owned by the
+        caller (403 otherwise). Newly authored equipment always starts private
+        (FR-008b).
+      properties:
+        name: { type: string }
+        category: { type: string }
+        libraryScope: { type: string, enum: [personal, bar] }
+        venueId: { type: [string, "null"], format: uuid }
+        cost: { type: [number, "null"] }
+        description: { type: [string, "null"] }
+        usageGuidance: { type: [string, "null"] }
+        typicalApplications: { type: [array, "null"], items: { type: string } }
+      required: [name, category, libraryScope]
+    UpdateEquipmentRequest:
+      type: object
+      properties:
+        name: { type: string }
+        category: { type: string }
+        cost: { type: [number, "null"] }
+        description: { type: [string, "null"] }
+        usageGuidance: { type: [string, "null"] }
+        typicalApplications: { type: [array, "null"], items: { type: string } }
+      required: [name, category]
+    EquipmentAuthor:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        category: { type: string }
+        libraryScope: { type: string, enum: [personal, bar] }
+        venueId: { type: [string, "null"], format: uuid }
+        cost: { type: [number, "null"] }
+        description: { type: [string, "null"] }
+        usageGuidance: { type: [string, "null"] }
+        typicalApplications: { type: array, items: { type: string } }
+        visibility: { type: string, enum: [private, public] }
+      required: [id, name, category, libraryScope, typicalApplications, visibility]

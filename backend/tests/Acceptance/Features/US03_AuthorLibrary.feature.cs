@@ -213,13 +213,16 @@ namespace SpecPour.Tests.Acceptance.Features
     await testRunner.GivenAsync("a signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 21
+    await testRunner.AndAsync("a curated ingredient the user can reference in a recipe line", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 22
     await testRunner.WhenAsync("the user defines \"House Grenadine\" as a house-made ingredient with a component re" +
                         "cipe, yield, shelf life, and storage instructions", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 22
+#line 23
     await testRunner.ThenAsync("the house-made ingredient is saved in the user\'s personal library", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 23
+#line 24
     await testRunner.AndAsync("the house-made ingredient can be used as an ingredient line in a new recipe", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
@@ -240,7 +243,7 @@ namespace SpecPour.Tests.Acceptance.Features
                     "io 3)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 25
+#line 26
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -250,17 +253,20 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 26
+#line 27
     await testRunner.GivenAsync("a signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 27
+#line 28
+    await testRunner.AndAsync("a curated ingredient the user can reference in a recipe line", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 29
     await testRunner.WhenAsync("the user creates a venue with a name, address, coordinates, and external referenc" +
                         "es", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 28
+#line 30
     await testRunner.ThenAsync("the venue is saved under the user\'s ownership", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 29
+#line 31
     await testRunner.AndAsync("the user can create a recipe scoped to that venue\'s bar library", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
@@ -278,7 +284,7 @@ namespace SpecPour.Tests.Acceptance.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("4 - A private recipe never appears for another user (spec.md scenario 4)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 31
+#line 33
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -288,25 +294,28 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 32
+#line 34
     await testRunner.GivenAsync("a signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 33
-    await testRunner.AndAsync("that user has created a private recipe", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
-#line 34
-    await testRunner.AndAsync("a second, different signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
 #line 35
-    await testRunner.WhenAsync("the second user searches for the first user\'s private recipe by name", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+    await testRunner.AndAsync("a curated ingredient the user can reference in a recipe line", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
 #line 36
-    await testRunner.ThenAsync("the private recipe never appears in the second user\'s search results", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+    await testRunner.AndAsync("that user has created a private recipe", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
 #line 37
-    await testRunner.WhenAsync("the second user browses the first user\'s personal library directly", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+    await testRunner.AndAsync("a second, different signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
 #line 38
+    await testRunner.WhenAsync("the second user searches for the first user\'s private recipe by name", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 39
+    await testRunner.ThenAsync("the private recipe never appears in the second user\'s search results", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 40
+    await testRunner.WhenAsync("the second user browses the first user\'s personal library directly", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 41
     await testRunner.ThenAsync("the private recipe is not accessible to the second user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

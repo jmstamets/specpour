@@ -7,6 +7,20 @@ void main() {
   final instance = ApiClient().getIngredientsApi();
 
   group(IngredientsApi, () {
+    // Author an ingredient in the caller's personal or bar library, optionally house-made (T059, FR-012/FR-017)
+    //
+    //Future<IngredientAuthor> createIngredient(CreateIngredientRequest createIngredientRequest) async
+    test('test createIngredient', () async {
+      // TODO
+    });
+
+    // Delete one of the caller's own authored ingredients (T059)
+    //
+    //Future deleteIngredient(String id) async
+    test('test deleteIngredient', () async {
+      // TODO
+    });
+
     // Get an ingredient's full detail, including allergen attributes (FR-016)
     //
     //Future<IngredientDetail> getIngredient(String id) async
@@ -27,6 +41,15 @@ void main() {
     //
     //Future<IngredientPage> listIngredients({ String category, String cursor, int limit }) async
     test('test listIngredients', () async {
+      // TODO
+    });
+
+    // Update one of the caller's own authored ingredients (T059, FR-012/FR-017)
+    //
+    // Rejects (400) a house-made defining recipe change that would transitively include this ingredient itself (FR-017's circular-reference edge case).
+    //
+    //Future<IngredientAuthor> updateIngredient(String id, UpdateIngredientRequest updateIngredientRequest) async
+    test('test updateIngredient', () async {
       // TODO
     });
 

@@ -14,6 +14,9 @@
          via Catalog's lookup port (contract sweep). -->
     <ProjectReference Include="..\..\Search\Contracts\SpecPour.Modules.Search.Contracts.csproj" />
     <ProjectReference Include="..\..\Catalog\Contracts\SpecPour.Modules.Catalog.Contracts.csproj" />
+    <!-- T059: bar-scoped ingredient authoring verifies the caller owns the venue,
+         same pattern as Catalog's recipe authoring. -->
+    <ProjectReference Include="..\..\Venues\Contracts\SpecPour.Modules.Venues.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +25,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="OpenIddict.Abstractions" Version="7.5.0" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.5.0" />
   </ItemGroup>
 
 </Project>

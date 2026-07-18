@@ -43,8 +43,18 @@ public sealed class IngredientsDbContext(DbContextOptions<IngredientsDbContext> 
         {
             entity.HasKey(c => c.Id);
             entity.HasIndex(c => c.NameKey).IsUnique();
-            // No rows seeded: FR-014's categories are curator-authored content —
-            // T040's seed content pack supplies real rows.
+
+            // T059: one fixed system fallback category for personal-library ingredient
+            // authoring — the create request doesn't require the author to pick a
+            // category (data-model.md's category_id is "curator-extensible," not a
+            // structure John's ATDD scenarios ask the author to navigate at V1). All
+            // other categories remain curator-authored content (T040's seed pack).
+            entity.HasData(new IngredientCategory
+            {
+                Id = IngredientsDbContextSeedIds.UncategorizedCategory,
+                NameKey = "category.uncategorized",
+                Definition = "Fallback category for personal-library ingredients created without an explicit category.",
+            });
         });
 
         modelBuilder.Entity<Allergen>(entity =>
@@ -91,4 +101,5 @@ public static class IngredientsDbContextSeedIds
     public static readonly Guid PeanutAllergen = new("00000000-0000-0000-0000-000000000204");
     public static readonly Guid GlutenAllergen = new("00000000-0000-0000-0000-000000000205");
     public static readonly Guid SulfitesAllergen = new("00000000-0000-0000-0000-000000000206");
+    public static readonly Guid UncategorizedCategory = new("00000000-0000-0000-0000-000000000207");
 }

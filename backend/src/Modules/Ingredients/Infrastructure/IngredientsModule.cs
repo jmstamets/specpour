@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events;
 using SpecPour.BuildingBlocks.Events.Outbox;
+using SpecPour.BuildingBlocks.Library;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Ingredients.Contracts;
 using SpecPour.Modules.Ingredients.Contracts.Events;
@@ -73,7 +74,12 @@ public sealed class IngredientsSearchRegistrationHostedService(ISearchableEntity
             Table: "Ingredients",
             IdColumn: "Id",
             TitleColumn: "Name",
-            TsVectorColumn: "SearchVector"));
+            TsVectorColumn: "SearchVector",
+            // T059: personal-library ingredients (including house-made ones) now
+            // exist alongside curated-core ones and default private — same privacy
+            // fix as CatalogModule's Recipe registration (FR-008b).
+            VisibilityColumn: "Visibility",
+            PublicVisibilityValue: (int)ContentVisibility.Public));
 
         return Task.CompletedTask;
     }

@@ -1,20 +1,36 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
+using OpenIddict.Validation.AspNetCore;
 using SpecPour.BuildingBlocks.Http;
+using SpecPour.BuildingBlocks.Identifiers;
 using SpecPour.BuildingBlocks.Library;
+using SpecPour.BuildingBlocks.Time;
 using SpecPour.Modules.Catalog.Application.DerivedData;
 using SpecPour.Modules.Catalog.Domain;
+using SpecPour.Modules.Catalog.Infrastructure.Search;
+using SpecPour.Modules.Venues.Contracts;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace SpecPour.Modules.Catalog.Infrastructure.Endpoints;
 
 /// <summary>
 /// GET /api/v1/recipes, GET /api/v1/recipes/{id} (T037, contracts/openapi/paths/catalog.yaml).
 /// Guest-accessible (FR-004b) — only <see cref="ContentVisibility.Public"/> recipes
-/// are returned; owner-scoped private-library reads land with the personal-library
-/// story (US3), not here.
+/// are returned to a guest/non-owner.
+///
+/// POST/PUT/DELETE /api/v1/recipes (T058, FR-018): bearer-only author CRUD with
+/// library scoping (personal|bar) and privacy enforcement (FR-008b) — a bar-scoped
+/// recipe's owner is the venue (single-user-owned per FR-058), verified via
+/// <see cref="IVenueOwnershipPort"/> rather than a hard cross-schema FK (ADR-0001).
+/// Authored recipes always start <see cref="ContentVisibility.Private"/> — publishing
+/// (with its consent cascade over referenced private ingredients, see spec.md's
+/// clarification) is a distinct, not-yet-built flow, never silently exposed here.
 /// </summary>
 public static class RecipeEndpoints
 {
@@ -23,11 +39,19 @@ public static class RecipeEndpoints
     public static void Map(IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapApiV1Group();
+        var bearerOnly = new AuthorizeAttribute
+        {
+            AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme,
+        };
+
         group.MapGet("/recipes", ListAsync);
         group.MapGet("/recipes/{id:guid}", GetAsync);
+        group.MapPost("/recipes", CreateAsync).RequireAuthorization(bearerOnly);
+        group.MapPut("/recipes/{id:guid}", UpdateAsync).RequireAuthorization(bearerOnly);
+        group.MapDelete("/recipes/{id:guid}", DeleteAsync).RequireAuthorization(bearerOnly);
     }
 
-    private static async Task<RecipePageResponse> ListAsync(
+    private static async Task<Results<Ok<RecipePageResponse>, ProblemHttpResult>> ListAsync(
         string? family,
         string? category,
         string? tag,
@@ -38,27 +62,59 @@ public static class RecipeEndpoints
         string? uses,
         string? allergenExclude,
         string? source,
+        string? scope,
         string? cursor,
         int? limit,
+        ClaimsPrincipal user,
         CatalogDbContext db,
         Ingredients.Contracts.IIngredientLookupPort ingredientLookup,
         Contracts.IRecipeLookupPort recipeLookup,
+        IVenueOwnershipPort venueOwnership,
         CancellationToken cancellationToken)
     {
         var pageSize = Math.Clamp(limit ?? DefaultLimit, 1, 100);
         var offset = CursorPagination.Decode(cursor);
 
-        // "source" facet (core library / my library / public, FR-050): V1 has no
-        // authenticated-caller context wired into this guest-facing endpoint yet
-        // (that lands with the personal-library story, US3), so every result here
-        // is implicitly "core" — a non-"core" source value matches nothing rather
-        // than silently ignoring the filter.
-        if (source is not null && !string.Equals(source, "core", StringComparison.OrdinalIgnoreCase))
+        IQueryable<Recipe> query;
+        if (scope is not null)
         {
-            return new RecipePageResponse([], null);
-        }
+            // T058, FR-050 "my library" facet: distinct from the guest-facing "source"
+            // facet below — personal/bar scope always requires an authenticated caller
+            // and always shows THEIR OWN recipes regardless of Visibility (a private
+            // draft is still theirs to see in their own library listing).
+            if (user.Identity?.IsAuthenticated != true)
+            {
+                return TypedResults.Problem(title: "Sign-in required", statusCode: StatusCodes.Status401Unauthorized);
+            }
 
-        var query = db.Recipes.Where(r => r.Visibility == ContentVisibility.Public);
+            var userId = CurrentUserId(user);
+            if (string.Equals(scope, "personal", StringComparison.OrdinalIgnoreCase))
+            {
+                query = db.Recipes.Where(r => r.OwnerType == OwnerType.User && r.OwnerId == userId && r.LibraryScope == LibraryScope.Personal);
+            }
+            else if (string.Equals(scope, "bar", StringComparison.OrdinalIgnoreCase))
+            {
+                var ownedVenueIds = await venueOwnership.GetOwnedVenueIdsAsync(userId, cancellationToken);
+                query = db.Recipes.Where(r =>
+                    r.OwnerType == OwnerType.Venue && r.LibraryScope == LibraryScope.Bar &&
+                    r.OwnerId != null && ownedVenueIds.Contains(r.OwnerId.Value));
+            }
+            else
+            {
+                return TypedResults.Ok(new RecipePageResponse([], null));
+            }
+        }
+        else if (source is not null && !string.Equals(source, "core", StringComparison.OrdinalIgnoreCase))
+        {
+            // "source" facet (core library / my library / public, FR-050): the "my
+            // library" case is handled by `scope` above; any other non-"core" value
+            // matches nothing rather than silently ignoring the filter.
+            return TypedResults.Ok(new RecipePageResponse([], null));
+        }
+        else
+        {
+            query = db.Recipes.Where(r => r.Visibility == ContentVisibility.Public);
+        }
 
         if (family is not null)
         {
@@ -146,20 +202,30 @@ public static class RecipeEndpoints
             r.FamilyId is { } familyId && familyKeysById.TryGetValue(familyId, out var familyKey) ? familyKey : null))
             .ToList();
 
-        return new RecipePageResponse(items, nextCursor);
+        return TypedResults.Ok(new RecipePageResponse(items, nextCursor));
     }
 
     private static async Task<Results<Ok<RecipeDetailResponse>, NotFound>> GetAsync(
         Guid id,
+        ClaimsPrincipal user,
         CatalogDbContext db,
         IRecipeDerivedDataCalculator calculator,
         Ingredients.Contracts.IIngredientLookupPort ingredientLookup,
         Equipment.Contracts.IEquipmentLookupPort equipmentLookup,
+        IVenueOwnershipPort venueOwnership,
         CancellationToken cancellationToken)
     {
-        var recipe = await db.Recipes.FirstOrDefaultAsync(r => r.Id == id && r.Visibility == ContentVisibility.Public, cancellationToken);
+        var recipe = await db.Recipes.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
         if (recipe is null)
         {
+            return TypedResults.NotFound();
+        }
+
+        if (recipe.Visibility != ContentVisibility.Public && !await IsOwnerAsync(recipe, user, venueOwnership, cancellationToken))
+        {
+            // 404, not 403: a private recipe's existence isn't disclosed to a
+            // non-owner (same no-enumeration reasoning as recovery/login elsewhere
+            // in this codebase) — matches spec.md scenario 4.
             return TypedResults.NotFound();
         }
 
@@ -233,6 +299,324 @@ public static class RecipeEndpoints
             derived.StandardDrinks,
             derived.Allergens));
     }
+
+    private static async Task<Results<Created<RecipeAuthorResponse>, ProblemHttpResult>> CreateAsync(
+        CreateRecipeRequest request,
+        ClaimsPrincipal user,
+        CatalogDbContext db,
+        IUuidGenerator uuidGenerator,
+        IClock clock,
+        Ingredients.Contracts.IIngredientLookupPort ingredientLookup,
+        IVenueOwnershipPort venueOwnership,
+        RecipeSearchDocumentRefresher searchRefresher,
+        CancellationToken cancellationToken)
+    {
+        var userId = CurrentUserId(user);
+
+        if (!TryParseAuthorLibraryScope(request.LibraryScope, out var libraryScope))
+        {
+            return TypedResults.Problem(title: "Invalid libraryScope", detail: "libraryScope must be 'personal' or 'bar'.", statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        OwnerType ownerType;
+        Guid ownerId;
+        if (libraryScope == LibraryScope.Bar)
+        {
+            if (request.VenueId is not { } venueId)
+            {
+                return TypedResults.Problem(title: "venueId required", detail: "A bar-scoped recipe must reference a venueId.", statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (!await venueOwnership.IsOwnedByAsync(venueId, userId, cancellationToken))
+            {
+                return TypedResults.Problem(title: "Not your venue", statusCode: StatusCodes.Status403Forbidden);
+            }
+
+            ownerType = OwnerType.Venue;
+            ownerId = venueId;
+        }
+        else
+        {
+            ownerType = OwnerType.User;
+            ownerId = userId;
+        }
+
+        if (!TryParseIngredientLines(request.IngredientLines, out var lines, out var lineError))
+        {
+            return TypedResults.Problem(title: "Invalid ingredient line", detail: lineError, statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        if (await FindUnknownIngredientIdAsync(lines, ingredientLookup, cancellationToken) is { } unknownIngredientId)
+        {
+            return TypedResults.Problem(title: "Unknown ingredient", detail: $"No such ingredient: {unknownIngredientId}.", statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var categoryIds = (request.CategoryIds ?? []).Distinct().ToList();
+        if (categoryIds.Count > 0 && await db.Categories.CountAsync(c => categoryIds.Contains(c.Id), cancellationToken) != categoryIds.Count)
+        {
+            return TypedResults.Problem(title: "Unknown category", statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var now = clock.UtcNow;
+        var recipe = new Recipe
+        {
+            Id = uuidGenerator.NewId(),
+
+            // T058: Method is purely internal ABV-dilution plumbing (T036) — no read
+            // endpoint ever renders it and no acceptance scenario asks the author to
+            // supply it, so this is a neutral, documented default rather than an
+            // exposed field, not a corner cut on anything actually specified.
+            Method = SpecPour.Modules.Measurements.Contracts.MixMethod.Built,
+            OwnerType = ownerType,
+            OwnerId = ownerId,
+            LibraryScope = libraryScope,
+            PrimaryName = request.PrimaryName,
+            AlternateNames = request.AlternateNames ?? [],
+            Instructions = request.Instructions ?? [],
+            IceSpec = string.Empty,
+
+            // T058: authored content always starts private (FR-008b) — publishing
+            // (with its consent cascade over referenced private ingredients, per
+            // spec.md's clarification) is a distinct, not-yet-built flow.
+            Visibility = ContentVisibility.Private,
+            CreatedAt = now,
+            UpdatedAt = now,
+        };
+
+        db.Recipes.Add(recipe);
+        AddIngredientLines(db, recipe.Id, lines, uuidGenerator);
+        foreach (var categoryId in categoryIds)
+        {
+            db.RecipeCategories.Add(new RecipeCategory { RecipeId = recipe.Id, CategoryId = categoryId });
+        }
+
+        await AddTagsAsync(db, recipe.Id, request.Tags, uuidGenerator, cancellationToken);
+
+        await db.SaveChangesAsync(cancellationToken);
+        await searchRefresher.RefreshAsync(recipe.Id, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
+
+        var response = await BuildAuthorResponseAsync(recipe, db, ingredientLookup, cancellationToken);
+        return TypedResults.Created($"/api/v1/recipes/{recipe.Id}", response);
+    }
+
+    private static async Task<Results<Ok<RecipeAuthorResponse>, NotFound, ProblemHttpResult>> UpdateAsync(
+        Guid id,
+        UpdateRecipeRequest request,
+        ClaimsPrincipal user,
+        CatalogDbContext db,
+        IUuidGenerator uuidGenerator,
+        IClock clock,
+        Ingredients.Contracts.IIngredientLookupPort ingredientLookup,
+        IVenueOwnershipPort venueOwnership,
+        RecipeSearchDocumentRefresher searchRefresher,
+        CancellationToken cancellationToken)
+    {
+        var recipe = await db.Recipes.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+        if (recipe is null || !await IsOwnerAsync(recipe, user, venueOwnership, cancellationToken))
+        {
+            return TypedResults.NotFound();
+        }
+
+        if (!TryParseIngredientLines(request.IngredientLines, out var lines, out var lineError))
+        {
+            return TypedResults.Problem(title: "Invalid ingredient line", detail: lineError, statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        if (await FindUnknownIngredientIdAsync(lines, ingredientLookup, cancellationToken) is { } unknownIngredientId)
+        {
+            return TypedResults.Problem(title: "Unknown ingredient", detail: $"No such ingredient: {unknownIngredientId}.", statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var categoryIds = (request.CategoryIds ?? []).Distinct().ToList();
+        if (categoryIds.Count > 0 && await db.Categories.CountAsync(c => categoryIds.Contains(c.Id), cancellationToken) != categoryIds.Count)
+        {
+            return TypedResults.Problem(title: "Unknown category", statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        recipe.PrimaryName = request.PrimaryName;
+        recipe.AlternateNames = request.AlternateNames ?? [];
+        recipe.Instructions = request.Instructions ?? [];
+        recipe.UpdatedAt = clock.UtcNow;
+
+        db.RecipeIngredientLines.RemoveRange(await db.RecipeIngredientLines.Where(l => l.RecipeId == id).ToListAsync(cancellationToken));
+        AddIngredientLines(db, id, lines, uuidGenerator);
+
+        db.RecipeCategories.RemoveRange(await db.RecipeCategories.Where(rc => rc.RecipeId == id).ToListAsync(cancellationToken));
+        foreach (var categoryId in categoryIds)
+        {
+            db.RecipeCategories.Add(new RecipeCategory { RecipeId = id, CategoryId = categoryId });
+        }
+
+        db.RecipeTags.RemoveRange(await db.RecipeTags.Where(rt => rt.RecipeId == id).ToListAsync(cancellationToken));
+        await AddTagsAsync(db, id, request.Tags, uuidGenerator, cancellationToken);
+
+        await db.SaveChangesAsync(cancellationToken);
+        await searchRefresher.RefreshAsync(id, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
+
+        var response = await BuildAuthorResponseAsync(recipe, db, ingredientLookup, cancellationToken);
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Results<NoContent, NotFound>> DeleteAsync(
+        Guid id, ClaimsPrincipal user, CatalogDbContext db, IVenueOwnershipPort venueOwnership, CancellationToken cancellationToken)
+    {
+        var recipe = await db.Recipes.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+        if (recipe is null || !await IsOwnerAsync(recipe, user, venueOwnership, cancellationToken))
+        {
+            return TypedResults.NotFound();
+        }
+
+        // RecipeIngredientLine/RecipeCategory/RecipeTag/RecipeGlassware/RecipeEquipment
+        // all cascade-delete on RecipeId (CatalogDbContext.OnModelCreating).
+        db.Recipes.Remove(recipe);
+        await db.SaveChangesAsync(cancellationToken);
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<bool> IsOwnerAsync(Recipe recipe, ClaimsPrincipal user, IVenueOwnershipPort venueOwnership, CancellationToken cancellationToken)
+    {
+        if (user.Identity?.IsAuthenticated != true)
+        {
+            return false;
+        }
+
+        var userId = CurrentUserId(user);
+        return recipe.OwnerType switch
+        {
+            OwnerType.User => recipe.OwnerId == userId,
+            OwnerType.Venue => recipe.OwnerId is { } venueId && await venueOwnership.IsOwnedByAsync(venueId, userId, cancellationToken),
+            _ => false,
+        };
+    }
+
+    private static bool TryParseAuthorLibraryScope(string value, out LibraryScope libraryScope)
+    {
+        if (string.Equals(value, "personal", StringComparison.OrdinalIgnoreCase))
+        {
+            libraryScope = LibraryScope.Personal;
+            return true;
+        }
+
+        if (string.Equals(value, "bar", StringComparison.OrdinalIgnoreCase))
+        {
+            libraryScope = LibraryScope.Bar;
+            return true;
+        }
+
+        libraryScope = default;
+        return false;
+    }
+
+    private static bool TryParseIngredientLines(
+        IReadOnlyList<CreateRecipeIngredientLineRequest>? requestLines,
+        out List<ParsedIngredientLine> lines,
+        out string? error)
+    {
+        lines = [];
+        error = null;
+        foreach (var line in requestLines ?? [])
+        {
+            if (!Enum.TryParse<IngredientScalingRule>(line.ScalingRule, ignoreCase: true, out var scalingRule))
+            {
+                error = $"Unknown scalingRule: {line.ScalingRule}";
+                lines = [];
+                return false;
+            }
+
+            lines.Add(new ParsedIngredientLine(line.IngredientId, line.Quantity, line.Unit, line.Purpose, scalingRule));
+        }
+
+        return true;
+    }
+
+    private static async Task<Guid?> FindUnknownIngredientIdAsync(
+        List<ParsedIngredientLine> lines, Ingredients.Contracts.IIngredientLookupPort ingredientLookup, CancellationToken cancellationToken)
+    {
+        if (lines.Count == 0)
+        {
+            return null;
+        }
+
+        var referencedIds = lines.Select(l => l.IngredientId).Distinct().ToList();
+        var summaries = await ingredientLookup.GetSummariesAsync(referencedIds, cancellationToken);
+        var missing = referencedIds.Where(i => !summaries.ContainsKey(i)).ToList();
+        return missing.Count > 0 ? missing[0] : null;
+    }
+
+    private static void AddIngredientLines(CatalogDbContext db, Guid recipeId, List<ParsedIngredientLine> lines, IUuidGenerator uuidGenerator)
+    {
+        var position = 1;
+        foreach (var line in lines)
+        {
+            db.RecipeIngredientLines.Add(new RecipeIngredientLine
+            {
+                Id = uuidGenerator.NewId(),
+                RecipeId = recipeId,
+                Position = position++,
+                IngredientId = line.IngredientId,
+                Quantity = line.Quantity,
+                Unit = line.Unit,
+                Purpose = line.Purpose,
+                ScalingRule = line.ScalingRule,
+            });
+        }
+    }
+
+    private static async Task AddTagsAsync(CatalogDbContext db, Guid recipeId, IReadOnlyList<string>? tagTexts, IUuidGenerator uuidGenerator, CancellationToken cancellationToken)
+    {
+        foreach (var tagText in (tagTexts ?? []).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var key = tagText.Trim().ToLowerInvariant();
+            var tag = await db.Tags.FirstOrDefaultAsync(t => t.Key == key, cancellationToken);
+            if (tag is null)
+            {
+                tag = new Tag { Id = uuidGenerator.NewId(), Key = key, DisplayText = tagText.Trim() };
+                db.Tags.Add(tag);
+            }
+
+            db.RecipeTags.Add(new RecipeTag { RecipeId = recipeId, TagId = tag.Id });
+        }
+    }
+
+    private static async Task<RecipeAuthorResponse> BuildAuthorResponseAsync(
+        Recipe recipe, CatalogDbContext db, Ingredients.Contracts.IIngredientLookupPort ingredientLookup, CancellationToken cancellationToken)
+    {
+        var lines = await db.RecipeIngredientLines.Where(l => l.RecipeId == recipe.Id).OrderBy(l => l.Position).ToListAsync(cancellationToken);
+        var summaries = await ingredientLookup.GetSummariesAsync([.. lines.Select(l => l.IngredientId).Distinct()], cancellationToken);
+        var ingredientLines = lines.Select(l => new RecipeIngredientLineResponse(
+            l.Position,
+            l.IngredientId,
+            summaries.TryGetValue(l.IngredientId, out var summary) ? summary.Name : null,
+            l.Quantity,
+            l.Unit,
+            l.Purpose,
+            l.ScalingRule.ToString())).ToList();
+
+        var categoryIds = await db.RecipeCategories.Where(rc => rc.RecipeId == recipe.Id).Select(rc => rc.CategoryId).ToListAsync(cancellationToken);
+        var tagKeys = await db.RecipeTags.Where(rt => rt.RecipeId == recipe.Id)
+            .Join(db.Tags, rt => rt.TagId, t => t.Id, (rt, t) => t.Key)
+            .ToListAsync(cancellationToken);
+
+        return new RecipeAuthorResponse(
+            recipe.Id,
+            recipe.PrimaryName,
+            recipe.AlternateNames,
+            recipe.LibraryScope.ToString().ToLowerInvariant(),
+            recipe.OwnerType == OwnerType.Venue ? recipe.OwnerId : null,
+            recipe.Instructions,
+            ingredientLines,
+            categoryIds,
+            tagKeys,
+            recipe.Visibility.ToString().ToLowerInvariant(),
+            recipe.CreatedAt,
+            recipe.UpdatedAt);
+    }
+
+    private static Guid CurrentUserId(ClaimsPrincipal user) => Guid.Parse(user.GetClaim(Claims.Subject)!);
+
+    private sealed record ParsedIngredientLine(Guid IngredientId, decimal Quantity, string Unit, string? Purpose, IngredientScalingRule ScalingRule);
 }
 
 public sealed record RecipePageResponse(IReadOnlyList<RecipeSummaryResponse> Items, string? NextCursor);
@@ -264,3 +648,37 @@ public sealed record RecipeDetailResponse(
     decimal AbvPercent,
     decimal StandardDrinks,
     IReadOnlyList<string> Allergens);
+
+public sealed record CreateRecipeIngredientLineRequest(Guid IngredientId, decimal Quantity, string Unit, string? Purpose, string ScalingRule);
+
+public sealed record CreateRecipeRequest(
+    string PrimaryName,
+    IReadOnlyList<string>? AlternateNames,
+    string LibraryScope,
+    Guid? VenueId,
+    IReadOnlyList<string>? Instructions,
+    IReadOnlyList<CreateRecipeIngredientLineRequest>? IngredientLines,
+    IReadOnlyList<Guid>? CategoryIds,
+    IReadOnlyList<string>? Tags);
+
+public sealed record UpdateRecipeRequest(
+    string PrimaryName,
+    IReadOnlyList<string>? AlternateNames,
+    IReadOnlyList<string>? Instructions,
+    IReadOnlyList<CreateRecipeIngredientLineRequest>? IngredientLines,
+    IReadOnlyList<Guid>? CategoryIds,
+    IReadOnlyList<string>? Tags);
+
+public sealed record RecipeAuthorResponse(
+    Guid Id,
+    string PrimaryName,
+    IReadOnlyList<string> AlternateNames,
+    string LibraryScope,
+    Guid? VenueId,
+    IReadOnlyList<string> Instructions,
+    IReadOnlyList<RecipeIngredientLineResponse> IngredientLines,
+    IReadOnlyList<Guid> CategoryIds,
+    IReadOnlyList<string> Tags,
+    string Visibility,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset UpdatedAt);

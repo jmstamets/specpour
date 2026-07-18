@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
+using SpecPour.Modules.Venues.Contracts;
 
 namespace SpecPour.Modules.Venues.Infrastructure;
 
@@ -27,6 +28,7 @@ public sealed class VenuesModule : IModule
             options.AddInterceptors(sp.GetRequiredService<OutboxSaveChangesInterceptor>());
         });
         services.AddSpecPourOutboxWriter(Name);
+        services.AddScoped<IVenueOwnershipPort, VenueOwnershipAdapter>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)

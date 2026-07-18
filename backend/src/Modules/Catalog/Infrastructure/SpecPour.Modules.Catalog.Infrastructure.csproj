@@ -14,6 +14,9 @@
          lookup port (contract sweep). -->
     <ProjectReference Include="..\..\Search\Contracts\SpecPour.Modules.Search.Contracts.csproj" />
     <ProjectReference Include="..\..\Equipment\Contracts\SpecPour.Modules.Equipment.Contracts.csproj" />
+    <!-- T058: verifying bar-library recipe authoring is scoped to a venue the
+         caller actually owns. -->
+    <ProjectReference Include="..\..\Venues\Contracts\SpecPour.Modules.Venues.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +25,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="OpenIddict.Abstractions" Version="7.5.0" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.5.0" />
   </ItemGroup>
 
 </Project>
