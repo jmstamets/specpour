@@ -562,13 +562,16 @@ components:
       type: object
       description: >-
         deviceDescription is the raw User-Agent header captured at token issuance —
-        best-effort, not a parsed device/OS model.
+        best-effort, not a parsed device/OS model. isCurrent (T188) marks the
+        caller's own session — the one backing the request's access token — so the
+        client can offer "sign out (this device)" and flag "This device" in the list.
       properties:
         id: { type: string, format: uuid }
         deviceDescription: { type: string }
         createdAt: { type: string, format: date-time }
         lastSeenAt: { type: string, format: date-time }
-      required: [id, deviceDescription, createdAt, lastSeenAt]
+        isCurrent: { type: boolean }
+      required: [id, deviceDescription, createdAt, lastSeenAt, isCurrent]
     SessionList:
       type: object
       properties:

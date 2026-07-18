@@ -352,6 +352,43 @@ public sealed class US02IdentitySteps
         _sessionIds.AddRange(sessions.Select(s => s.GetProperty("id").GetGuid()));
     }
 
+    [Then(@"exactly one listed session is marked as the current device")]
+    public async Task ThenExactlyOneListedSessionIsMarkedAsTheCurrentDevice()
+    {
+        // T188: list as device 0 — exactly one of the two sessions must carry
+        // isCurrent=true (the one whose OpenIddict authorization backs device 0's
+        // own access token). If GetAuthorizationId() didn't resolve on the
+        // validated access token, this would be zero, not one.
+        var currentIds = await CurrentSessionIdsAsync(_deviceTokens[0]);
+        Assert.Single(currentIds);
+    }
+
+    [Then(@"each device sees a different session as its own current device")]
+    public async Task ThenEachDeviceSeesADifferentSessionAsItsOwnCurrentDevice()
+    {
+        // isCurrent is request-relative: device 0 and device 1 must each see
+        // THEIR OWN session as current, never the other's — the actual proof
+        // that this is a per-caller match and not, say, always the newest row.
+        var device0Current = Assert.Single(await CurrentSessionIdsAsync(_deviceTokens[0]));
+        var device1Current = Assert.Single(await CurrentSessionIdsAsync(_deviceTokens[1]));
+        Assert.NotEqual(device0Current, device1Current);
+    }
+
+    private static async Task<List<Guid>> CurrentSessionIdsAsync(string accessToken)
+    {
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+        var response = await client.GetAsync(new Uri("/api/v1/me/sessions", UriKind.Relative));
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        return
+        [
+            .. json.RootElement.GetProperty("sessions").EnumerateArray()
+                .Where(s => s.GetProperty("isCurrent").GetBoolean())
+                .Select(s => s.GetProperty("id").GetGuid()),
+        ];
+    }
+
     [When(@"the user revokes the first session")]
     public async Task WhenTheUserRevokesTheFirstSession()
     {

@@ -498,6 +498,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountMenuTitle => 'Account';
 
   @override
+  String get accountMenuSignOutButton => 'Sign out';
+
+  @override
   String get channelPreferencesTitle => 'Notification preferences';
 
   @override

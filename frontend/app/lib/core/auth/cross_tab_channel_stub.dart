@@ -15,10 +15,14 @@ Future<T> withRefreshLock<T>(Future<T> Function() body) => body();
 /// No other contexts to notify on native.
 void broadcastTokens(String accessToken, String refreshToken) {}
 
+/// No other contexts to notify on native (T188).
+void broadcastSignedOut() {}
+
 /// No other contexts to hear from on native.
 void startTokenBroadcastListener(
-  void Function(String accessToken, String refreshToken) onTokens,
-) {}
+  void Function(String accessToken, String refreshToken) onTokens, {
+  void Function()? onSignedOut,
+}) {}
 
 /// Nothing to hand off — native is single-context.
 void writeHandoff(

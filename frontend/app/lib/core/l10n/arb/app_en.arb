@@ -590,6 +590,10 @@
   "@accountMenuTitle": {
     "description": "T161 account menu screen title, and the tooltip/gated-action label for the AppBar entry point that opens it."
   },
+  "accountMenuSignOutButton": "Sign out",
+  "@accountMenuSignOutButton": {
+    "description": "T188 account menu: signs out of the current session and returns to Discover."
+  },
   "channelPreferencesTitle": "Notification preferences",
   "@channelPreferencesTitle": {
     "description": "T151 channel-preferences screen title."

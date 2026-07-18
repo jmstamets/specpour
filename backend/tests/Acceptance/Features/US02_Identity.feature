@@ -101,6 +101,12 @@ Feature: US2 - Create an account and manage identity
     Then only the second session remains active
     And the first device's session can no longer be refreshed
 
+  Scenario: 20 - The session list marks exactly the caller's own session as current (T188, FR-001b)
+    Given a registered adult user
+    When the user signs in from two devices
+    Then exactly one listed session is marked as the current device
+    And each device sees a different session as its own current device
+
   Scenario: 18 - A redeemed refresh token cannot be reused (T177, ADR-0005)
     Given a registered adult user
     When the user acquires a refresh token

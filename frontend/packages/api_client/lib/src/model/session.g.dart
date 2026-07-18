@@ -15,6 +15,8 @@ class _$Session extends Session {
   final DateTime createdAt;
   @override
   final DateTime lastSeenAt;
+  @override
+  final bool isCurrent;
 
   factory _$Session([void Function(SessionBuilder)? updates]) =>
       (SessionBuilder()..update(updates))._build();
@@ -23,7 +25,8 @@ class _$Session extends Session {
       {required this.id,
       required this.deviceDescription,
       required this.createdAt,
-      required this.lastSeenAt})
+      required this.lastSeenAt,
+      required this.isCurrent})
       : super._();
   @override
   Session rebuild(void Function(SessionBuilder) updates) =>
@@ -39,7 +42,8 @@ class _$Session extends Session {
         id == other.id &&
         deviceDescription == other.deviceDescription &&
         createdAt == other.createdAt &&
-        lastSeenAt == other.lastSeenAt;
+        lastSeenAt == other.lastSeenAt &&
+        isCurrent == other.isCurrent;
   }
 
   @override
@@ -49,6 +53,7 @@ class _$Session extends Session {
     _$hash = $jc(_$hash, deviceDescription.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, lastSeenAt.hashCode);
+    _$hash = $jc(_$hash, isCurrent.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -59,7 +64,8 @@ class _$Session extends Session {
           ..add('id', id)
           ..add('deviceDescription', deviceDescription)
           ..add('createdAt', createdAt)
-          ..add('lastSeenAt', lastSeenAt))
+          ..add('lastSeenAt', lastSeenAt)
+          ..add('isCurrent', isCurrent))
         .toString();
   }
 }
@@ -84,6 +90,10 @@ class SessionBuilder implements Builder<Session, SessionBuilder> {
   DateTime? get lastSeenAt => _$this._lastSeenAt;
   set lastSeenAt(DateTime? lastSeenAt) => _$this._lastSeenAt = lastSeenAt;
 
+  bool? _isCurrent;
+  bool? get isCurrent => _$this._isCurrent;
+  set isCurrent(bool? isCurrent) => _$this._isCurrent = isCurrent;
+
   SessionBuilder() {
     Session._defaults(this);
   }
@@ -95,6 +105,7 @@ class SessionBuilder implements Builder<Session, SessionBuilder> {
       _deviceDescription = $v.deviceDescription;
       _createdAt = $v.createdAt;
       _lastSeenAt = $v.lastSeenAt;
+      _isCurrent = $v.isCurrent;
       _$v = null;
     }
     return this;
@@ -123,6 +134,8 @@ class SessionBuilder implements Builder<Session, SessionBuilder> {
               createdAt, r'Session', 'createdAt'),
           lastSeenAt: BuiltValueNullFieldError.checkNotNull(
               lastSeenAt, r'Session', 'lastSeenAt'),
+          isCurrent: BuiltValueNullFieldError.checkNotNull(
+              isCurrent, r'Session', 'isCurrent'),
         );
     replace(_$result);
     return _$result;

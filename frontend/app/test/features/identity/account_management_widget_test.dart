@@ -182,12 +182,14 @@ class _FakeAccountInterceptor extends Interceptor {
             'deviceDescription': 'Chrome on macOS',
             'createdAt': '2026-07-01T00:00:00Z',
             'lastSeenAt': '2026-07-14T00:00:00Z',
+            'isCurrent': true,
           },
         {
           'id': 'session-2',
           'deviceDescription': 'Safari on iOS',
           'createdAt': '2026-07-02T00:00:00Z',
           'lastSeenAt': '2026-07-13T00:00:00Z',
+          'isCurrent': false,
         },
       ];
       return handler.resolve(

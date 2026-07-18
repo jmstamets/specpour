@@ -60,6 +60,7 @@ const _handoffOrphanTtl = Duration(seconds: 30);
 
 web.BroadcastChannel? _channel;
 void Function(String accessToken, String refreshToken)? _onTokens;
+void Function()? _onSignedOut;
 
 web.BroadcastChannel _channelInstance() {
   final existing = _channel;
@@ -78,6 +79,12 @@ web.BroadcastChannel _channelInstance() {
     try {
       decoded = jsonDecode((raw as JSString).toDart) as Map<String, dynamic>;
     } on Object {
+      return;
+    }
+    // T188: a sibling tab signed out — this tab must drop its own auth state
+    // too, so every tab reflects the same signed-out reality.
+    if (decoded['signedOut'] == true) {
+      _onSignedOut?.call();
       return;
     }
     final access = decoded['access'];
@@ -136,12 +143,21 @@ void broadcastTokens(String accessToken, String refreshToken) {
   _channelInstance().postMessage(payload.toJS);
 }
 
+/// T188: tells every other SpecPour tab that the user signed out, so they drop
+/// their own auth state and land signed out too.
+void broadcastSignedOut() {
+  _channelInstance().postMessage(jsonEncode({'signedOut': true}).toJS);
+}
+
 /// Wires the persistent listener that keeps THIS tab's in-memory auth state in
-/// sync with whichever tab last refreshed. Call once on web app start.
+/// sync with whichever tab last refreshed ([onTokens]) or signed out
+/// ([onSignedOut], T188). Call once on web app start.
 void startTokenBroadcastListener(
-  void Function(String accessToken, String refreshToken) onTokens,
-) {
+  void Function(String accessToken, String refreshToken) onTokens, {
+  void Function()? onSignedOut,
+}) {
   _onTokens = onTokens;
+  _onSignedOut = onSignedOut;
   _channelInstance();
 }
 

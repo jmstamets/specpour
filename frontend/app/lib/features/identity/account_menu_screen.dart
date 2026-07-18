@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/auth/identity_auth_service.dart';
 import '../../core/l10n/gen/app_localizations.dart';
 
 class AccountMenuScreen extends ConsumerWidget {
@@ -56,6 +57,23 @@ class AccountMenuScreen extends ConsumerWidget {
             title: Text(l10n.accountLifecycleTitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/account/lifecycle'),
+          ),
+          const Divider(),
+          // T188: sign out of the current session, then land on Discover signed
+          // out. Uses go() (not push) so the account stack is replaced, not
+          // stacked behind Discover.
+          ListTile(
+            key: const Key('accountMenuSignOutButton'),
+            leading: const Icon(Icons.logout_outlined),
+            title: Text(l10n.accountMenuSignOutButton),
+            onTap: () async {
+              await ref
+                  .read(identityAuthServiceProvider)
+                  .signOutCurrentSession();
+              if (context.mounted) {
+                context.go('/');
+              }
+            },
           ),
         ],
       ),

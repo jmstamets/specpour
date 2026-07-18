@@ -994,6 +994,12 @@ abstract class AppLocalizations {
   /// **'Account'**
   String get accountMenuTitle;
 
+  /// T188 account menu: signs out of the current session and returns to Discover.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get accountMenuSignOutButton;
+
   /// T151 channel-preferences screen title.
   ///
   /// In en, this message translates to:

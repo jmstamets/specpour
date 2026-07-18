@@ -163,6 +163,13 @@ and technique conforming to professional craft-cocktail standards."
   canonical-source chain intact (same resolution shape as FR-001a above). Contract
   path and implementation task filed near T166 (the other high-severity session-
   invalidation work) — not implemented as part of this reconciliation.
+- Q: (Round 3 walkthrough, 2026-07-18) Sign-out of the *current* session (distinct
+  from sign-out-everywhere) had no user-facing entry point, and FR-001b named only
+  per-session revocation + sign-out-everywhere. `docs/specification-statement.md` §1
+  was updated 2026-07-18 to name all three ("sign-out of the current session,
+  per-session revocation, and a single-action sign-out-everywhere"). → A: FR-001b
+  extended to match the source wording; delivered by T188 (Account-menu Sign out,
+  current-session only). Sign-out-everywhere remains separately tracked (T182).
 - Q: (/speckit-analyze U2, 2026-07-17) The data-export deliverable's format
   (downloadable JSON artifact vs. on-screen-only rendering) had no FR — `docs/
   specification-statement.md` §1 stated it explicitly ("Data export produces a
@@ -759,9 +766,10 @@ action, target, timestamp, and before/after state.
   self-service recovery path (e.g., one-time backup codes issued at enrollment) not
   contingent on possessing the lost factor, escalating to a staff-assisted,
   audit-logged reset (FR-065) when self-service recovery is also unavailable.
-- **FR-001b**: Session/device management MUST include per-session revocation and a
-  single-action "sign out everywhere" that revokes all of a user's active
-  sessions/devices at once.
+- **FR-001b**: Session/device management MUST include sign-out of the current session,
+  per-session revocation, and a single-action "sign out everywhere" that revokes all of
+  a user's active sessions/devices at once. (Sign-out of the current session added
+  2026-07-18 to match `docs/specification-statement.md` §1; delivered by T188.)
 - **FR-002**: System MUST capture and store date of birth at registration; V1 enforces
   no mandatory age gating on its informational surfaces (per-surface configuration per
   FR-002a), but the data must exist for future age-gated features without
