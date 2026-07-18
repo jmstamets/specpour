@@ -19,6 +19,7 @@ doc/ConceptDetail.md
 doc/ConceptPage.md
 doc/ConceptSummary.md
 doc/ConceptVariant.md
+doc/CreateVenueRequest.md
 doc/CursorPage.md
 doc/EnrollMfaRequest.md
 doc/EntitlementManifest.md
@@ -68,6 +69,10 @@ doc/Session.md
 doc/SessionList.md
 doc/SupportResourceResponse.md
 doc/SupportResourcesResponse.md
+doc/UpdateVenueRequest.md
+doc/Venue.md
+doc/VenuePage.md
+doc/VenuesApi.md
 lib/api_client.dart
 lib/src/api.dart
 lib/src/api/authorization_api.dart
@@ -79,6 +84,7 @@ lib/src/api/identity_api.dart
 lib/src/api/ingredients_api.dart
 lib/src/api/notifications_api.dart
 lib/src/api/search_api.dart
+lib/src/api/venues_api.dart
 lib/src/api_util.dart
 lib/src/auth/api_key_auth.dart
 lib/src/auth/auth.dart
@@ -100,6 +106,7 @@ lib/src/model/concept_detail.dart
 lib/src/model/concept_page.dart
 lib/src/model/concept_summary.dart
 lib/src/model/concept_variant.dart
+lib/src/model/create_venue_request.dart
 lib/src/model/cursor_page.dart
 lib/src/model/date.dart
 lib/src/model/enroll_mfa_request.dart
@@ -144,6 +151,9 @@ lib/src/model/session.dart
 lib/src/model/session_list.dart
 lib/src/model/support_resource_response.dart
 lib/src/model/support_resources_response.dart
+lib/src/model/update_venue_request.dart
+lib/src/model/venue.dart
+lib/src/model/venue_page.dart
 lib/src/serializers.dart
 pubspec.yaml
 test/age_gate_response_test.dart
@@ -163,6 +173,7 @@ test/concept_detail_test.dart
 test/concept_page_test.dart
 test/concept_summary_test.dart
 test/concept_variant_test.dart
+test/create_venue_request_test.dart
 test/cursor_page_test.dart
 test/enroll_mfa_request_test.dart
 test/entitlement_manifest_test.dart
@@ -212,3 +223,7 @@ test/session_list_test.dart
 test/session_test.dart
 test/support_resource_response_test.dart
 test/support_resources_response_test.dart
+test/update_venue_request_test.dart
+test/venue_page_test.dart
+test/venue_test.dart
+test/venues_api_test.dart

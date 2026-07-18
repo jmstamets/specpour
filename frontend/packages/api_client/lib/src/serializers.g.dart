@@ -25,6 +25,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ConceptPage.serializer)
       ..add(ConceptSummary.serializer)
       ..add(ConceptVariant.serializer)
+      ..add(CreateVenueRequest.serializer)
       ..add(CursorPage.serializer)
       ..add(EnrollMfaRequest.serializer)
       ..add(EntitlementManifest.serializer)
@@ -75,6 +76,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(SessionList.serializer)
       ..add(SupportResourceResponse.serializer)
       ..add(SupportResourcesResponse.serializer)
+      ..add(UpdateVenueRequest.serializer)
+      ..add(Venue.serializer)
+      ..add(VenuePage.serializer)
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(AutoLinkMatch)]),
           () => ListBuilder<AutoLinkMatch>())
@@ -147,6 +151,15 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(RoleGrantSummary)]),
           () => ListBuilder<RoleGrantSummary>())
       ..addBuilderFactory(
@@ -190,6 +203,9 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(
               BuiltList, const [const FullType(SupportResourceResponse)]),
           () => ListBuilder<SupportResourceResponse>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Venue)]),
+          () => ListBuilder<Venue>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType.nullable(JsonObject)]),

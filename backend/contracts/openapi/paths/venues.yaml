@@ -1,0 +1,159 @@
+venues:
+  get:
+    operationId: listVenues
+    tags: [venues]
+    summary: List the caller's venues (T061, FR-058)
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of the caller's own venues.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VenuePage'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+  post:
+    operationId: createVenue
+    tags: [venues]
+    summary: Create a venue owned by the caller (T061, FR-058)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateVenueRequest'
+    responses:
+      '201':
+        description: The created venue.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Venue'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+venuesById:
+  get:
+    operationId: getVenue
+    tags: [venues]
+    summary: Get one of the caller's venues by id (T061, FR-058)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The venue's full detail.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Venue'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  put:
+    operationId: updateVenue
+    tags: [venues]
+    summary: Update one of the caller's venues (T061, FR-058)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateVenueRequest'
+    responses:
+      '200':
+        description: The updated venue.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Venue'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  delete:
+    operationId: deleteVenue
+    tags: [venues]
+    summary: Delete one of the caller's venues (T061, FR-058)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '204':
+        description: The venue was deleted.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+components:
+  schemas:
+    Venue:
+      type: object
+      description: >-
+        A venue owned by a single user (FR-058) — no OwnerType/LibraryScope
+        polymorphism here, unlike Catalog/Ingredients/Equipment's authored content.
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        address: { type: [string, "null"] }
+        latitude: { type: [number, "null"], format: double }
+        longitude: { type: [number, "null"], format: double }
+        externalReferences:
+          type: array
+          items: { type: string }
+        createdAt: { type: string, format: date-time }
+      required: [id, name, externalReferences, createdAt]
+    VenuePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/Venue' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    CreateVenueRequest:
+      type: object
+      properties:
+        name: { type: string }
+        address: { type: [string, "null"] }
+        latitude: { type: [number, "null"], format: double }
+        longitude: { type: [number, "null"], format: double }
+        externalReferences:
+          type: [array, "null"]
+          items: { type: string }
+      required: [name]
+    UpdateVenueRequest:
+      type: object
+      properties:
+        name: { type: string }
+        address: { type: [string, "null"] }
+        latitude: { type: [number, "null"], format: double }
+        longitude: { type: [number, "null"], format: double }
+        externalReferences:
+          type: [array, "null"]
+          items: { type: string }
+      required: [name]

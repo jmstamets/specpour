@@ -10,4 +10,20 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <!-- T061: the Npgsql/EF Core plugin mapping NetTopologySuite geometry types
+         (Venue.Location) to Postgres' `geometry` column type — UseNetTopologySuite()
+         on the DbContext options is what actually activates it. The postgis
+         extension itself was already created by T013's base migration; this is its
+         first real consumer. -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="OpenIddict.Abstractions" Version="7.5.0" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.5.0" />
+  </ItemGroup>
+
 </Project>

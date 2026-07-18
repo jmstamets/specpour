@@ -19,6 +19,7 @@ export 'package:api_client/src/api/identity_api.dart';
 export 'package:api_client/src/api/ingredients_api.dart';
 export 'package:api_client/src/api/notifications_api.dart';
 export 'package:api_client/src/api/search_api.dart';
+export 'package:api_client/src/api/venues_api.dart';
 
 export 'package:api_client/src/model/age_gate_response.dart';
 export 'package:api_client/src/model/auth_account.dart';
@@ -34,6 +35,7 @@ export 'package:api_client/src/model/concept_detail.dart';
 export 'package:api_client/src/model/concept_page.dart';
 export 'package:api_client/src/model/concept_summary.dart';
 export 'package:api_client/src/model/concept_variant.dart';
+export 'package:api_client/src/model/create_venue_request.dart';
 export 'package:api_client/src/model/cursor_page.dart';
 export 'package:api_client/src/model/enroll_mfa_request.dart';
 export 'package:api_client/src/model/entitlement_manifest.dart';
@@ -77,4 +79,7 @@ export 'package:api_client/src/model/session.dart';
 export 'package:api_client/src/model/session_list.dart';
 export 'package:api_client/src/model/support_resource_response.dart';
 export 'package:api_client/src/model/support_resources_response.dart';
+export 'package:api_client/src/model/update_venue_request.dart';
+export 'package:api_client/src/model/venue.dart';
+export 'package:api_client/src/model/venue_page.dart';
 

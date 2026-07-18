@@ -28,6 +28,7 @@ import 'package:api_client/src/model/concept_detail.dart';
 import 'package:api_client/src/model/concept_page.dart';
 import 'package:api_client/src/model/concept_summary.dart';
 import 'package:api_client/src/model/concept_variant.dart';
+import 'package:api_client/src/model/create_venue_request.dart';
 import 'package:api_client/src/model/cursor_page.dart';
 import 'package:api_client/src/model/enroll_mfa_request.dart';
 import 'package:api_client/src/model/entitlement_manifest.dart';
@@ -71,6 +72,9 @@ import 'package:api_client/src/model/session.dart';
 import 'package:api_client/src/model/session_list.dart';
 import 'package:api_client/src/model/support_resource_response.dart';
 import 'package:api_client/src/model/support_resources_response.dart';
+import 'package:api_client/src/model/update_venue_request.dart';
+import 'package:api_client/src/model/venue.dart';
+import 'package:api_client/src/model/venue_page.dart';
 
 part 'serializers.g.dart';
 
@@ -89,6 +93,7 @@ part 'serializers.g.dart';
   ConceptPage,
   ConceptSummary,
   ConceptVariant,
+  CreateVenueRequest,
   CursorPage,
   EnrollMfaRequest,
   EntitlementManifest,
@@ -132,6 +137,9 @@ part 'serializers.g.dart';
   SessionList,
   SupportResourceResponse,
   SupportResourcesResponse,
+  UpdateVenueRequest,
+  Venue,
+  VenuePage,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..add(const OneOfSerializer())

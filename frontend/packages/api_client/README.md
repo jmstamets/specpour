@@ -110,6 +110,11 @@ Class | Method | HTTP request | Description
 [*NotificationsApi*](doc/NotificationsApi.md) | [**markInboxMessageRead**](doc/NotificationsApi.md#markinboxmessageread) | **POST** /inbox/{id}/read | Mark an inbox message as read
 [*NotificationsApi*](doc/NotificationsApi.md) | [**updateMyChannelPreferences**](doc/NotificationsApi.md#updatemychannelpreferences) | **PUT** /me/channels | Update the caller&#39;s notification channel opt-in preferences
 [*SearchApi*](doc/SearchApi.md) | [**search**](doc/SearchApi.md#search) | **GET** /search | Full-text search across recipes, ingredients, equipment, glossary terms, and articles (FR-049)
+[*VenuesApi*](doc/VenuesApi.md) | [**createVenue**](doc/VenuesApi.md#createvenue) | **POST** /venues | Create a venue owned by the caller (T061, FR-058)
+[*VenuesApi*](doc/VenuesApi.md) | [**deleteVenue**](doc/VenuesApi.md#deletevenue) | **DELETE** /venues/{id} | Delete one of the caller&#39;s venues (T061, FR-058)
+[*VenuesApi*](doc/VenuesApi.md) | [**getVenue**](doc/VenuesApi.md#getvenue) | **GET** /venues/{id} | Get one of the caller&#39;s venues by id (T061, FR-058)
+[*VenuesApi*](doc/VenuesApi.md) | [**listVenues**](doc/VenuesApi.md#listvenues) | **GET** /venues | List the caller&#39;s venues (T061, FR-058)
+[*VenuesApi*](doc/VenuesApi.md) | [**updateVenue**](doc/VenuesApi.md#updatevenue) | **PUT** /venues/{id} | Update one of the caller&#39;s venues (T061, FR-058)
 
 
 ## Documentation For Models
@@ -128,6 +133,7 @@ Class | Method | HTTP request | Description
  - [ConceptPage](doc/ConceptPage.md)
  - [ConceptSummary](doc/ConceptSummary.md)
  - [ConceptVariant](doc/ConceptVariant.md)
+ - [CreateVenueRequest](doc/CreateVenueRequest.md)
  - [CursorPage](doc/CursorPage.md)
  - [EnrollMfaRequest](doc/EnrollMfaRequest.md)
  - [EntitlementManifest](doc/EntitlementManifest.md)
@@ -171,6 +177,9 @@ Class | Method | HTTP request | Description
  - [SessionList](doc/SessionList.md)
  - [SupportResourceResponse](doc/SupportResourceResponse.md)
  - [SupportResourcesResponse](doc/SupportResourcesResponse.md)
+ - [UpdateVenueRequest](doc/UpdateVenueRequest.md)
+ - [Venue](doc/Venue.md)
+ - [VenuePage](doc/VenuePage.md)
 
 
 ## Documentation For Authorization

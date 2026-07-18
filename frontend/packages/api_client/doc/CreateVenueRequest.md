@@ -1,0 +1,19 @@
+# api_client.model.CreateVenueRequest
+
+## Load the model package
+```dart
+import 'package:api_client/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**name** | **String** |  | 
+**address** | **String** |  | [optional] 
+**latitude** | **double** |  | [optional] 
+**longitude** | **double** |  | [optional] 
+**externalReferences** | **BuiltList&lt;String&gt;** |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
