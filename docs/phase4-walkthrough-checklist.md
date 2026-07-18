@@ -107,19 +107,19 @@ you could lose access to your account." — visible after the next bundle rebuil
   a manual key beneath. **Scan it with a real authenticator app** (Google/
   Microsoft Authenticator, 1Password, …) — it should add a "SpecPour" entry
   showing a 6-digit code. Enter that code to confirm; enrollment succeeds.
-  *(Confirmed with a real authenticator, 2026-07-18.)*
+  _(Confirmed with a real authenticator, 2026-07-18.)_
 - [PASS with note] After confirming with a valid code: a **backup-code list**
   appears with clear wording that these are shown once and won't be shown again.
-  *(Wording judged during the walkthrough → T195 appended the "you could lose
+  _(Wording judged during the walkthrough → T195 appended the "you could lose
   access to your account" consequence sentence; the updated copy shows after the
-  next bundle rebuild.)*
+  next bundle rebuild.)_
 - [ ] **OPEN for John** — Tap **"I've saved these codes"** — the codes disappear
-  and do not reappear on navigating away and back to this screen.
+      and do not reappear on navigating away and back to this screen.
 - [PASS] Tap **Regenerate backup codes** — a fresh set appears with the same
-  one-time framing; dismiss it the same way. *(Observed, 2026-07-18.)*
+  one-time framing; dismiss it the same way. _(Observed, 2026-07-18.)_
 - [ ] **OPEN for John** — Tap **Turn off two-factor authentication** — status
-  updates to reflect it's off, and the regenerate/disable buttons are replaced by
-  the enroll button again.
+      updates to reflect it's off, and the regenerate/disable buttons are replaced by
+      the enroll button again.
 
 ### (d) T050 — account recovery
 
@@ -191,24 +191,22 @@ you could lose access to your account." — visible after the next bundle rebuil
   indicator make it obvious something happened?
 - [PASS] Tap **Delete my account** — a confirmation dialog appears first, with wording that makes clear this is permanent. Cancelling it should leave the account intact (don't confirm delete unless you're fine losing this walkthrough's test account — deleting it ends the session and returns to Discover).
 
-### (i) T188 — sign out (current session) — OPEN for John (2026-07-18)
+### (i) T188 — sign out (current session) — CONFIRMED by John (2026-07-18)
 
-All four are mechanically covered by the browser tier (`web_sign_out_test.dart`,
-green in CI) but **left open for John's own eyeball per his sign-off directive** —
-this section had no human pass yet.
+All four mechanically covered by the browser tier (`web_sign_out_test.dart`,
+green in CI) **and confirmed by John's own walkthrough** (2026-07-18: "all tests
+pass").
 
-- [ ] The Account menu has a **Sign out** entry (below the five destinations,
+- [PASS] The Account menu has a **Sign out** entry (below the five destinations,
   under a divider).
-- [ ] Tap **Sign out** — it returns to Discover, signed out (tapping the account
+- [PASS] Tap **Sign out** — it returns to Discover, signed out (tapping the account
   icon now shows the sign-in prompt again, not the account menu).
-- [ ] **Signed out survives reload**: after signing out, reload the page — you
+- [PASS] **Signed out survives reload**: after signing out, reload the page — you
   stay signed out (the persisted token was cleared; you are not silently
-  restored). _(Mechanically covered by `web_sign_out_test.dart`, but worth an
-  eyeball.)_
-- [ ] **Second tab signs out too**: open the app in two tabs, both signed in;
-  sign out in one — the other also lands signed out (on Discover). _(Also
-  mechanically covered by the browser tier's second-tab iframe test.)_
-- [ ] From **Active sessions**, revoking the row badged **"This device"** (its
+  restored).
+- [PASS] **Second tab signs out too**: open the app in two tabs, both signed in;
+  sign out in one — the other also lands signed out (on Discover).
+- [PASS] From **Active sessions**, revoking the row badged **"This device"** (its
   button reads **Sign out**) does the same thing — signs you out and returns to
   Discover. Revoking any _other_ session just drops it from the list.
 
@@ -226,21 +224,19 @@ this section had no human pass yet.
 ### Round 4 disposition (2026-07-18) — the current gate
 
 Phase 4 is **not yet formally signed off** — held pending John's confirmation of
-the last open items below. Everything else has been walked and passed across
+the last two open items below. Everything else has been walked and passed across
 Rounds 1–4.
 
 - **Confirmed this round (John):** (c) QR MFA enrollment with a real
   authenticator; (c) regenerate backup codes; (e) sessions-list polish (T189
-  "This device" badge + humanized descriptions). Plus all of (a),(b),(d),(f),(g),
-  (h) from prior rounds.
-- **Still OPEN for John (this is the whole remaining gate):**
-  - (i) all four sign-out checks — menu entry; sign out → Discover; signed-out
-    survives reload; second tab lands signed out; current-session revoke from the
-    sessions list. (Mechanically green in the browser tier; needs John's eyeball.)
+  "This device" badge + humanized descriptions); **(i) all four sign-out checks
+  (T188 — confirmed 2026-07-18: "all tests pass")**. Plus all of
+  (a),(b),(d),(f),(g),(h) from prior rounds.
+- **Still OPEN for John (the whole remaining gate — two boxes in section (c)):**
   - (c) "I've saved these codes" → codes don't reappear.
   - (c) Turn off two-factor → status flips and the enroll button returns.
 - **Rides along, not a gate:** the T195 backup-codes copy addition ("…you could
-  lose access to your account.") shows after the next bundle rebuild.
+  lose access to your account.") is now in the served bundle (rebuilt this batch).
 
 **On John's confirmation of the open items**, this checklist is committed as the
 Phase 4 walkthrough record and Phase 4 is formally signed off; T190 (coverage
