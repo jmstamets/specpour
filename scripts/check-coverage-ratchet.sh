@@ -47,6 +47,34 @@
 # in its own commit (deliberate and visible) — never a standing tolerance,
 # which would let small regressions accumulate silently over time.
 #
+# NONDETERMINISTIC-COVERAGE FLAKE RULE (T200, pre-armed 2026-07-19): the T198
+# incident's root cause — a single line whose coverage depends on wall-clock
+# timing, not on what tests exist — is a LATENT FLAKE, not a one-off. It can
+# recur between any two CI runs, not just local-vs-CI. When a ratchet failure
+# is within ~1 line of baseline (a swing of a fraction of a percent on a
+# denominator in the thousands), investigate it AS a suspected nondeterministic
+# line FIRST, before assuming it's a real regression or reflexively
+# re-baselining:
+#   1. Compare the failing run's artifact against the run that last passed
+#      (same production code, if any) — a same-denominator, few-line delta is
+#      the signature (see T198's playbook: `gh run download`, merge with this
+#      script, diff line-by-line).
+#   2. If confirmed nondeterministic, the fix is making the line
+#      DETERMINISTICALLY covered (a test that reliably exercises it) or
+#      explicitly EXCLUDING it (`ExcludeByFile`/`Exclude` in
+#      backend/coverlet.runsettings, with a comment explaining why) — never an
+#      epsilon added to this ratchet (see above; still rejected).
+#   3. Two candidate mechanisms identified but NOT confirmed as of T200 (two
+#      fresh local runs failed to reproduce the T198 delta, both matching CI
+#      exactly): `OutboxDispatcherBackgroundService` (5s poll loop, every
+#      module's outbox — BuildingBlocks/Events/Outbox/) and
+#      `AccountLifecycleBackgroundService` (same poll-loop shape, Identity-only
+#      — Modules/Identity/Infrastructure/Lifecycle/). Both race their own
+#      branch coverage (e.g. "did a poll cycle catch a pending row before the
+#      test host shut down") against wall-clock time rather than against any
+#      deterministic test trigger. Start here on the next occurrence rather
+#      than re-deriving candidates from scratch.
+#
 # Usage:
 #   scripts/check-coverage-ratchet.sh <backend-coverage-root> <frontend-lcov-file>
 #
