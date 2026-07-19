@@ -120,6 +120,29 @@ inventoryItemById:
       '404':
         $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
+inventoryMakeable:
+  get:
+    operationId: getMakeableRecipes
+    tags: [inventory]
+    summary: >-
+      "What can I make?" against the caller's personal inventory, with near-misses
+      and substitutions (T067, FR-031)
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: >-
+          Fully-makeable recipes and near-misses. Every recipe entry carries a
+          per-line "lines" array — the recipe-level matchQuality (makeable entries
+          only) is a DERIVED SUMMARY of the lines (the loosest quality among them),
+          never independent truth (ratified 2026-07-19).
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MakeableResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
 components:
   schemas:
     InventoryItem:
@@ -165,3 +188,66 @@ components:
       properties:
         quantity: { type: [number, "null"] }
         bottleSize: { type: [string, "null"] }
+    MatchQuality:
+      type: string
+      description: >-
+        statement §2's ladder, tightest to loosest. Extensible from day one — T201's
+        facet-partial slots in later as a new value, never a shape change.
+      enum: [exact-product, class-satisfied, substitution, missing]
+    Requirement:
+      type: object
+      description: A recipe line's requirement as stated, name-resolved.
+      properties:
+        ingredientId: { type: string, format: uuid }
+        ingredientName: { type: [string, "null"] }
+        quantity: { type: number }
+        unit: { type: string }
+      required: [ingredientId, quantity, unit]
+    SatisfiedBy:
+      type: object
+      description: The caller's inventory item (or substitution) satisfying a line. Absent (null) exactly when the line's matchQuality is "missing".
+      properties:
+        inventoryItemId: { type: string, format: uuid }
+        ingredientId: { type: string, format: uuid }
+        ingredientName: { type: [string, "null"] }
+      required: [inventoryItemId, ingredientId]
+    MakeabilityLine:
+      type: object
+      properties:
+        requirement: { $ref: '#/components/schemas/Requirement' }
+        matchQuality: { $ref: '#/components/schemas/MatchQuality' }
+        satisfiedBy:
+          oneOf:
+            - { $ref: '#/components/schemas/SatisfiedBy' }
+            - type: "null"
+      required: [requirement, matchQuality, satisfiedBy]
+    MakeableRecipe:
+      type: object
+      description: matchQuality here is a derived summary of lines (the loosest satisfied-line quality) — never independent truth.
+      properties:
+        recipeId: { type: string, format: uuid }
+        recipeName: { type: string }
+        matchQuality: { $ref: '#/components/schemas/MatchQuality' }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/MakeabilityLine' }
+      required: [recipeId, recipeName, matchQuality, lines]
+    NearMissRecipe:
+      type: object
+      properties:
+        recipeId: { type: string, format: uuid }
+        recipeName: { type: string }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/MakeabilityLine' }
+      required: [recipeId, recipeName, lines]
+    MakeableResponse:
+      type: object
+      properties:
+        makeable:
+          type: array
+          items: { $ref: '#/components/schemas/MakeableRecipe' }
+        nearMiss:
+          type: array
+          items: { $ref: '#/components/schemas/NearMissRecipe' }
+      required: [makeable, nearMiss]

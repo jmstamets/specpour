@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
+using SpecPour.Modules.Inventory.Application.Makeability;
 
 namespace SpecPour.Modules.Inventory.Infrastructure;
 
@@ -29,10 +30,12 @@ public sealed class InventoryModule : IModule
             options.AddInterceptors(sp.GetRequiredService<OutboxSaveChangesInterceptor>());
         });
         services.AddSpecPourOutboxWriter(Name);
+        services.AddScoped<MakeabilityCalculator>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
         Endpoints.InventoryItemEndpoints.Map(endpoints);
+        Endpoints.MakeabilityEndpoints.Map(endpoints);
     }
 }

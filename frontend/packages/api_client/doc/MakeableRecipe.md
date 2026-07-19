@@ -1,0 +1,18 @@
+# api_client.model.MakeableRecipe
+
+## Load the model package
+```dart
+import 'package:api_client/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**recipeId** | **String** |  | 
+**recipeName** | **String** |  | 
+**matchQuality** | [**MatchQuality**](MatchQuality.md) |  | 
+**lines** | [**BuiltList&lt;MakeabilityLine&gt;**](MakeabilityLine.md) |  | 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**createInventoryItem**](InventoryApi.md#createinventoryitem) | **POST** /inventory/items | Add an item to the caller&#39;s personal inventory, or a venue&#39;s inventory the caller owns (T066, FR-029/FR-030)
 [**deleteInventoryItem**](InventoryApi.md#deleteinventoryitem) | **DELETE** /inventory/items/{id} | Remove one of the caller&#39;s own inventory items (T066, FR-029)
 [**getInventoryItem**](InventoryApi.md#getinventoryitem) | **GET** /inventory/items/{id} | Get one of the caller&#39;s own inventory items by id (T066, FR-029)
+[**getMakeableRecipes**](InventoryApi.md#getmakeablerecipes) | **GET** /inventory/makeable | \&quot;What can I make?\&quot; against the caller&#39;s personal inventory, with near-misses and substitutions (T067, FR-031)
 [**listInventoryItems**](InventoryApi.md#listinventoryitems) | **GET** /inventory/items | List the caller&#39;s own inventory, or a venue&#39;s inventory the caller owns (T066, FR-029)
 [**updateInventoryItem**](InventoryApi.md#updateinventoryitem) | **PUT** /inventory/items/{id} | Update the quantity/bottle size of one of the caller&#39;s own inventory items (T066, FR-029)
 
@@ -126,6 +127,43 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**InventoryItem**](InventoryItem.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMakeableRecipes**
+> MakeableResponse getMakeableRecipes()
+
+\"What can I make?\" against the caller's personal inventory, with near-misses and substitutions (T067, FR-031)
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getInventoryApi();
+
+try {
+    final response = api.getMakeableRecipes();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling InventoryApi->getMakeableRecipes: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**MakeableResponse**](MakeableResponse.md)
 
 ### Authorization
 

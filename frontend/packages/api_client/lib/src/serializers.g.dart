@@ -70,11 +70,16 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(LoginMfaRequest.serializer)
       ..add(LoginRequest.serializer)
       ..add(LoginResult.serializer)
+      ..add(MakeabilityLine.serializer)
+      ..add(MakeableRecipe.serializer)
+      ..add(MakeableResponse.serializer)
+      ..add(MatchQuality.serializer)
       ..add(MeExport.serializer)
       ..add(MeExportUnitPreferenceEnum.serializer)
       ..add(MfaEnrollment.serializer)
       ..add(MfaStatus.serializer)
       ..add(MfaStatusMethodEnum.serializer)
+      ..add(NearMissRecipe.serializer)
       ..add(ProblemDetails.serializer)
       ..add(RecipeAuthor.serializer)
       ..add(RecipeAuthorLibraryScopeEnum.serializer)
@@ -90,9 +95,11 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RecoveryRequest.serializer)
       ..add(RegisterRequest.serializer)
       ..add(RegisterRequestUnitPreferenceEnum.serializer)
+      ..add(Requirement.serializer)
       ..add(ResponsibleConsumptionMessageResponse.serializer)
       ..add(RoleGrantSummary.serializer)
       ..add(RoleGrantSummaryScopeTypeEnum.serializer)
+      ..add(SatisfiedBy.serializer)
       ..add(SearchResult.serializer)
       ..add(SearchResultEntityTypeEnum.serializer)
       ..add(SearchResultPage.serializer)
@@ -151,6 +158,18 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(InventoryItem)]),
           () => ListBuilder<InventoryItem>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(MakeabilityLine)]),
+          () => ListBuilder<MakeabilityLine>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(MakeabilityLine)]),
+          () => ListBuilder<MakeabilityLine>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(MakeableRecipe)]),
+          () => ListBuilder<MakeableRecipe>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(NearMissRecipe)]),
+          () => ListBuilder<NearMissRecipe>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(RecipeSummary)]),
           () => ListBuilder<RecipeSummary>())

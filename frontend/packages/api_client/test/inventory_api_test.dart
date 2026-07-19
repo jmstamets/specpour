@@ -28,6 +28,13 @@ void main() {
       // TODO
     });
 
+    // \"What can I make?\" against the caller's personal inventory, with near-misses and substitutions (T067, FR-031)
+    //
+    //Future<MakeableResponse> getMakeableRecipes() async
+    test('test getMakeableRecipes', () async {
+      // TODO
+    });
+
     // List the caller's own inventory, or a venue's inventory the caller owns (T066, FR-029)
     //
     //Future<InventoryItemPage> listInventoryItems({ String venueId, String cursor, int limit }) async

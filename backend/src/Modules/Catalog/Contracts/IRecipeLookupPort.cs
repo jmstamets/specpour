@@ -35,4 +35,18 @@ public interface IRecipeLookupPort
     /// this is not guest-facing, so no visibility filter applies here.
     /// </summary>
     Task<IReadOnlyList<Guid>> GetIngredientIdsUsedByAsync(Guid recipeId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// T067: every recipe visible to <paramref name="callerUserId"/> for "what can I
+    /// make" purposes — public/core recipes, the caller's own personal recipes, and
+    /// recipes scoped to any venue the caller owns (same visibility shape as
+    /// <c>RecipeEndpoints.ListAsync</c>'s scope=bar case) — with each recipe's full
+    /// ingredient lines (id, quantity, unit), since the makeability engine needs the
+    /// actual line detail, not just names.
+    /// </summary>
+    Task<IReadOnlyList<RecipeMakeabilityInfo>> GetRecipesForMakeabilityAsync(Guid callerUserId, CancellationToken cancellationToken);
 }
+
+public sealed record RecipeIngredientLineInfo(Guid IngredientId, decimal Quantity, string Unit);
+
+public sealed record RecipeMakeabilityInfo(Guid RecipeId, string RecipeName, IReadOnlyList<RecipeIngredientLineInfo> Lines);

@@ -139,6 +139,8 @@ paths:
     $ref: './paths/inventory.yaml#/inventoryItems'
   /inventory/items/{id}:
     $ref: './paths/inventory.yaml#/inventoryItemById'
+  /inventory/makeable:
+    $ref: './paths/inventory.yaml#/inventoryMakeable'
 # Populated incrementally by per-story tasks via $ref — see tasks.md for the
 # per-module path authoring schedule.
 

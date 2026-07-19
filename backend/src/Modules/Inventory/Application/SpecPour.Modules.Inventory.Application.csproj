@@ -4,6 +4,13 @@
     <ProjectReference Include="..\Domain\SpecPour.Modules.Inventory.Domain.csproj" />
     <ProjectReference Include="..\Contracts\SpecPour.Modules.Inventory.Contracts.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\SpecPour.BuildingBlocks.csproj" />
+    <!-- T067: the makeability engine resolves hierarchy/curated substitutions via
+         Ingredients' lookup port and takes the caller's visible recipes (with their
+         ingredient lines) as input via Catalog's lookup port — both Contracts-only
+         (constitution Principle III), matching RecipeDerivedDataCalculator's shape
+         (a domain-data-in, no-DbContext Application service). -->
+    <ProjectReference Include="..\..\Ingredients\Contracts\SpecPour.Modules.Ingredients.Contracts.csproj" />
+    <ProjectReference Include="..\..\Catalog\Contracts\SpecPour.Modules.Catalog.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

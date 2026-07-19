@@ -63,9 +63,14 @@ import 'package:api_client/src/model/inventory_item_page.dart';
 import 'package:api_client/src/model/login_mfa_request.dart';
 import 'package:api_client/src/model/login_request.dart';
 import 'package:api_client/src/model/login_result.dart';
+import 'package:api_client/src/model/makeability_line.dart';
+import 'package:api_client/src/model/makeable_recipe.dart';
+import 'package:api_client/src/model/makeable_response.dart';
+import 'package:api_client/src/model/match_quality.dart';
 import 'package:api_client/src/model/me_export.dart';
 import 'package:api_client/src/model/mfa_enrollment.dart';
 import 'package:api_client/src/model/mfa_status.dart';
+import 'package:api_client/src/model/near_miss_recipe.dart';
 import 'package:api_client/src/model/problem_details.dart';
 import 'package:api_client/src/model/recipe_author.dart';
 import 'package:api_client/src/model/recipe_detail.dart';
@@ -76,8 +81,10 @@ import 'package:api_client/src/model/recipe_summary.dart';
 import 'package:api_client/src/model/recovery_confirm_request.dart';
 import 'package:api_client/src/model/recovery_request.dart';
 import 'package:api_client/src/model/register_request.dart';
+import 'package:api_client/src/model/requirement.dart';
 import 'package:api_client/src/model/responsible_consumption_message_response.dart';
 import 'package:api_client/src/model/role_grant_summary.dart';
+import 'package:api_client/src/model/satisfied_by.dart';
 import 'package:api_client/src/model/search_result.dart';
 import 'package:api_client/src/model/search_result_page.dart';
 import 'package:api_client/src/model/session.dart';
@@ -144,9 +151,14 @@ part 'serializers.g.dart';
   LoginMfaRequest,
   LoginRequest,
   LoginResult,
+  MakeabilityLine,
+  MakeableRecipe,
+  MakeableResponse,
+  MatchQuality,
   MeExport,
   MfaEnrollment,
   MfaStatus,
+  NearMissRecipe,
   ProblemDetails,
   RecipeAuthor,
   RecipeDetail,
@@ -157,8 +169,10 @@ part 'serializers.g.dart';
   RecoveryConfirmRequest,
   RecoveryRequest,
   RegisterRequest,
+  Requirement,
   ResponsibleConsumptionMessageResponse,
   RoleGrantSummary,
+  SatisfiedBy,
   SearchResult,
   SearchResultPage,
   Session,
