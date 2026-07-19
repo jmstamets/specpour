@@ -12,6 +12,9 @@
          registers its searchable table with Search at startup (FR-049), same pattern
          Catalog established (T032). -->
     <ProjectReference Include="..\..\Search\Contracts\SpecPour.Modules.Search.Contracts.csproj" />
+    <!-- T060: bar-scoped equipment authoring verifies the caller owns the venue,
+         same pattern as Catalog/Ingredients. -->
+    <ProjectReference Include="..\..\Venues\Contracts\SpecPour.Modules.Venues.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +23,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="OpenIddict.Abstractions" Version="7.5.0" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.5.0" />
   </ItemGroup>
 
 </Project>

@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\Modules\Ingredients\Infrastructure\SpecPour.Modules.Ingredients.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Equipment\Infrastructure\SpecPour.Modules.Equipment.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Glossary\Infrastructure\SpecPour.Modules.Glossary.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Venues\Infrastructure\SpecPour.Modules.Venues.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,9 +11,12 @@ import 'package:dio/dio.dart';
 import 'package:api_client/src/api_util.dart';
 import 'package:api_client/src/model/concept_detail.dart';
 import 'package:api_client/src/model/concept_page.dart';
+import 'package:api_client/src/model/create_recipe_request.dart';
 import 'package:api_client/src/model/problem_details.dart';
+import 'package:api_client/src/model/recipe_author.dart';
 import 'package:api_client/src/model/recipe_detail.dart';
 import 'package:api_client/src/model/recipe_page.dart';
+import 'package:api_client/src/model/update_recipe_request.dart';
 
 class CatalogApi {
 
@@ -22,6 +25,160 @@ class CatalogApi {
   final Serializers _serializers;
 
   const CatalogApi(this._dio, this._serializers);
+
+  /// Author a recipe in the caller&#39;s personal or bar library (T058, FR-018)
+  /// 
+  ///
+  /// Parameters:
+  /// * [createRecipeRequest] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [RecipeAuthor] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<RecipeAuthor>> createRecipe({ 
+    required CreateRecipeRequest createRecipeRequest,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/recipes';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(CreateRecipeRequest);
+      _bodyData = _serializers.serialize(createRecipeRequest, specifiedType: _type);
+
+    } catch(error, stackTrace) {
+      throw DioException(
+         requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    RecipeAuthor? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(RecipeAuthor),
+      ) as RecipeAuthor;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<RecipeAuthor>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// Delete one of the caller&#39;s own authored recipes (T058, FR-018)
+  /// 
+  ///
+  /// Parameters:
+  /// * [id] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future]
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<void>> deleteRecipe({ 
+    required String id,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/recipes/{id}'.replaceAll('{' r'id' '}', encodeQueryParameter(_serializers, id, const FullType(String)).toString());
+    final _options = Options(
+      method: r'DELETE',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    return _response;
+  }
 
   /// Get a concept page with its approved variant recipes (FR-021)
   /// 
@@ -288,6 +445,7 @@ class CatalogApi {
   /// * [uses] - Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050) — a class-level ingredient ID matches recipes using it or any descendant.
   /// * [allergenExclude] - Comma-separated allergen keys to exclude.
   /// * [source_] 
+  /// * [scope] - T058, FR-050 \"my library\" facet: the caller's own recipes in that library, regardless of visibility. Requires an authenticated caller (401 otherwise).
   /// * [cursor] - Opaque pagination cursor from a previous page's `nextCursor`.
   /// * [limit] - Maximum number of items to return.
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -310,6 +468,7 @@ class CatalogApi {
     String? uses,
     String? allergenExclude,
     String? source_,
+    String? scope,
     String? cursor,
     int? limit = 20,
     CancelToken? cancelToken,
@@ -349,6 +508,7 @@ class CatalogApi {
       if (uses != null) r'uses': encodeQueryParameter(_serializers, uses, const FullType(String)),
       if (allergenExclude != null) r'allergenExclude': encodeQueryParameter(_serializers, allergenExclude, const FullType(String)),
       if (source_ != null) r'source': encodeQueryParameter(_serializers, source_, const FullType(String)),
+      if (scope != null) r'scope': encodeQueryParameter(_serializers, scope, const FullType(String)),
       if (cursor != null) r'cursor': encodeQueryParameter(_serializers, cursor, const FullType(String)),
       if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
     };
@@ -382,6 +542,109 @@ class CatalogApi {
     }
 
     return Response<RecipePage>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// Update one of the caller&#39;s own authored recipes (T058, FR-018)
+  /// 
+  ///
+  /// Parameters:
+  /// * [id] 
+  /// * [updateRecipeRequest] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [RecipeAuthor] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<RecipeAuthor>> updateRecipe({ 
+    required String id,
+    required UpdateRecipeRequest updateRecipeRequest,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/recipes/{id}'.replaceAll('{' r'id' '}', encodeQueryParameter(_serializers, id, const FullType(String)).toString());
+    final _options = Options(
+      method: r'PUT',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(UpdateRecipeRequest);
+      _bodyData = _serializers.serialize(updateRecipeRequest, specifiedType: _type);
+
+    } catch(error, stackTrace) {
+      throw DioException(
+         requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    RecipeAuthor? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(RecipeAuthor),
+      ) as RecipeAuthor;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<RecipeAuthor>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

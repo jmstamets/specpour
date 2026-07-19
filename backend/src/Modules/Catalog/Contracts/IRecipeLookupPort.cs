@@ -26,4 +26,13 @@ public interface IRecipeLookupPort
     /// </summary>
     Task<IReadOnlyList<Guid>> GetRecipeIdsUsingIngredientsAsync(
         IReadOnlyCollection<Guid> ingredientIds, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// T059/FR-017: the ingredient IDs a recipe's lines reference, regardless of
+    /// visibility — Ingredients needs this to walk a house-made ingredient's defining
+    /// recipe (and, transitively, any house-made ingredient THAT recipe itself uses)
+    /// to reject a circular reference. Unlike <see cref="GetRecipeIdsUsingIngredientsAsync"/>,
+    /// this is not guest-facing, so no visibility filter applies here.
+    /// </summary>
+    Task<IReadOnlyList<Guid>> GetIngredientIdsUsedByAsync(Guid recipeId, CancellationToken cancellationToken);
 }

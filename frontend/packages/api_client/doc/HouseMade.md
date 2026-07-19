@@ -1,0 +1,20 @@
+# api_client.model.HouseMade
+
+## Load the model package
+```dart
+import 'package:api_client/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**definingRecipeId** | **String** |  | 
+**definingRecipeName** | **String** |  | [optional] 
+**yieldQuantity** | **num** |  | 
+**yieldUnit** | **String** |  | 
+**shelfLifeDays** | **int** |  | 
+**storageInstructions** | **String** |  | 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

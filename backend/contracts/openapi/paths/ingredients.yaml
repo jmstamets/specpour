@@ -10,6 +10,13 @@ ingredients:
       - name: category
         in: query
         schema: { type: string }
+      - name: scope
+        in: query
+        schema: { type: string, enum: [personal] }
+        description: >-
+          T059/T063 "my library" facet (the recipe editor's ingredient picker
+          needs the caller's own house-made/personal ingredients, not just
+          curated public ones). Requires an authenticated caller (401 otherwise).
       - $ref: '../openapi.yaml#/components/parameters/CursorParam'
       - $ref: '../openapi.yaml#/components/parameters/LimitParam'
     responses:
@@ -19,6 +26,33 @@ ingredients:
           application/json:
             schema:
               $ref: '#/components/schemas/IngredientPage'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+  post:
+    operationId: createIngredient
+    tags: [ingredients]
+    summary: Author an ingredient in the caller's personal or bar library, optionally house-made (T059, FR-012/FR-017)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateIngredientRequest'
+    responses:
+      '201':
+        description: The created ingredient.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngredientAuthor'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '403':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
 ingredientById:
   get:
@@ -40,6 +74,57 @@ ingredientById:
           application/json:
             schema:
               $ref: '#/components/schemas/IngredientDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  put:
+    operationId: updateIngredient
+    tags: [ingredients]
+    summary: Update one of the caller's own authored ingredients (T059, FR-012/FR-017)
+    description: >-
+      Rejects (400) a house-made defining recipe change that would transitively
+      include this ingredient itself (FR-017's circular-reference edge case).
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateIngredientRequest'
+    responses:
+      '200':
+        description: The updated ingredient.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngredientAuthor'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  delete:
+    operationId: deleteIngredient
+    tags: [ingredients]
+    summary: Delete one of the caller's own authored ingredients (T059)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '204':
+        description: The ingredient was deleted.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
       '404':
         $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
@@ -120,3 +205,76 @@ components:
           type: array
           items: { $ref: '#/components/schemas/IngredientRecipeRef' }
       required: [items]
+    CreateHouseMadeRequest:
+      type: object
+      description: FR-017 — a house-made ingredient's defining recipe, yield, shelf life, and storage instructions.
+      properties:
+        definingRecipeId: { type: string, format: uuid }
+        yieldQuantity: { type: number }
+        yieldUnit: { type: string }
+        shelfLifeDays: { type: integer }
+        storageInstructions: { type: string }
+      required: [definingRecipeId, yieldQuantity, yieldUnit, shelfLifeDays, storageInstructions]
+    CreateIngredientRequest:
+      type: object
+      description: >-
+        T059, FR-012/FR-014/FR-017. libraryScope "bar" requires venueId, verified as
+        owned by the caller (403 otherwise). categoryId defaults to a fixed system
+        fallback category when omitted. Newly authored ingredients always start
+        private (FR-008b).
+      properties:
+        name: { type: string }
+        libraryScope: { type: string, enum: [personal, bar] }
+        venueId: { type: [string, "null"], format: uuid }
+        categoryId: { type: [string, "null"], format: uuid }
+        parentId: { type: [string, "null"], format: uuid }
+        abvPercent: { type: [number, "null"] }
+        sources: { type: [array, "null"], items: { type: string } }
+        description: { type: [string, "null"] }
+        houseMade:
+          oneOf:
+            - $ref: '#/components/schemas/CreateHouseMadeRequest'
+            - type: "null"
+      required: [name, libraryScope]
+    UpdateIngredientRequest:
+      type: object
+      properties:
+        name: { type: string }
+        categoryId: { type: [string, "null"], format: uuid }
+        parentId: { type: [string, "null"], format: uuid }
+        abvPercent: { type: [number, "null"] }
+        sources: { type: [array, "null"], items: { type: string } }
+        description: { type: [string, "null"] }
+        houseMade:
+          oneOf:
+            - $ref: '#/components/schemas/CreateHouseMadeRequest'
+            - type: "null"
+      required: [name]
+    HouseMade:
+      type: object
+      properties:
+        definingRecipeId: { type: string, format: uuid }
+        definingRecipeName: { type: [string, "null"] }
+        yieldQuantity: { type: number }
+        yieldUnit: { type: string }
+        shelfLifeDays: { type: integer }
+        storageInstructions: { type: string }
+      required: [definingRecipeId, yieldQuantity, yieldUnit, shelfLifeDays, storageInstructions]
+    IngredientAuthor:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        libraryScope: { type: string, enum: [personal, bar] }
+        venueId: { type: [string, "null"], format: uuid }
+        categoryId: { type: string, format: uuid }
+        parentId: { type: [string, "null"], format: uuid }
+        abvPercent: { type: [number, "null"] }
+        sources: { type: array, items: { type: string } }
+        description: { type: [string, "null"] }
+        visibility: { type: string, enum: [private, public] }
+        houseMade:
+          oneOf:
+            - $ref: '#/components/schemas/HouseMade'
+            - type: "null"
+      required: [id, name, libraryScope, categoryId, sources, visibility]

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using SpecPour.BuildingBlocks.Http;
+using SpecPour.BuildingBlocks.Library;
 using SpecPour.Modules.Catalog.Domain;
 
 namespace SpecPour.Modules.Catalog.Infrastructure.Endpoints;
@@ -55,9 +56,22 @@ public static class ConceptEndpoints
         // RecipeName is resolved via a same-schema join (Recipe lives in this
         // same Catalog module, unlike RecipeIngredientLine's cross-module
         // IngredientId) so the client can render a link, not a raw GUID.
+        //
+        // T196 visibility-filter sweep: no "attach my recipe as a concept
+        // variant" endpoint exists yet (FR-021's "users MAY attach their
+        // published variant" is unbuilt), so nothing can create an
+        // Approved ConceptVariantLink against a private recipe today — but
+        // this join had no defensive Visibility check of its own, unlike
+        // every other guest-facing surface. Added now so the day that
+        // attach-variant endpoint lands, this concept page can't leak a
+        // private recipe's name through an approved-but-unpublished link.
         var variants = await db.ConceptVariantLinks
             .Where(v => v.ConceptId == id && v.State == ConceptVariantState.Approved)
-            .Join(db.Recipes, v => v.RecipeId, r => r.Id, (v, r) => new ConceptVariantResponse(v.RecipeId, r.PrimaryName, v.DifferentiatorText))
+            .Join(
+                db.Recipes.Where(r => r.Visibility == ContentVisibility.Public),
+                v => v.RecipeId,
+                r => r.Id,
+                (v, r) => new ConceptVariantResponse(v.RecipeId, r.PrimaryName, v.DifferentiatorText))
             .ToListAsync(cancellationToken);
 
         return TypedResults.Ok(new ConceptDetailResponse(concept.Id, concept.Name, concept.Description, variants));

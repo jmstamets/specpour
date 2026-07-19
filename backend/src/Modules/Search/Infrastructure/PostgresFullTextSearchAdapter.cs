@@ -57,16 +57,30 @@ public sealed class PostgresFullTextSearchAdapter(NpgsqlDataSource dataSource, I
 
     private static string BuildUnionQuery(IReadOnlyList<SearchableEntityDescriptor> descriptors)
     {
-        var branches = descriptors.Select(d => $"""
-            SELECT
-                '{EscapeLiteral(d.EntityType)}' AS entity_type,
-                "{d.IdColumn}" AS entity_id,
-                "{d.TitleColumn}" AS title,
-                ts_rank("{d.TsVectorColumn}", websearch_to_tsquery('english', @query)) + similarity("{d.TitleColumn}", @query) AS score
-            FROM {d.Schema}."{d.Table}"
-            WHERE "{d.TsVectorColumn}" @@ websearch_to_tsquery('english', @query)
-               OR similarity("{d.TitleColumn}", @query) > @threshold
-            """);
+        var branches = descriptors.Select(d =>
+        {
+            // T058: private/personal-library rows (e.g. an authored Recipe) must never
+            // surface in another caller's search results (FR-008b) — descriptors that
+            // carry a visibility column get an extra AND clause restricting this branch
+            // to the public value. PublicVisibilityValue is a plain int from trusted
+            // module-registration code (never request input), safe to interpolate
+            // directly the same way the other descriptor fields already are.
+            var visibilityClause = d.VisibilityColumn is not null && d.PublicVisibilityValue is not null
+                ? $"""AND "{d.VisibilityColumn}" = {d.PublicVisibilityValue.Value}"""
+                : string.Empty;
+
+            return $"""
+                SELECT
+                    '{EscapeLiteral(d.EntityType)}' AS entity_type,
+                    "{d.IdColumn}" AS entity_id,
+                    "{d.TitleColumn}" AS title,
+                    ts_rank("{d.TsVectorColumn}", websearch_to_tsquery('english', @query)) + similarity("{d.TitleColumn}", @query) AS score
+                FROM {d.Schema}."{d.Table}"
+                WHERE ("{d.TsVectorColumn}" @@ websearch_to_tsquery('english', @query)
+                   OR similarity("{d.TitleColumn}", @query) > @threshold)
+                {visibilityClause}
+                """;
+        });
 
         var union = string.Join("\nUNION ALL\n", branches);
 

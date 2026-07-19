@@ -48,6 +48,12 @@ recipes:
       - name: source
         in: query
         schema: { type: string, enum: [core, personal, public] }
+      - name: scope
+        in: query
+        schema: { type: string, enum: [personal, bar] }
+        description: >-
+          T058, FR-050 "my library" facet: the caller's own recipes in that library,
+          regardless of visibility. Requires an authenticated caller (401 otherwise).
       - $ref: '../openapi.yaml#/components/parameters/CursorParam'
       - $ref: '../openapi.yaml#/components/parameters/LimitParam'
     responses:
@@ -57,6 +63,33 @@ recipes:
           application/json:
             schema:
               $ref: '#/components/schemas/RecipePage'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+  post:
+    operationId: createRecipe
+    tags: [catalog]
+    summary: Author a recipe in the caller's personal or bar library (T058, FR-018)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateRecipeRequest'
+    responses:
+      '201':
+        description: The created recipe.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeAuthor'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '403':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
 recipeById:
   get:
@@ -78,6 +111,54 @@ recipeById:
           application/json:
             schema:
               $ref: '#/components/schemas/RecipeDetail'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  put:
+    operationId: updateRecipe
+    tags: [catalog]
+    summary: Update one of the caller's own authored recipes (T058, FR-018)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateRecipeRequest'
+    responses:
+      '200':
+        description: The updated recipe.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeAuthor'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  delete:
+    operationId: deleteRecipe
+    tags: [catalog]
+    summary: Delete one of the caller's own authored recipes (T058, FR-018)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '204':
+        description: The recipe was deleted.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
       '404':
         $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
@@ -226,3 +307,60 @@ components:
           type: array
           items: { $ref: '#/components/schemas/ConceptVariant' }
       required: [id, name, description, variants]
+    RecipeIngredientLineInput:
+      type: object
+      properties:
+        ingredientId: { type: string, format: uuid }
+        quantity: { type: number }
+        unit: { type: string }
+        purpose: { type: [string, "null"] }
+        scalingRule: { type: string, enum: [Linear, Stepwise, OmitInBatch, AddFreshAtService] }
+      required: [ingredientId, quantity, unit, scalingRule]
+    CreateRecipeRequest:
+      type: object
+      description: >-
+        T058, FR-018. libraryScope "bar" requires venueId, verified as owned by the
+        caller (403 otherwise). Newly authored recipes always start private (FR-008b)
+        — publishing is a separate, not-yet-built flow.
+      properties:
+        primaryName: { type: string }
+        alternateNames: { type: [array, "null"], items: { type: string } }
+        libraryScope: { type: string, enum: [personal, bar] }
+        venueId: { type: [string, "null"], format: uuid }
+        instructions: { type: [array, "null"], items: { type: string } }
+        ingredientLines:
+          type: [array, "null"]
+          items: { $ref: '#/components/schemas/RecipeIngredientLineInput' }
+        categoryIds: { type: [array, "null"], items: { type: string, format: uuid } }
+        tags: { type: [array, "null"], items: { type: string } }
+      required: [primaryName, libraryScope]
+    UpdateRecipeRequest:
+      type: object
+      properties:
+        primaryName: { type: string }
+        alternateNames: { type: [array, "null"], items: { type: string } }
+        instructions: { type: [array, "null"], items: { type: string } }
+        ingredientLines:
+          type: [array, "null"]
+          items: { $ref: '#/components/schemas/RecipeIngredientLineInput' }
+        categoryIds: { type: [array, "null"], items: { type: string, format: uuid } }
+        tags: { type: [array, "null"], items: { type: string } }
+      required: [primaryName]
+    RecipeAuthor:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        primaryName: { type: string }
+        alternateNames: { type: array, items: { type: string } }
+        libraryScope: { type: string, enum: [personal, bar] }
+        venueId: { type: [string, "null"], format: uuid }
+        instructions: { type: array, items: { type: string } }
+        ingredientLines:
+          type: array
+          items: { $ref: '#/components/schemas/RecipeIngredientLine' }
+        categoryIds: { type: array, items: { type: string, format: uuid } }
+        tags: { type: array, items: { type: string } }
+        visibility: { type: string, enum: [private, public] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required: [id, primaryName, alternateNames, libraryScope, instructions, ingredientLines, categoryIds, tags, visibility, createdAt, updatedAt]

@@ -285,6 +285,13 @@ final identityApiProvider = Provider<IdentityApi>(
   ),
 );
 
+final venuesApiProvider = Provider<VenuesApi>(
+  (ref) => VenuesApi(
+    ref.watch(apiClientProvider).dio,
+    ref.watch(apiClientProvider).serializers,
+  ),
+);
+
 /// T047/ADR-0003: a second Dio pointed at the host root (not /api/v1), sharing
 /// [cookieJarProvider], for the raw OAuth endpoints (/connect/authorize,
 /// /connect/token) that aren't part of the generated OpenAPI client — they're

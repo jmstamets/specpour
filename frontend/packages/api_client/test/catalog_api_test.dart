@@ -7,6 +7,20 @@ void main() {
   final instance = ApiClient().getCatalogApi();
 
   group(CatalogApi, () {
+    // Author a recipe in the caller's personal or bar library (T058, FR-018)
+    //
+    //Future<RecipeAuthor> createRecipe(CreateRecipeRequest createRecipeRequest) async
+    test('test createRecipe', () async {
+      // TODO
+    });
+
+    // Delete one of the caller's own authored recipes (T058, FR-018)
+    //
+    //Future deleteRecipe(String id) async
+    test('test deleteRecipe', () async {
+      // TODO
+    });
+
     // Get a concept page with its approved variant recipes (FR-021)
     //
     //Future<ConceptDetail> getConcept(String id) async
@@ -32,8 +46,15 @@ void main() {
     //
     // Guest-accessible (FR-004b). Only public/core recipes are returned — private personal-library recipes land with the personal-library story (US3). The rating and makeable-from-inventory facets are staged (T149/T148); ABV-range filtering computes ABV per candidate at request time rather than from a stored column, since ABV is always derived, never persisted (data-model.md).
     //
-    //Future<RecipePage> listRecipes({ String family, String category, String tag, String flavorProfile, String equipment, String glassware, String ice, String uses, String allergenExclude, String source_, String cursor, int limit }) async
+    //Future<RecipePage> listRecipes({ String family, String category, String tag, String flavorProfile, String equipment, String glassware, String ice, String uses, String allergenExclude, String source_, String scope, String cursor, int limit }) async
     test('test listRecipes', () async {
+      // TODO
+    });
+
+    // Update one of the caller's own authored recipes (T058, FR-018)
+    //
+    //Future<RecipeAuthor> updateRecipe(String id, UpdateRecipeRequest updateRecipeRequest) async
+    test('test updateRecipe', () async {
       // TODO
     });
 

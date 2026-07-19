@@ -22,10 +22,21 @@ public interface ISearchableEntityRegistry
 /// (<c>SpecPour.BuildingBlocks.Search.TsVectorMigrationExtensions.AddGeneratedTsVectorColumn</c>)
 /// and, for name-fuzziness matching, a trigram index on <paramref name="TitleColumn"/>.
 /// </summary>
+/// <param name="VisibilityColumn">
+/// T058: name of the entity's integer <c>ContentVisibility</c> column, if it has one —
+/// null for entity types with no visibility concept. When set alongside
+/// <paramref name="PublicVisibilityValue"/>, the adapter restricts this branch to that
+/// value, so a private/personal-library row (e.g. an authored Recipe) is never
+/// returned to a search caller who isn't its owner (FR-008b privacy). Search itself
+/// stays entity-agnostic (T141 ADR) — this is a column NAME and a plain integer, not a
+/// dependency on any content module's own enum type.
+/// </param>
 public sealed record SearchableEntityDescriptor(
     string EntityType,
     string Schema,
     string Table,
     string IdColumn,
     string TitleColumn,
-    string TsVectorColumn);
+    string TsVectorColumn,
+    string? VisibilityColumn = null,
+    int? PublicVisibilityValue = null);

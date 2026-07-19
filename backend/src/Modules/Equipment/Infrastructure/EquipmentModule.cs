@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events.Outbox;
+using SpecPour.BuildingBlocks.Library;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Equipment.Contracts;
 using SpecPour.Modules.Search.Contracts;
+using SpecPour.Modules.Venues.Contracts;
 
 namespace SpecPour.Modules.Equipment.Infrastructure;
 
@@ -52,7 +54,12 @@ public sealed class EquipmentSearchRegistrationHostedService(ISearchableEntityRe
             Table: "Equipment",
             IdColumn: "Id",
             TitleColumn: "Name",
-            TsVectorColumn: "SearchVector"));
+            TsVectorColumn: "SearchVector",
+            // T060: personal/bar-library equipment now exists alongside curated-core
+            // rows and defaults private — same privacy fix as Catalog/Ingredients'
+            // registrations (FR-008b).
+            VisibilityColumn: "Visibility",
+            PublicVisibilityValue: (int)ContentVisibility.Public));
 
         return Task.CompletedTask;
     }

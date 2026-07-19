@@ -28,9 +28,15 @@ import 'package:api_client/src/model/concept_detail.dart';
 import 'package:api_client/src/model/concept_page.dart';
 import 'package:api_client/src/model/concept_summary.dart';
 import 'package:api_client/src/model/concept_variant.dart';
+import 'package:api_client/src/model/create_equipment_request.dart';
+import 'package:api_client/src/model/create_house_made_request.dart';
+import 'package:api_client/src/model/create_ingredient_request.dart';
+import 'package:api_client/src/model/create_recipe_request.dart';
+import 'package:api_client/src/model/create_venue_request.dart';
 import 'package:api_client/src/model/cursor_page.dart';
 import 'package:api_client/src/model/enroll_mfa_request.dart';
 import 'package:api_client/src/model/entitlement_manifest.dart';
+import 'package:api_client/src/model/equipment_author.dart';
 import 'package:api_client/src/model/equipment_detail.dart';
 import 'package:api_client/src/model/equipment_page.dart';
 import 'package:api_client/src/model/equipment_ref.dart';
@@ -42,8 +48,10 @@ import 'package:api_client/src/model/glossary_article_summary.dart';
 import 'package:api_client/src/model/glossary_term_detail.dart';
 import 'package:api_client/src/model/glossary_term_page.dart';
 import 'package:api_client/src/model/glossary_term_summary.dart';
+import 'package:api_client/src/model/house_made.dart';
 import 'package:api_client/src/model/inbox_message.dart';
 import 'package:api_client/src/model/inbox_page.dart';
+import 'package:api_client/src/model/ingredient_author.dart';
 import 'package:api_client/src/model/ingredient_detail.dart';
 import 'package:api_client/src/model/ingredient_page.dart';
 import 'package:api_client/src/model/ingredient_recipe_ref.dart';
@@ -56,8 +64,10 @@ import 'package:api_client/src/model/me_export.dart';
 import 'package:api_client/src/model/mfa_enrollment.dart';
 import 'package:api_client/src/model/mfa_status.dart';
 import 'package:api_client/src/model/problem_details.dart';
+import 'package:api_client/src/model/recipe_author.dart';
 import 'package:api_client/src/model/recipe_detail.dart';
 import 'package:api_client/src/model/recipe_ingredient_line.dart';
+import 'package:api_client/src/model/recipe_ingredient_line_input.dart';
 import 'package:api_client/src/model/recipe_page.dart';
 import 'package:api_client/src/model/recipe_summary.dart';
 import 'package:api_client/src/model/recovery_confirm_request.dart';
@@ -71,6 +81,12 @@ import 'package:api_client/src/model/session.dart';
 import 'package:api_client/src/model/session_list.dart';
 import 'package:api_client/src/model/support_resource_response.dart';
 import 'package:api_client/src/model/support_resources_response.dart';
+import 'package:api_client/src/model/update_equipment_request.dart';
+import 'package:api_client/src/model/update_ingredient_request.dart';
+import 'package:api_client/src/model/update_recipe_request.dart';
+import 'package:api_client/src/model/update_venue_request.dart';
+import 'package:api_client/src/model/venue.dart';
+import 'package:api_client/src/model/venue_page.dart';
 
 part 'serializers.g.dart';
 
@@ -89,9 +105,15 @@ part 'serializers.g.dart';
   ConceptPage,
   ConceptSummary,
   ConceptVariant,
+  CreateEquipmentRequest,
+  CreateHouseMadeRequest,
+  CreateIngredientRequest,
+  CreateRecipeRequest,
+  CreateVenueRequest,
   CursorPage,
   EnrollMfaRequest,
   EntitlementManifest,
+  EquipmentAuthor,
   EquipmentDetail,
   EquipmentPage,
   EquipmentRef,
@@ -103,8 +125,10 @@ part 'serializers.g.dart';
   GlossaryTermDetail,
   GlossaryTermPage,
   GlossaryTermSummary,
+  HouseMade,
   InboxMessage,
   InboxPage,
+  IngredientAuthor,
   IngredientDetail,
   IngredientPage,
   IngredientRecipeRef,
@@ -117,8 +141,10 @@ part 'serializers.g.dart';
   MfaEnrollment,
   MfaStatus,
   ProblemDetails,
+  RecipeAuthor,
   RecipeDetail,
   RecipeIngredientLine,
+  RecipeIngredientLineInput,
   RecipePage,
   RecipeSummary,
   RecoveryConfirmRequest,
@@ -132,6 +158,12 @@ part 'serializers.g.dart';
   SessionList,
   SupportResourceResponse,
   SupportResourcesResponse,
+  UpdateEquipmentRequest,
+  UpdateIngredientRequest,
+  UpdateRecipeRequest,
+  UpdateVenueRequest,
+  Venue,
+  VenuePage,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..add(const OneOfSerializer())

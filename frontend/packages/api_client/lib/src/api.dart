@@ -18,6 +18,7 @@ import 'package:api_client/src/api/identity_api.dart';
 import 'package:api_client/src/api/ingredients_api.dart';
 import 'package:api_client/src/api/notifications_api.dart';
 import 'package:api_client/src/api/search_api.dart';
+import 'package:api_client/src/api/venues_api.dart';
 
 class ApiClient {
   static const String basePath = r'/api/v1';
@@ -165,5 +166,11 @@ class ApiClient {
   /// by doing that all interceptors will not be executed
   SearchApi getSearchApi() {
     return SearchApi(dio, serializers);
+  }
+
+  /// Get VenuesApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  VenuesApi getVenuesApi() {
+    return VenuesApi(dio, serializers);
   }
 }

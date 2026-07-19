@@ -233,6 +233,14 @@ namespace SpecPour.Modules.Ingredients.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("IngredientCategories", "ingredients");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000207"),
+                            Definition = "Fallback category for personal-library ingredients created without an explicit category.",
+                            NameKey = "category.uncategorized"
+                        });
                 });
 
             modelBuilder.Entity("SpecPour.Modules.Ingredients.Domain.SubstitutionRule", b =>

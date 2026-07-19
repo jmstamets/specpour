@@ -131,6 +131,10 @@ paths:
     $ref: './paths/glossary.yaml#/glossaryAutolink'
   /search:
     $ref: './paths/search.yaml#/search'
+  /venues:
+    $ref: './paths/venues.yaml#/venues'
+  /venues/{id}:
+    $ref: './paths/venues.yaml#/venuesById'
 # Populated incrementally by per-story tasks via $ref — see tasks.md for the
 # per-module path authoring schedule.
 

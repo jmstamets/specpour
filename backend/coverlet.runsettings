@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  T197: excludes generated/non-production code from the backend coverage
+  denominator so the T190 ratchet is more sensitive to real regressions.
+
+  - ExcludeByFile: EF Core migrations (Migrations/*.cs, including the
+    generated Designer.cs and ModelSnapshot.cs siblings coverlet would
+    otherwise count as coverable-but-never-exercised) and everything under
+    any obj/ intermediate build directory (GlobalUsings.g.cs, AssemblyInfo.cs,
+    etc. — real compiled sequence points, zero real logic).
+  - Exclude: the Seeder tool by assembly — deploy-time content-import
+    tooling, not application code any test suite exercises or should be
+    expected to.
+
+  Deliberately does NOT use ExcludeByAttribute (GeneratedCodeAttribute /
+  CompilerGeneratedAttribute): empirically confirmed (T197) to be far too
+  broad in this codebase — it drops entire FILES, not just individual
+  generated members, once a class's only remaining coverable content is a
+  compiler-generated construct. This codebase's pervasive use of "record"
+  types and primary constructors means large numbers of genuinely
+  meaningful classes have compiler-generated equality/constructor members
+  as their sole instrumented sequence points; excluding by that attribute
+  measured 37 assemblies / 320 classes collapsing to 15 assemblies / 95
+  classes on this codebase's Unit suite alone (CompilerGeneratedAttribute)
+  or 33/211 (GeneratedCodeAttribute alone) — both silently deleting real,
+  untested production code from the denominator rather than narrowly
+  excluding tool-generated boilerplate. ExcludeByFile + assembly-scoped
+  Exclude, tested in isolation, behave exactly as expected (37 assemblies
+  unchanged, ~63 fewer files matching the migrations/Seeder file count) —
+  those are the only mechanisms used here.
+
+  Referenced via the "settings" flag (backend/coverlet.runsettings) on every
+  "dotnet test" coverage-collecting invocation (CI and local). Does not
+  change what tests run or their pass/fail outcome — only what coverlet
+  counts as coverable.
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Exclude>[SpecPour.Tools.Seeder]*</Exclude>
+          <ExcludeByFile>**/Migrations/*.cs,**/obj/**/*.cs</ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

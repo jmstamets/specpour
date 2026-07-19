@@ -39,6 +39,17 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         title: Text(l10n.discoverTitle),
         actions: [
           IconButton(
+            key: const Key('libraryNavButton'),
+            icon: const Icon(Icons.menu_book_outlined),
+            tooltip: l10n.libraryTitle,
+            onPressed: () => requireAccount(
+              ref: ref,
+              context: context,
+              actionLabel: l10n.libraryTitle,
+              onAuthenticated: () => context.push('/library'),
+            ),
+          ),
+          IconButton(
             key: const Key('accountNavButton'),
             icon: const Icon(Icons.account_circle_outlined),
             tooltip: l10n.accountMenuTitle,

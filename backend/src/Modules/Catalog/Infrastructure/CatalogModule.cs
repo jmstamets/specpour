@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events;
 using SpecPour.BuildingBlocks.Events.Outbox;
+using SpecPour.BuildingBlocks.Library;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Catalog.Application.DerivedData;
 using SpecPour.Modules.Catalog.Contracts;
@@ -69,7 +70,13 @@ public sealed class CatalogSearchRegistrationHostedService(ISearchableEntityRegi
             Table: "Recipes",
             IdColumn: "Id",
             TitleColumn: "PrimaryName",
-            TsVectorColumn: "SearchVector"));
+            TsVectorColumn: "SearchVector",
+            // T058: personal/bar-library recipes now exist (authored, defaulting
+            // private) alongside curated-core ones — without this, the adapter's raw
+            // SQL had no visibility concept at all and would have leaked every
+            // private recipe into every caller's search results (FR-008b).
+            VisibilityColumn: "Visibility",
+            PublicVisibilityValue: (int)ContentVisibility.Public));
 
         return Task.CompletedTask;
     }

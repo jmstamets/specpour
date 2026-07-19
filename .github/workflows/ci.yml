@@ -61,6 +61,7 @@ jobs:
       - name: Run ${{ matrix.suite }} suite
         run: |
           dotnet test backend/tests/${{ matrix.suite }} -c Release --no-build \
+            --settings backend/coverlet.runsettings \
             --collect:"XPlat Code Coverage" --results-directory "TestResults/${{ matrix.suite }}" \
             2>&1 | tee test-output.log
           # Defense-in-depth (2026-07-16 fail-open audit): no --filter is used

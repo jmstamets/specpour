@@ -37,4 +37,11 @@ public sealed class RecipeLookupAdapter(CatalogDbContext db) : IRecipeLookupPort
             .Distinct()
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Guid>> GetIngredientIdsUsedByAsync(Guid recipeId, CancellationToken cancellationToken) =>
+        await db.RecipeIngredientLines
+            .Where(l => l.RecipeId == recipeId)
+            .Select(l => l.IngredientId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
 }

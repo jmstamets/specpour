@@ -10,4 +10,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- T061: Venue.Location (FR-058) is a real geometry type — Domain references the
+         plain geometry library only (no DB/EF dependency here; the Npgsql mapping
+         plugin lives in Infrastructure), matching clean-architecture layering. -->
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+  </ItemGroup>
+
 </Project>

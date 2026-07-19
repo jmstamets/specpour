@@ -69,15 +69,21 @@ All URIs are relative to */api/v1*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*AuthorizationApi*](doc/AuthorizationApi.md) | [**getMyEntitlements**](doc/AuthorizationApi.md#getmyentitlements) | **GET** /me/entitlements | Get the caller&#39;s entitlement manifest
+[*CatalogApi*](doc/CatalogApi.md) | [**createRecipe**](doc/CatalogApi.md#createrecipe) | **POST** /recipes | Author a recipe in the caller&#39;s personal or bar library (T058, FR-018)
+[*CatalogApi*](doc/CatalogApi.md) | [**deleteRecipe**](doc/CatalogApi.md#deleterecipe) | **DELETE** /recipes/{id} | Delete one of the caller&#39;s own authored recipes (T058, FR-018)
 [*CatalogApi*](doc/CatalogApi.md) | [**getConcept**](doc/CatalogApi.md#getconcept) | **GET** /concepts/{id} | Get a concept page with its approved variant recipes (FR-021)
 [*CatalogApi*](doc/CatalogApi.md) | [**getRecipe**](doc/CatalogApi.md#getrecipe) | **GET** /recipes/{id} | Get a recipe&#39;s full detail, including derived ABV/standard drinks/allergens (FR-022)
 [*CatalogApi*](doc/CatalogApi.md) | [**listConcepts**](doc/CatalogApi.md#listconcepts) | **GET** /concepts | Browse concept pages (FR-021)
 [*CatalogApi*](doc/CatalogApi.md) | [**listRecipes**](doc/CatalogApi.md#listrecipes) | **GET** /recipes | Browse/search recipes with content facets (FR-050)
+[*CatalogApi*](doc/CatalogApi.md) | [**updateRecipe**](doc/CatalogApi.md#updaterecipe) | **PUT** /recipes/{id} | Update one of the caller&#39;s own authored recipes (T058, FR-018)
 [*ComplianceApi*](doc/ComplianceApi.md) | [**getAgeGate**](doc/ComplianceApi.md#getagegate) | **GET** /compliance/age-gate | Get the per-surface age-gate configuration and jurisdiction rule
 [*ComplianceApi*](doc/ComplianceApi.md) | [**getResponsibleConsumptionMessage**](doc/ComplianceApi.md#getresponsibleconsumptionmessage) | **GET** /compliance/messaging | Get the persistent responsible-consumption message for a surface (FR-067)
 [*ComplianceApi*](doc/ComplianceApi.md) | [**getSupportResources**](doc/ComplianceApi.md#getsupportresources) | **GET** /compliance/support-resources | Get jurisdiction-aware support resources (FR-069)
+[*EquipmentApi*](doc/EquipmentApi.md) | [**createEquipment**](doc/EquipmentApi.md#createequipment) | **POST** /equipment | Author an equipment item in the caller&#39;s personal or bar library (T060, FR-024)
+[*EquipmentApi*](doc/EquipmentApi.md) | [**deleteEquipmentItem**](doc/EquipmentApi.md#deleteequipmentitem) | **DELETE** /equipment/{id} | Delete one of the caller&#39;s own authored equipment items (T060)
 [*EquipmentApi*](doc/EquipmentApi.md) | [**getEquipmentItem**](doc/EquipmentApi.md#getequipmentitem) | **GET** /equipment/{id} | Get an equipment item&#39;s full detail (FR-024)
 [*EquipmentApi*](doc/EquipmentApi.md) | [**listEquipment**](doc/EquipmentApi.md#listequipment) | **GET** /equipment | Browse equipment (FR-024)
+[*EquipmentApi*](doc/EquipmentApi.md) | [**updateEquipmentItem**](doc/EquipmentApi.md#updateequipmentitem) | **PUT** /equipment/{id} | Update one of the caller&#39;s own authored equipment items (T060, FR-024)
 [*GlossaryApi*](doc/GlossaryApi.md) | [**getGlossaryArticle**](doc/GlossaryApi.md#getglossaryarticle) | **GET** /glossary/articles/{id} | Get an article&#39;s full body (FR-026)
 [*GlossaryApi*](doc/GlossaryApi.md) | [**getGlossaryAutolink**](doc/GlossaryApi.md#getglossaryautolink) | **GET** /glossary/autolink | Resolve auto-link matches for a block of content (FR-027)
 [*GlossaryApi*](doc/GlossaryApi.md) | [**getGlossaryTerm**](doc/GlossaryApi.md#getglossaryterm) | **GET** /glossary/terms/{id} | Get a glossary term&#39;s ordered, numbered definitions (FR-025)
@@ -102,14 +108,22 @@ Class | Method | HTTP request | Description
 [*IdentityApi*](doc/IdentityApi.md) | [**registerAccount**](doc/IdentityApi.md#registeraccount) | **POST** /auth/register | Email/password registration with DOB capture and underage rejection (FR-001/FR-002/FR-002c, T047)
 [*IdentityApi*](doc/IdentityApi.md) | [**requestAccountRecovery**](doc/IdentityApi.md#requestaccountrecovery) | **POST** /auth/recovery | Request account recovery (T050, FR — lost-credential recovery)
 [*IdentityApi*](doc/IdentityApi.md) | [**revokeMySession**](doc/IdentityApi.md#revokemysession) | **DELETE** /me/sessions/{id} | Revoke a session/device (T051)
+[*IngredientsApi*](doc/IngredientsApi.md) | [**createIngredient**](doc/IngredientsApi.md#createingredient) | **POST** /ingredients | Author an ingredient in the caller&#39;s personal or bar library, optionally house-made (T059, FR-012/FR-017)
+[*IngredientsApi*](doc/IngredientsApi.md) | [**deleteIngredient**](doc/IngredientsApi.md#deleteingredient) | **DELETE** /ingredients/{id} | Delete one of the caller&#39;s own authored ingredients (T059)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**getIngredient**](doc/IngredientsApi.md#getingredient) | **GET** /ingredients/{id} | Get an ingredient&#39;s full detail, including allergen attributes (FR-016)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**getIngredientRecipes**](doc/IngredientsApi.md#getingredientrecipes) | **GET** /ingredients/{id}/recipes | Recipes using this ingredient, hierarchy-aware (T155, FR-014a)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**listIngredients**](doc/IngredientsApi.md#listingredients) | **GET** /ingredients | Browse ingredients (FR-014)
+[*IngredientsApi*](doc/IngredientsApi.md) | [**updateIngredient**](doc/IngredientsApi.md#updateingredient) | **PUT** /ingredients/{id} | Update one of the caller&#39;s own authored ingredients (T059, FR-012/FR-017)
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getInbox**](doc/NotificationsApi.md#getinbox) | **GET** /inbox | Get the caller&#39;s inbox messages
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getMyChannelPreferences**](doc/NotificationsApi.md#getmychannelpreferences) | **GET** /me/channels | Get the caller&#39;s notification channel opt-in preferences
 [*NotificationsApi*](doc/NotificationsApi.md) | [**markInboxMessageRead**](doc/NotificationsApi.md#markinboxmessageread) | **POST** /inbox/{id}/read | Mark an inbox message as read
 [*NotificationsApi*](doc/NotificationsApi.md) | [**updateMyChannelPreferences**](doc/NotificationsApi.md#updatemychannelpreferences) | **PUT** /me/channels | Update the caller&#39;s notification channel opt-in preferences
 [*SearchApi*](doc/SearchApi.md) | [**search**](doc/SearchApi.md#search) | **GET** /search | Full-text search across recipes, ingredients, equipment, glossary terms, and articles (FR-049)
+[*VenuesApi*](doc/VenuesApi.md) | [**createVenue**](doc/VenuesApi.md#createvenue) | **POST** /venues | Create a venue owned by the caller (T061, FR-058)
+[*VenuesApi*](doc/VenuesApi.md) | [**deleteVenue**](doc/VenuesApi.md#deletevenue) | **DELETE** /venues/{id} | Delete one of the caller&#39;s venues (T061, FR-058)
+[*VenuesApi*](doc/VenuesApi.md) | [**getVenue**](doc/VenuesApi.md#getvenue) | **GET** /venues/{id} | Get one of the caller&#39;s venues by id (T061, FR-058)
+[*VenuesApi*](doc/VenuesApi.md) | [**listVenues**](doc/VenuesApi.md#listvenues) | **GET** /venues | List the caller&#39;s venues (T061, FR-058)
+[*VenuesApi*](doc/VenuesApi.md) | [**updateVenue**](doc/VenuesApi.md#updatevenue) | **PUT** /venues/{id} | Update one of the caller&#39;s venues (T061, FR-058)
 
 
 ## Documentation For Models
@@ -128,9 +142,15 @@ Class | Method | HTTP request | Description
  - [ConceptPage](doc/ConceptPage.md)
  - [ConceptSummary](doc/ConceptSummary.md)
  - [ConceptVariant](doc/ConceptVariant.md)
+ - [CreateEquipmentRequest](doc/CreateEquipmentRequest.md)
+ - [CreateHouseMadeRequest](doc/CreateHouseMadeRequest.md)
+ - [CreateIngredientRequest](doc/CreateIngredientRequest.md)
+ - [CreateRecipeRequest](doc/CreateRecipeRequest.md)
+ - [CreateVenueRequest](doc/CreateVenueRequest.md)
  - [CursorPage](doc/CursorPage.md)
  - [EnrollMfaRequest](doc/EnrollMfaRequest.md)
  - [EntitlementManifest](doc/EntitlementManifest.md)
+ - [EquipmentAuthor](doc/EquipmentAuthor.md)
  - [EquipmentDetail](doc/EquipmentDetail.md)
  - [EquipmentPage](doc/EquipmentPage.md)
  - [EquipmentRef](doc/EquipmentRef.md)
@@ -142,8 +162,10 @@ Class | Method | HTTP request | Description
  - [GlossaryTermDetail](doc/GlossaryTermDetail.md)
  - [GlossaryTermPage](doc/GlossaryTermPage.md)
  - [GlossaryTermSummary](doc/GlossaryTermSummary.md)
+ - [HouseMade](doc/HouseMade.md)
  - [InboxMessage](doc/InboxMessage.md)
  - [InboxPage](doc/InboxPage.md)
+ - [IngredientAuthor](doc/IngredientAuthor.md)
  - [IngredientDetail](doc/IngredientDetail.md)
  - [IngredientPage](doc/IngredientPage.md)
  - [IngredientRecipeRef](doc/IngredientRecipeRef.md)
@@ -156,8 +178,10 @@ Class | Method | HTTP request | Description
  - [MfaEnrollment](doc/MfaEnrollment.md)
  - [MfaStatus](doc/MfaStatus.md)
  - [ProblemDetails](doc/ProblemDetails.md)
+ - [RecipeAuthor](doc/RecipeAuthor.md)
  - [RecipeDetail](doc/RecipeDetail.md)
  - [RecipeIngredientLine](doc/RecipeIngredientLine.md)
+ - [RecipeIngredientLineInput](doc/RecipeIngredientLineInput.md)
  - [RecipePage](doc/RecipePage.md)
  - [RecipeSummary](doc/RecipeSummary.md)
  - [RecoveryConfirmRequest](doc/RecoveryConfirmRequest.md)
@@ -171,6 +195,12 @@ Class | Method | HTTP request | Description
  - [SessionList](doc/SessionList.md)
  - [SupportResourceResponse](doc/SupportResourceResponse.md)
  - [SupportResourcesResponse](doc/SupportResourcesResponse.md)
+ - [UpdateEquipmentRequest](doc/UpdateEquipmentRequest.md)
+ - [UpdateIngredientRequest](doc/UpdateIngredientRequest.md)
+ - [UpdateRecipeRequest](doc/UpdateRecipeRequest.md)
+ - [UpdateVenueRequest](doc/UpdateVenueRequest.md)
+ - [Venue](doc/Venue.md)
+ - [VenuePage](doc/VenuePage.md)
 
 
 ## Documentation For Authorization

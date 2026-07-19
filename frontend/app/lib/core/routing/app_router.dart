@@ -24,6 +24,10 @@ import '../../features/identity/recovery_request_screen.dart';
 import '../../features/identity/register_screen.dart';
 import '../../features/identity/sessions_screen.dart';
 import '../../features/identity/sign_in_screen.dart';
+import '../../features/library/house_made_ingredient_editor_screen.dart';
+import '../../features/library/library_screen.dart';
+import '../../features/library/recipe_editor_screen.dart';
+import '../../features/library/venues_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -128,6 +132,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/auth/external/complete-registration',
         name: 'completeExternalRegistration',
         builder: (context, state) => const CompleteExternalRegistrationScreen(),
+      ),
+      GoRoute(
+        path: '/library',
+        name: 'library',
+        builder: (context, state) => const LibraryScreen(),
+      ),
+      GoRoute(
+        path: '/library/recipes/new',
+        name: 'recipeEditor',
+        builder: (context, state) => const RecipeEditorScreen(),
+      ),
+      GoRoute(
+        path: '/library/ingredients/new',
+        name: 'houseMadeIngredientEditor',
+        builder: (context, state) => const HouseMadeIngredientEditorScreen(),
+      ),
+      GoRoute(
+        path: '/library/venues',
+        name: 'venues',
+        builder: (context, state) => const VenuesScreen(),
       ),
     ],
   );

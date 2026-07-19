@@ -25,9 +25,20 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ConceptPage.serializer)
       ..add(ConceptSummary.serializer)
       ..add(ConceptVariant.serializer)
+      ..add(CreateEquipmentRequest.serializer)
+      ..add(CreateEquipmentRequestLibraryScopeEnum.serializer)
+      ..add(CreateHouseMadeRequest.serializer)
+      ..add(CreateIngredientRequest.serializer)
+      ..add(CreateIngredientRequestLibraryScopeEnum.serializer)
+      ..add(CreateRecipeRequest.serializer)
+      ..add(CreateRecipeRequestLibraryScopeEnum.serializer)
+      ..add(CreateVenueRequest.serializer)
       ..add(CursorPage.serializer)
       ..add(EnrollMfaRequest.serializer)
       ..add(EntitlementManifest.serializer)
+      ..add(EquipmentAuthor.serializer)
+      ..add(EquipmentAuthorLibraryScopeEnum.serializer)
+      ..add(EquipmentAuthorVisibilityEnum.serializer)
       ..add(EquipmentDetail.serializer)
       ..add(EquipmentPage.serializer)
       ..add(EquipmentRef.serializer)
@@ -40,8 +51,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GlossaryTermDetail.serializer)
       ..add(GlossaryTermPage.serializer)
       ..add(GlossaryTermSummary.serializer)
+      ..add(HouseMade.serializer)
       ..add(InboxMessage.serializer)
       ..add(InboxPage.serializer)
+      ..add(IngredientAuthor.serializer)
+      ..add(IngredientAuthorLibraryScopeEnum.serializer)
+      ..add(IngredientAuthorVisibilityEnum.serializer)
       ..add(IngredientDetail.serializer)
       ..add(IngredientPage.serializer)
       ..add(IngredientRecipeRef.serializer)
@@ -56,8 +71,13 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(MfaStatus.serializer)
       ..add(MfaStatusMethodEnum.serializer)
       ..add(ProblemDetails.serializer)
+      ..add(RecipeAuthor.serializer)
+      ..add(RecipeAuthorLibraryScopeEnum.serializer)
+      ..add(RecipeAuthorVisibilityEnum.serializer)
       ..add(RecipeDetail.serializer)
       ..add(RecipeIngredientLine.serializer)
+      ..add(RecipeIngredientLineInput.serializer)
+      ..add(RecipeIngredientLineInputScalingRuleEnum.serializer)
       ..add(RecipeIngredientLineScalingRuleEnum.serializer)
       ..add(RecipePage.serializer)
       ..add(RecipeSummary.serializer)
@@ -75,6 +95,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(SessionList.serializer)
       ..add(SupportResourceResponse.serializer)
       ..add(SupportResourcesResponse.serializer)
+      ..add(UpdateEquipmentRequest.serializer)
+      ..add(UpdateIngredientRequest.serializer)
+      ..add(UpdateRecipeRequest.serializer)
+      ..add(UpdateVenueRequest.serializer)
+      ..add(Venue.serializer)
+      ..add(VenuePage.serializer)
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(AutoLinkMatch)]),
           () => ListBuilder<AutoLinkMatch>())
@@ -147,8 +173,83 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(RoleGrantSummary)]),
           () => ListBuilder<RoleGrantSummary>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(RecipeIngredientLine)]),
+          () => ListBuilder<RecipeIngredientLine>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(RecipeIngredientLineInput)]),
+          () => ListBuilder<RecipeIngredientLineInput>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(RecipeIngredientLineInput)]),
+          () => ListBuilder<RecipeIngredientLineInput>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
@@ -190,6 +291,9 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(
               BuiltList, const [const FullType(SupportResourceResponse)]),
           () => ListBuilder<SupportResourceResponse>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Venue)]),
+          () => ListBuilder<Venue>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType.nullable(JsonObject)]),

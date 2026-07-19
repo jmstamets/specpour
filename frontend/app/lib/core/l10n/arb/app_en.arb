@@ -650,5 +650,193 @@
   "mfaSettingsManualKeyLabel": "Can't scan the code? Enter this key manually instead:",
   "@mfaSettingsManualKeyLabel": {
     "description": "T187 MFA settings screen: label above the manual-entry secret shown as a fallback beneath the QR code."
+  },
+  "libraryTitle": "My Library",
+  "@libraryTitle": {
+    "description": "T063 library home screen title — the caller's personal authoring workspace."
+  },
+  "libraryRecipesSectionTitle": "Recipes",
+  "@libraryRecipesSectionTitle": {
+    "description": "T063 library screen: personal recipes section header."
+  },
+  "libraryIngredientsSectionTitle": "House-made ingredients",
+  "@libraryIngredientsSectionTitle": {
+    "description": "T063 library screen: personal house-made ingredients section header."
+  },
+  "libraryEmptyRecipes": "No recipes yet. Create your first one.",
+  "@libraryEmptyRecipes": {
+    "description": "T063 library screen: empty state for the personal recipes list."
+  },
+  "libraryEmptyIngredients": "No house-made ingredients yet.",
+  "@libraryEmptyIngredients": {
+    "description": "T063 library screen: empty state for the personal house-made ingredients list."
+  },
+  "libraryCreateRecipeButton": "New recipe",
+  "@libraryCreateRecipeButton": {
+    "description": "T063 library screen: button that opens the recipe editor for a new recipe."
+  },
+  "libraryCreateIngredientButton": "New house-made ingredient",
+  "@libraryCreateIngredientButton": {
+    "description": "T063 library screen: button that opens the house-made ingredient editor."
+  },
+  "libraryManageVenuesButton": "Venues",
+  "@libraryManageVenuesButton": {
+    "description": "T063 library screen: button that opens the venue switcher/manager for a professional user's bar library."
+  },
+  "recipeEditorTitle": "New recipe",
+  "@recipeEditorTitle": {
+    "description": "T058/T063 recipe editor screen title."
+  },
+  "recipeEditorPrimaryNameLabel": "Recipe name",
+  "@recipeEditorPrimaryNameLabel": {
+    "description": "T063 recipe editor: primary name field label."
+  },
+  "recipeEditorAlternateNamesLabel": "Alternate names (comma-separated)",
+  "@recipeEditorAlternateNamesLabel": {
+    "description": "T063 recipe editor: alternate names field label."
+  },
+  "recipeEditorLibraryScopeLabel": "Library",
+  "@recipeEditorLibraryScopeLabel": {
+    "description": "T063 recipe editor: personal vs. bar library scope selector label."
+  },
+  "recipeEditorScopePersonal": "Personal",
+  "@recipeEditorScopePersonal": {
+    "description": "T063 recipe editor: personal library scope option."
+  },
+  "recipeEditorScopeBar": "Bar",
+  "@recipeEditorScopeBar": {
+    "description": "T063 recipe editor: bar library scope option."
+  },
+  "recipeEditorVenueLabel": "Venue",
+  "@recipeEditorVenueLabel": {
+    "description": "T063 recipe editor: venue picker label, shown when the bar library scope is selected."
+  },
+  "recipeEditorNoVenuesHint": "You don't have any venues yet. Create one first.",
+  "@recipeEditorNoVenuesHint": {
+    "description": "T063 recipe editor: shown when bar scope is selected but the caller owns no venues."
+  },
+  "recipeEditorInstructionsLabel": "Instructions",
+  "@recipeEditorInstructionsLabel": {
+    "description": "T063 recipe editor: step-by-step instructions section header."
+  },
+  "recipeEditorAddInstructionButton": "Add step",
+  "@recipeEditorAddInstructionButton": {
+    "description": "T063 recipe editor: button that adds a blank instruction step field."
+  },
+  "recipeEditorIngredientLinesLabel": "Ingredients",
+  "@recipeEditorIngredientLinesLabel": {
+    "description": "T063 recipe editor: ingredient lines section header."
+  },
+  "recipeEditorAddIngredientLineButton": "Add ingredient",
+  "@recipeEditorAddIngredientLineButton": {
+    "description": "T063 recipe editor: button that adds a blank ingredient line."
+  },
+  "recipeEditorIngredientLabel": "Ingredient",
+  "@recipeEditorIngredientLabel": {
+    "description": "T063 recipe editor: ingredient picker label within an ingredient line."
+  },
+  "recipeEditorQuantityLabel": "Qty",
+  "@recipeEditorQuantityLabel": {
+    "description": "T063 recipe editor: quantity field label within an ingredient line."
+  },
+  "recipeEditorUnitLabel": "Unit",
+  "@recipeEditorUnitLabel": {
+    "description": "T063 recipe editor: unit field label within an ingredient line."
+  },
+  "recipeEditorPurposeLabel": "Role (optional)",
+  "@recipeEditorPurposeLabel": {
+    "description": "T063 recipe editor: purpose/role field label within an ingredient line."
+  },
+  "recipeEditorScalingRuleLabel": "Scaling rule",
+  "@recipeEditorScalingRuleLabel": {
+    "description": "T063 recipe editor: scaling-rule picker label within an ingredient line."
+  },
+  "recipeEditorRemoveLineTooltip": "Remove ingredient",
+  "@recipeEditorRemoveLineTooltip": {
+    "description": "T063 recipe editor: tooltip on the remove-ingredient-line icon button."
+  },
+  "recipeEditorSubmitButton": "Save recipe",
+  "@recipeEditorSubmitButton": {
+    "description": "T063 recipe editor: submit button."
+  },
+  "recipeEditorMissingFieldsError": "Enter a recipe name and at least one ingredient.",
+  "@recipeEditorMissingFieldsError": {
+    "description": "T063 recipe editor: local validation error shown before submitting."
+  },
+  "houseMadeEditorTitle": "New house-made ingredient",
+  "@houseMadeEditorTitle": {
+    "description": "T059/T063 house-made ingredient editor screen title."
+  },
+  "houseMadeEditorNameLabel": "Ingredient name",
+  "@houseMadeEditorNameLabel": {
+    "description": "T063 house-made ingredient editor: name field label."
+  },
+  "houseMadeEditorDefiningRecipeLabel": "Component recipe",
+  "@houseMadeEditorDefiningRecipeLabel": {
+    "description": "T063 house-made ingredient editor: picker for the recipe that defines how to make this ingredient."
+  },
+  "houseMadeEditorNoRecipesHint": "You need a personal recipe describing how to make this before you can define it as a house-made ingredient. Create that recipe first.",
+  "@houseMadeEditorNoRecipesHint": {
+    "description": "T063 house-made ingredient editor: shown when the caller has no personal recipes to pick as the defining recipe."
+  },
+  "houseMadeEditorYieldQuantityLabel": "Yield quantity",
+  "@houseMadeEditorYieldQuantityLabel": {
+    "description": "T063 house-made ingredient editor: yield quantity field label."
+  },
+  "houseMadeEditorYieldUnitLabel": "Yield unit",
+  "@houseMadeEditorYieldUnitLabel": {
+    "description": "T063 house-made ingredient editor: yield unit field label."
+  },
+  "houseMadeEditorShelfLifeDaysLabel": "Shelf life (days)",
+  "@houseMadeEditorShelfLifeDaysLabel": {
+    "description": "T063 house-made ingredient editor: shelf life field label."
+  },
+  "houseMadeEditorStorageInstructionsLabel": "Storage instructions",
+  "@houseMadeEditorStorageInstructionsLabel": {
+    "description": "T063 house-made ingredient editor: storage instructions field label."
+  },
+  "houseMadeEditorSubmitButton": "Save ingredient",
+  "@houseMadeEditorSubmitButton": {
+    "description": "T063 house-made ingredient editor: submit button."
+  },
+  "houseMadeEditorMissingFieldsError": "Fill in every field before saving.",
+  "@houseMadeEditorMissingFieldsError": {
+    "description": "T063 house-made ingredient editor: local validation error shown before submitting."
+  },
+  "venuesTitle": "Venues",
+  "@venuesTitle": {
+    "description": "T061/T063 venue switcher/manager screen title."
+  },
+  "venuesEmptyMessage": "No venues yet. Add your first one.",
+  "@venuesEmptyMessage": {
+    "description": "T063 venues screen: empty state."
+  },
+  "venueCreateButton": "New venue",
+  "@venueCreateButton": {
+    "description": "T063 venues screen: button that opens the new-venue form."
+  },
+  "venueNameLabel": "Venue name",
+  "@venueNameLabel": {
+    "description": "T063 venue form: name field label."
+  },
+  "venueAddressLabel": "Address (optional)",
+  "@venueAddressLabel": {
+    "description": "T063 venue form: address field label."
+  },
+  "venueLatitudeLabel": "Latitude (optional)",
+  "@venueLatitudeLabel": {
+    "description": "T063 venue form: latitude field label."
+  },
+  "venueLongitudeLabel": "Longitude (optional)",
+  "@venueLongitudeLabel": {
+    "description": "T063 venue form: longitude field label."
+  },
+  "venueSubmitButton": "Save venue",
+  "@venueSubmitButton": {
+    "description": "T063 venue form: submit button."
+  },
+  "venueMissingFieldsError": "Enter a venue name.",
+  "@venueMissingFieldsError": {
+    "description": "T063 venue form: local validation error shown before submitting."
   }
 }
