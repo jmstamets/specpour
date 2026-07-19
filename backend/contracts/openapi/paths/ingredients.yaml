@@ -10,6 +10,13 @@ ingredients:
       - name: category
         in: query
         schema: { type: string }
+      - name: scope
+        in: query
+        schema: { type: string, enum: [personal] }
+        description: >-
+          T059/T063 "my library" facet (the recipe editor's ingredient picker
+          needs the caller's own house-made/personal ingredients, not just
+          curated public ones). Requires an authenticated caller (401 otherwise).
       - $ref: '../openapi.yaml#/components/parameters/CursorParam'
       - $ref: '../openapi.yaml#/components/parameters/LimitParam'
     responses:
@@ -19,6 +26,8 @@ ingredients:
           application/json:
             schema:
               $ref: '#/components/schemas/IngredientPage'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
   post:
     operationId: createIngredient
     tags: [ingredients]

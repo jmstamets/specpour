@@ -346,6 +346,7 @@ class IngredientsApi {
   ///
   /// Parameters:
   /// * [category] 
+  /// * [scope] - T059/T063 \"my library\" facet (the recipe editor's ingredient picker needs the caller's own house-made/personal ingredients, not just curated public ones). Requires an authenticated caller (401 otherwise).
   /// * [cursor] - Opaque pagination cursor from a previous page's `nextCursor`.
   /// * [limit] - Maximum number of items to return.
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -359,6 +360,7 @@ class IngredientsApi {
   /// Throws [DioException] if API call or serialization fails
   Future<Response<IngredientPage>> listIngredients({ 
     String? category,
+    String? scope,
     String? cursor,
     int? limit = 20,
     CancelToken? cancelToken,
@@ -389,6 +391,7 @@ class IngredientsApi {
 
     final _queryParameters = <String, dynamic>{
       if (category != null) r'category': encodeQueryParameter(_serializers, category, const FullType(String)),
+      if (scope != null) r'scope': encodeQueryParameter(_serializers, scope, const FullType(String)),
       if (cursor != null) r'cursor': encodeQueryParameter(_serializers, cursor, const FullType(String)),
       if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
     };

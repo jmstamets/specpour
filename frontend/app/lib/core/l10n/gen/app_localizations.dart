@@ -1071,6 +1071,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Can\'t scan the code? Enter this key manually instead:'**
   String get mfaSettingsManualKeyLabel;
+
+  /// T063 library home screen title — the caller's personal authoring workspace.
+  ///
+  /// In en, this message translates to:
+  /// **'My Library'**
+  String get libraryTitle;
+
+  /// T063 library screen: personal recipes section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipes'**
+  String get libraryRecipesSectionTitle;
+
+  /// T063 library screen: personal house-made ingredients section header.
+  ///
+  /// In en, this message translates to:
+  /// **'House-made ingredients'**
+  String get libraryIngredientsSectionTitle;
+
+  /// T063 library screen: empty state for the personal recipes list.
+  ///
+  /// In en, this message translates to:
+  /// **'No recipes yet. Create your first one.'**
+  String get libraryEmptyRecipes;
+
+  /// T063 library screen: empty state for the personal house-made ingredients list.
+  ///
+  /// In en, this message translates to:
+  /// **'No house-made ingredients yet.'**
+  String get libraryEmptyIngredients;
+
+  /// T063 library screen: button that opens the recipe editor for a new recipe.
+  ///
+  /// In en, this message translates to:
+  /// **'New recipe'**
+  String get libraryCreateRecipeButton;
+
+  /// T063 library screen: button that opens the house-made ingredient editor.
+  ///
+  /// In en, this message translates to:
+  /// **'New house-made ingredient'**
+  String get libraryCreateIngredientButton;
+
+  /// T063 library screen: button that opens the venue switcher/manager for a professional user's bar library.
+  ///
+  /// In en, this message translates to:
+  /// **'Venues'**
+  String get libraryManageVenuesButton;
+
+  /// T058/T063 recipe editor screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'New recipe'**
+  String get recipeEditorTitle;
+
+  /// T063 recipe editor: primary name field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe name'**
+  String get recipeEditorPrimaryNameLabel;
+
+  /// T063 recipe editor: alternate names field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternate names (comma-separated)'**
+  String get recipeEditorAlternateNamesLabel;
+
+  /// T063 recipe editor: personal vs. bar library scope selector label.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get recipeEditorLibraryScopeLabel;
+
+  /// T063 recipe editor: personal library scope option.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get recipeEditorScopePersonal;
+
+  /// T063 recipe editor: bar library scope option.
+  ///
+  /// In en, this message translates to:
+  /// **'Bar'**
+  String get recipeEditorScopeBar;
+
+  /// T063 recipe editor: venue picker label, shown when the bar library scope is selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Venue'**
+  String get recipeEditorVenueLabel;
+
+  /// T063 recipe editor: shown when bar scope is selected but the caller owns no venues.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any venues yet. Create one first.'**
+  String get recipeEditorNoVenuesHint;
+
+  /// T063 recipe editor: step-by-step instructions section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions'**
+  String get recipeEditorInstructionsLabel;
+
+  /// T063 recipe editor: button that adds a blank instruction step field.
+  ///
+  /// In en, this message translates to:
+  /// **'Add step'**
+  String get recipeEditorAddInstructionButton;
+
+  /// T063 recipe editor: ingredient lines section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get recipeEditorIngredientLinesLabel;
+
+  /// T063 recipe editor: button that adds a blank ingredient line.
+  ///
+  /// In en, this message translates to:
+  /// **'Add ingredient'**
+  String get recipeEditorAddIngredientLineButton;
+
+  /// T063 recipe editor: ingredient picker label within an ingredient line.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredient'**
+  String get recipeEditorIngredientLabel;
+
+  /// T063 recipe editor: quantity field label within an ingredient line.
+  ///
+  /// In en, this message translates to:
+  /// **'Qty'**
+  String get recipeEditorQuantityLabel;
+
+  /// T063 recipe editor: unit field label within an ingredient line.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get recipeEditorUnitLabel;
+
+  /// T063 recipe editor: purpose/role field label within an ingredient line.
+  ///
+  /// In en, this message translates to:
+  /// **'Role (optional)'**
+  String get recipeEditorPurposeLabel;
+
+  /// T063 recipe editor: scaling-rule picker label within an ingredient line.
+  ///
+  /// In en, this message translates to:
+  /// **'Scaling rule'**
+  String get recipeEditorScalingRuleLabel;
+
+  /// T063 recipe editor: tooltip on the remove-ingredient-line icon button.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove ingredient'**
+  String get recipeEditorRemoveLineTooltip;
+
+  /// T063 recipe editor: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Save recipe'**
+  String get recipeEditorSubmitButton;
+
+  /// T063 recipe editor: local validation error shown before submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a recipe name and at least one ingredient.'**
+  String get recipeEditorMissingFieldsError;
+
+  /// T059/T063 house-made ingredient editor screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'New house-made ingredient'**
+  String get houseMadeEditorTitle;
+
+  /// T063 house-made ingredient editor: name field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredient name'**
+  String get houseMadeEditorNameLabel;
+
+  /// T063 house-made ingredient editor: picker for the recipe that defines how to make this ingredient.
+  ///
+  /// In en, this message translates to:
+  /// **'Component recipe'**
+  String get houseMadeEditorDefiningRecipeLabel;
+
+  /// T063 house-made ingredient editor: shown when the caller has no personal recipes to pick as the defining recipe.
+  ///
+  /// In en, this message translates to:
+  /// **'You need a personal recipe describing how to make this before you can define it as a house-made ingredient. Create that recipe first.'**
+  String get houseMadeEditorNoRecipesHint;
+
+  /// T063 house-made ingredient editor: yield quantity field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Yield quantity'**
+  String get houseMadeEditorYieldQuantityLabel;
+
+  /// T063 house-made ingredient editor: yield unit field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Yield unit'**
+  String get houseMadeEditorYieldUnitLabel;
+
+  /// T063 house-made ingredient editor: shelf life field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf life (days)'**
+  String get houseMadeEditorShelfLifeDaysLabel;
+
+  /// T063 house-made ingredient editor: storage instructions field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage instructions'**
+  String get houseMadeEditorStorageInstructionsLabel;
+
+  /// T063 house-made ingredient editor: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Save ingredient'**
+  String get houseMadeEditorSubmitButton;
+
+  /// T063 house-made ingredient editor: local validation error shown before submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in every field before saving.'**
+  String get houseMadeEditorMissingFieldsError;
+
+  /// T061/T063 venue switcher/manager screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Venues'**
+  String get venuesTitle;
+
+  /// T063 venues screen: empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'No venues yet. Add your first one.'**
+  String get venuesEmptyMessage;
+
+  /// T063 venues screen: button that opens the new-venue form.
+  ///
+  /// In en, this message translates to:
+  /// **'New venue'**
+  String get venueCreateButton;
+
+  /// T063 venue form: name field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Venue name'**
+  String get venueNameLabel;
+
+  /// T063 venue form: address field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Address (optional)'**
+  String get venueAddressLabel;
+
+  /// T063 venue form: latitude field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude (optional)'**
+  String get venueLatitudeLabel;
+
+  /// T063 venue form: longitude field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude (optional)'**
+  String get venueLongitudeLabel;
+
+  /// T063 venue form: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Save venue'**
+  String get venueSubmitButton;
+
+  /// T063 venue form: local validation error shown before submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a venue name.'**
+  String get venueMissingFieldsError;
 }
 
 class _AppLocalizationsDelegate

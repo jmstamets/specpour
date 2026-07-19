@@ -183,7 +183,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **listIngredients**
-> IngredientPage listIngredients(category, cursor, limit)
+> IngredientPage listIngredients(category, scope, cursor, limit)
 
 Browse ingredients (FR-014)
 
@@ -193,11 +193,12 @@ import 'package:api_client/api.dart';
 
 final api = ApiClient().getIngredientsApi();
 final String category = category_example; // String | 
+final String scope = scope_example; // String | T059/T063 \"my library\" facet (the recipe editor's ingredient picker needs the caller's own house-made/personal ingredients, not just curated public ones). Requires an authenticated caller (401 otherwise).
 final String cursor = cursor_example; // String | Opaque pagination cursor from a previous page's `nextCursor`.
 final int limit = 56; // int | Maximum number of items to return.
 
 try {
-    final response = api.listIngredients(category, cursor, limit);
+    final response = api.listIngredients(category, scope, cursor, limit);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling IngredientsApi->listIngredients: $e\n');
@@ -209,6 +210,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **category** | **String**|  | [optional] 
+ **scope** | **String**| T059/T063 \"my library\" facet (the recipe editor's ingredient picker needs the caller's own house-made/personal ingredients, not just curated public ones). Requires an authenticated caller (401 otherwise). | [optional] 
  **cursor** | **String**| Opaque pagination cursor from a previous page's `nextCursor`. | [optional] 
  **limit** | **int**| Maximum number of items to return. | [optional] [default to 20]
 
@@ -223,7 +225,7 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: application/json
+ - **Accept**: application/json, application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

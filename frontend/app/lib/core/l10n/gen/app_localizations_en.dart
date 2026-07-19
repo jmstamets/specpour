@@ -561,4 +561,150 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get mfaSettingsManualKeyLabel =>
       'Can\'t scan the code? Enter this key manually instead:';
+
+  @override
+  String get libraryTitle => 'My Library';
+
+  @override
+  String get libraryRecipesSectionTitle => 'Recipes';
+
+  @override
+  String get libraryIngredientsSectionTitle => 'House-made ingredients';
+
+  @override
+  String get libraryEmptyRecipes => 'No recipes yet. Create your first one.';
+
+  @override
+  String get libraryEmptyIngredients => 'No house-made ingredients yet.';
+
+  @override
+  String get libraryCreateRecipeButton => 'New recipe';
+
+  @override
+  String get libraryCreateIngredientButton => 'New house-made ingredient';
+
+  @override
+  String get libraryManageVenuesButton => 'Venues';
+
+  @override
+  String get recipeEditorTitle => 'New recipe';
+
+  @override
+  String get recipeEditorPrimaryNameLabel => 'Recipe name';
+
+  @override
+  String get recipeEditorAlternateNamesLabel =>
+      'Alternate names (comma-separated)';
+
+  @override
+  String get recipeEditorLibraryScopeLabel => 'Library';
+
+  @override
+  String get recipeEditorScopePersonal => 'Personal';
+
+  @override
+  String get recipeEditorScopeBar => 'Bar';
+
+  @override
+  String get recipeEditorVenueLabel => 'Venue';
+
+  @override
+  String get recipeEditorNoVenuesHint =>
+      'You don\'t have any venues yet. Create one first.';
+
+  @override
+  String get recipeEditorInstructionsLabel => 'Instructions';
+
+  @override
+  String get recipeEditorAddInstructionButton => 'Add step';
+
+  @override
+  String get recipeEditorIngredientLinesLabel => 'Ingredients';
+
+  @override
+  String get recipeEditorAddIngredientLineButton => 'Add ingredient';
+
+  @override
+  String get recipeEditorIngredientLabel => 'Ingredient';
+
+  @override
+  String get recipeEditorQuantityLabel => 'Qty';
+
+  @override
+  String get recipeEditorUnitLabel => 'Unit';
+
+  @override
+  String get recipeEditorPurposeLabel => 'Role (optional)';
+
+  @override
+  String get recipeEditorScalingRuleLabel => 'Scaling rule';
+
+  @override
+  String get recipeEditorRemoveLineTooltip => 'Remove ingredient';
+
+  @override
+  String get recipeEditorSubmitButton => 'Save recipe';
+
+  @override
+  String get recipeEditorMissingFieldsError =>
+      'Enter a recipe name and at least one ingredient.';
+
+  @override
+  String get houseMadeEditorTitle => 'New house-made ingredient';
+
+  @override
+  String get houseMadeEditorNameLabel => 'Ingredient name';
+
+  @override
+  String get houseMadeEditorDefiningRecipeLabel => 'Component recipe';
+
+  @override
+  String get houseMadeEditorNoRecipesHint =>
+      'You need a personal recipe describing how to make this before you can define it as a house-made ingredient. Create that recipe first.';
+
+  @override
+  String get houseMadeEditorYieldQuantityLabel => 'Yield quantity';
+
+  @override
+  String get houseMadeEditorYieldUnitLabel => 'Yield unit';
+
+  @override
+  String get houseMadeEditorShelfLifeDaysLabel => 'Shelf life (days)';
+
+  @override
+  String get houseMadeEditorStorageInstructionsLabel => 'Storage instructions';
+
+  @override
+  String get houseMadeEditorSubmitButton => 'Save ingredient';
+
+  @override
+  String get houseMadeEditorMissingFieldsError =>
+      'Fill in every field before saving.';
+
+  @override
+  String get venuesTitle => 'Venues';
+
+  @override
+  String get venuesEmptyMessage => 'No venues yet. Add your first one.';
+
+  @override
+  String get venueCreateButton => 'New venue';
+
+  @override
+  String get venueNameLabel => 'Venue name';
+
+  @override
+  String get venueAddressLabel => 'Address (optional)';
+
+  @override
+  String get venueLatitudeLabel => 'Latitude (optional)';
+
+  @override
+  String get venueLongitudeLabel => 'Longitude (optional)';
+
+  @override
+  String get venueSubmitButton => 'Save venue';
+
+  @override
+  String get venueMissingFieldsError => 'Enter a venue name.';
 }

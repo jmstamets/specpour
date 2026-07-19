@@ -39,7 +39,7 @@ void main() {
 
     // Browse ingredients (FR-014)
     //
-    //Future<IngredientPage> listIngredients({ String category, String cursor, int limit }) async
+    //Future<IngredientPage> listIngredients({ String category, String scope, String cursor, int limit }) async
     test('test listIngredients', () async {
       // TODO
     });

@@ -47,13 +47,36 @@ public static class IngredientEndpoints
         group.MapDelete("/ingredients/{id:guid}", DeleteAsync).RequireAuthorization(bearerOnly);
     }
 
-    private static async Task<IngredientPageResponse> ListAsync(
-        string? category, string? cursor, int? limit, IngredientsDbContext db, CancellationToken cancellationToken)
+    private static async Task<Results<Ok<IngredientPageResponse>, ProblemHttpResult>> ListAsync(
+        string? category, string? scope, string? cursor, int? limit, ClaimsPrincipal user, IngredientsDbContext db, CancellationToken cancellationToken)
     {
         var pageSize = Math.Clamp(limit ?? DefaultLimit, 1, 100);
         var offset = CursorPagination.Decode(cursor);
 
-        var query = db.Ingredients.Where(i => i.Visibility == ContentVisibility.Public);
+        IQueryable<Ingredient> query;
+        if (scope is not null)
+        {
+            // T059/T063 (recipe editor's ingredient picker needs the caller's own
+            // house-made/personal ingredients, not just curated public ones): "my
+            // library" facet, same shape as RecipeEndpoints.ListAsync's `scope`.
+            if (user.Identity?.IsAuthenticated != true)
+            {
+                return TypedResults.Problem(title: "Sign-in required", statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            if (!string.Equals(scope, "personal", StringComparison.OrdinalIgnoreCase))
+            {
+                return TypedResults.Ok(new IngredientPageResponse([], null));
+            }
+
+            var userId = CurrentUserId(user);
+            query = db.Ingredients.Where(i => i.OwnerType == OwnerType.User && i.OwnerId == userId && i.LibraryScope == LibraryScope.Personal);
+        }
+        else
+        {
+            query = db.Ingredients.Where(i => i.Visibility == ContentVisibility.Public);
+        }
+
         if (category is not null)
         {
             query = query.Where(i => db.IngredientCategories.Any(c => c.Id == i.CategoryId && c.NameKey == category));
@@ -72,13 +95,13 @@ public static class IngredientEndpoints
             .Where(i => parentIds.Contains(i.Id))
             .ToDictionaryAsync(i => i.Id, i => i.Name, cancellationToken);
 
-        return new IngredientPageResponse(
+        return TypedResults.Ok(new IngredientPageResponse(
             [.. page.Select(i => new IngredientSummaryResponse(
                 i.Id,
                 i.Name,
                 i.ParentId,
                 i.ParentId is { } pid ? parentNames.GetValueOrDefault(pid) : null))],
-            nextCursor);
+            nextCursor));
     }
 
     private static async Task<Results<Ok<IngredientDetailResponse>, NotFound>> GetAsync(
