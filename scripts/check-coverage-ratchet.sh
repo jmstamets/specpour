@@ -24,6 +24,29 @@
 # concurrent PRs), for a benefit (saving one manual line-edit) that doesn't
 # justify the added attack surface on a solo-dev repo.
 #
+# BASELINE-SOURCING RULE (T198, established 2026-07-19): every number written
+# into coverage-baseline.json MUST come from CI's OWN coverage artifact, never
+# from a local `dotnet test`/`flutter test --coverage` run. To (re-)baseline:
+# download the coverage-report run's `coverage-backend-*` and
+# `coverage-frontend` artifacts (`gh run download <id>`), then run THIS script
+# against them to read the exact numbers, and commit those. The environment
+# that ENFORCES the baseline (CI) must be the environment that PRODUCES it —
+# local and CI measurements genuinely differ. The incident that established
+# this: T197 set 74.4% backend from a LOCAL measurement (3229/4339 covered);
+# CI measured 3228/4339 (74.3%) on functionally-identical code — the SAME
+# denominator, one fewer covered line (a background hosted-service timer path
+# that fired locally but not in that CI run) — and the ratchet tripped on the
+# very first CI run. A locally-set baseline sits at whatever point the local
+# environment's nondeterminism happened to land, which is systematically not
+# where CI lands.
+#
+# NO EPSILON / TOLERANCE (rejected deliberately, T198): the ratchet compares
+# strictly (>=), with no fuzz band to absorb small drops. A 0.1% failure on a
+# legitimate line is the ratchet working at full sensitivity. The sanctioned
+# escape valve for a justified drop is a documented, reviewed baseline update
+# in its own commit (deliberate and visible) — never a standing tolerance,
+# which would let small regressions accumulate silently over time.
+#
 # Usage:
 #   scripts/check-coverage-ratchet.sh <backend-coverage-root> <frontend-lcov-file>
 #

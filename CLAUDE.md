@@ -78,6 +78,22 @@ constitution is at `.specify/memory/constitution.md` (v1.6.0).
   If a story's checkpoint proves too large for one sitting, the draft PR —
   at any red-but-committed point — is the safe parking state; stop there and
   report, rather than rushing or silently narrowing scope.
+- **Coverage baselines come from CI, never local computation (recorded
+  2026-07-19, T198).** Every number in `coverage-baseline.json` must be
+  sourced from CI's own coverage artifact — download the coverage-report
+  run's `coverage-backend-*`/`coverage-frontend` artifacts (`gh run download
+  <id>`), merge them with the ratchet script, and commit those numbers. Never
+  baseline from a local `dotnet test`/`flutter test --coverage` run: the
+  environment that ENFORCES the baseline (CI) must be the one that PRODUCES
+  it. Local and CI measurements genuinely differ — **precedent (T198):** a
+  locally-set 74.4% backend baseline (3229/4339 covered) tripped the ratchet
+  on the first CI run, which measured 3228/4339 (74.3%) on identical code —
+  same denominator, one background-timer-dependent line apart. **No
+  epsilon/tolerance** is ever added to the ratchet to paper over this
+  (explicitly rejected): a small drop is the ratchet working at full
+  sensitivity; the escape valve for a *justified* drop is a documented,
+  reviewed baseline update in its own commit — deliberate and visible — never
+  a standing fuzz band that lets regressions accumulate silently.
 - **Escape-hatch disclosure in the commit message itself (recorded
   2026-07-19).** Any use of a gate-bypass or escape hatch — `SKIP_LOCAL_CI_GATE=1`
   is the current example, but this applies to any future one — must be
