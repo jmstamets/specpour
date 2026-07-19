@@ -16,6 +16,7 @@ import 'package:api_client/src/api/equipment_api.dart';
 import 'package:api_client/src/api/glossary_api.dart';
 import 'package:api_client/src/api/identity_api.dart';
 import 'package:api_client/src/api/ingredients_api.dart';
+import 'package:api_client/src/api/inventory_api.dart';
 import 'package:api_client/src/api/notifications_api.dart';
 import 'package:api_client/src/api/search_api.dart';
 import 'package:api_client/src/api/venues_api.dart';
@@ -154,6 +155,12 @@ class ApiClient {
   /// by doing that all interceptors will not be executed
   IngredientsApi getIngredientsApi() {
     return IngredientsApi(dio, serializers);
+  }
+
+  /// Get InventoryApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  InventoryApi getInventoryApi() {
+    return InventoryApi(dio, serializers);
   }
 
   /// Get NotificationsApi instance, base route and serializer can be overridden by a given but be careful,

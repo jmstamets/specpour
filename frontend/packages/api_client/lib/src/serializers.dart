@@ -31,6 +31,7 @@ import 'package:api_client/src/model/concept_variant.dart';
 import 'package:api_client/src/model/create_equipment_request.dart';
 import 'package:api_client/src/model/create_house_made_request.dart';
 import 'package:api_client/src/model/create_ingredient_request.dart';
+import 'package:api_client/src/model/create_inventory_item_request.dart';
 import 'package:api_client/src/model/create_recipe_request.dart';
 import 'package:api_client/src/model/create_venue_request.dart';
 import 'package:api_client/src/model/cursor_page.dart';
@@ -57,6 +58,8 @@ import 'package:api_client/src/model/ingredient_page.dart';
 import 'package:api_client/src/model/ingredient_recipe_ref.dart';
 import 'package:api_client/src/model/ingredient_recipes.dart';
 import 'package:api_client/src/model/ingredient_summary.dart';
+import 'package:api_client/src/model/inventory_item.dart';
+import 'package:api_client/src/model/inventory_item_page.dart';
 import 'package:api_client/src/model/login_mfa_request.dart';
 import 'package:api_client/src/model/login_request.dart';
 import 'package:api_client/src/model/login_result.dart';
@@ -83,6 +86,7 @@ import 'package:api_client/src/model/support_resource_response.dart';
 import 'package:api_client/src/model/support_resources_response.dart';
 import 'package:api_client/src/model/update_equipment_request.dart';
 import 'package:api_client/src/model/update_ingredient_request.dart';
+import 'package:api_client/src/model/update_inventory_item_request.dart';
 import 'package:api_client/src/model/update_recipe_request.dart';
 import 'package:api_client/src/model/update_venue_request.dart';
 import 'package:api_client/src/model/venue.dart';
@@ -108,6 +112,7 @@ part 'serializers.g.dart';
   CreateEquipmentRequest,
   CreateHouseMadeRequest,
   CreateIngredientRequest,
+  CreateInventoryItemRequest,
   CreateRecipeRequest,
   CreateVenueRequest,
   CursorPage,
@@ -134,6 +139,8 @@ part 'serializers.g.dart';
   IngredientRecipeRef,
   IngredientRecipes,
   IngredientSummary,
+  InventoryItem,
+  InventoryItemPage,
   LoginMfaRequest,
   LoginRequest,
   LoginResult,
@@ -160,6 +167,7 @@ part 'serializers.g.dart';
   SupportResourcesResponse,
   UpdateEquipmentRequest,
   UpdateIngredientRequest,
+  UpdateInventoryItemRequest,
   UpdateRecipeRequest,
   UpdateVenueRequest,
   Venue,

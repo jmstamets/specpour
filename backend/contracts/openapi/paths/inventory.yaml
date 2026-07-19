@@ -1,0 +1,167 @@
+inventoryItems:
+  get:
+    operationId: listInventoryItems
+    tags: [inventory]
+    summary: List the caller's own inventory, or a venue's inventory the caller owns (T066, FR-029)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: venueId
+        in: query
+        description: When present, lists that venue's inventory instead of the caller's personal inventory (403 if the caller doesn't own it).
+        schema: { type: string, format: uuid }
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of inventory items.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItemPage'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '403':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  post:
+    operationId: createInventoryItem
+    tags: [inventory]
+    summary: Add an item to the caller's personal inventory, or a venue's inventory the caller owns (T066, FR-029/FR-030)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateInventoryItemRequest'
+    responses:
+      '201':
+        description: The created inventory item.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '403':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+inventoryItemById:
+  get:
+    operationId: getInventoryItem
+    tags: [inventory]
+    summary: Get one of the caller's own inventory items by id (T066, FR-029)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The inventory item.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        # Always 404, never 403, for another caller's item (no existence disclosure).
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  put:
+    operationId: updateInventoryItem
+    tags: [inventory]
+    summary: Update the quantity/bottle size of one of the caller's own inventory items (T066, FR-029)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateInventoryItemRequest'
+    responses:
+      '200':
+        description: The updated inventory item.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  delete:
+    operationId: deleteInventoryItem
+    tags: [inventory]
+    summary: Remove one of the caller's own inventory items (T066, FR-029)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '204':
+        description: The item was deleted.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+components:
+  schemas:
+    InventoryItem:
+      type: object
+      description: >-
+        Owner-only from birth (FR-029) — no visibility/public variant exists for
+        this type at all, unlike Recipe/Ingredient/Equipment.
+      properties:
+        id: { type: string, format: uuid }
+        ingredientId: { type: string, format: uuid }
+        ingredientName: { type: [string, "null"] }
+        quantity: { type: [number, "null"] }
+        bottleSize: { type: [string, "null"] }
+        source:
+          type: string
+          enum: [photo-recognition, barcode, manual, prep]
+        addedAt: { type: string, format: date-time }
+      required: [id, ingredientId, source, addedAt]
+    InventoryItemPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/InventoryItem' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    CreateInventoryItemRequest:
+      type: object
+      properties:
+        ingredientId: { type: string, format: uuid }
+        venueId:
+          type: [string, "null"]
+          format: uuid
+          description: Omit for the caller's personal inventory; provide to add to a venue's inventory the caller owns.
+        quantity: { type: [number, "null"] }
+        bottleSize: { type: [string, "null"] }
+        source:
+          type: string
+          enum: [photo-recognition, barcode, manual, prep]
+      required: [ingredientId, source]
+    UpdateInventoryItemRequest:
+      type: object
+      properties:
+        quantity: { type: [number, "null"] }
+        bottleSize: { type: [string, "null"] }

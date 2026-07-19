@@ -2,6 +2,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\SpecPour.Modules.Inventory.Application.csproj" />
+    <!-- Cross-module Contracts-only dependencies (constitution Principle III): T066
+         resolves ingredient names/hierarchy via Ingredients' lookup port, and
+         verifies bar-scoped inventory is owned by the caller via Venues' port
+         (same pattern as Catalog's RecipeEndpoints). -->
+    <ProjectReference Include="..\..\Ingredients\Contracts\SpecPour.Modules.Ingredients.Contracts.csproj" />
+    <ProjectReference Include="..\..\Venues\Contracts\SpecPour.Modules.Venues.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -9,5 +15,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="OpenIddict.Abstractions" Version="7.5.0" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.5.0" />
+  </ItemGroup>
 
 </Project>

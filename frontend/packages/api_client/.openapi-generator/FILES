@@ -22,6 +22,7 @@ doc/ConceptVariant.md
 doc/CreateEquipmentRequest.md
 doc/CreateHouseMadeRequest.md
 doc/CreateIngredientRequest.md
+doc/CreateInventoryItemRequest.md
 doc/CreateRecipeRequest.md
 doc/CreateVenueRequest.md
 doc/CursorPage.md
@@ -52,6 +53,9 @@ doc/IngredientRecipeRef.md
 doc/IngredientRecipes.md
 doc/IngredientSummary.md
 doc/IngredientsApi.md
+doc/InventoryApi.md
+doc/InventoryItem.md
+doc/InventoryItemPage.md
 doc/LoginMfaRequest.md
 doc/LoginRequest.md
 doc/LoginResult.md
@@ -80,6 +84,7 @@ doc/SupportResourceResponse.md
 doc/SupportResourcesResponse.md
 doc/UpdateEquipmentRequest.md
 doc/UpdateIngredientRequest.md
+doc/UpdateInventoryItemRequest.md
 doc/UpdateRecipeRequest.md
 doc/UpdateVenueRequest.md
 doc/Venue.md
@@ -94,6 +99,7 @@ lib/src/api/equipment_api.dart
 lib/src/api/glossary_api.dart
 lib/src/api/identity_api.dart
 lib/src/api/ingredients_api.dart
+lib/src/api/inventory_api.dart
 lib/src/api/notifications_api.dart
 lib/src/api/search_api.dart
 lib/src/api/venues_api.dart
@@ -121,6 +127,7 @@ lib/src/model/concept_variant.dart
 lib/src/model/create_equipment_request.dart
 lib/src/model/create_house_made_request.dart
 lib/src/model/create_ingredient_request.dart
+lib/src/model/create_inventory_item_request.dart
 lib/src/model/create_recipe_request.dart
 lib/src/model/create_venue_request.dart
 lib/src/model/cursor_page.dart
@@ -148,6 +155,8 @@ lib/src/model/ingredient_page.dart
 lib/src/model/ingredient_recipe_ref.dart
 lib/src/model/ingredient_recipes.dart
 lib/src/model/ingredient_summary.dart
+lib/src/model/inventory_item.dart
+lib/src/model/inventory_item_page.dart
 lib/src/model/login_mfa_request.dart
 lib/src/model/login_request.dart
 lib/src/model/login_result.dart
@@ -174,6 +183,7 @@ lib/src/model/support_resource_response.dart
 lib/src/model/support_resources_response.dart
 lib/src/model/update_equipment_request.dart
 lib/src/model/update_ingredient_request.dart
+lib/src/model/update_inventory_item_request.dart
 lib/src/model/update_recipe_request.dart
 lib/src/model/update_venue_request.dart
 lib/src/model/venue.dart
@@ -200,6 +210,7 @@ test/concept_variant_test.dart
 test/create_equipment_request_test.dart
 test/create_house_made_request_test.dart
 test/create_ingredient_request_test.dart
+test/create_inventory_item_request_test.dart
 test/create_recipe_request_test.dart
 test/create_venue_request_test.dart
 test/cursor_page_test.dart
@@ -230,6 +241,9 @@ test/ingredient_recipe_ref_test.dart
 test/ingredient_recipes_test.dart
 test/ingredient_summary_test.dart
 test/ingredients_api_test.dart
+test/inventory_api_test.dart
+test/inventory_item_page_test.dart
+test/inventory_item_test.dart
 test/login_mfa_request_test.dart
 test/login_request_test.dart
 test/login_result_test.dart
@@ -258,6 +272,7 @@ test/support_resource_response_test.dart
 test/support_resources_response_test.dart
 test/update_equipment_request_test.dart
 test/update_ingredient_request_test.dart
+test/update_inventory_item_request_test.dart
 test/update_recipe_request_test.dart
 test/update_venue_request_test.dart
 test/venue_page_test.dart

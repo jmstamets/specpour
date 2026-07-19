@@ -25,6 +25,7 @@ public static class ModuleRegistry
         new Modules.Equipment.Infrastructure.EquipmentModule(), // T034
         new Modules.Glossary.Infrastructure.GlossaryModule(), // T035
         new Modules.Venues.Infrastructure.VenuesModule(), // T061
+        new Modules.Inventory.Infrastructure.InventoryModule(), // T066
         // ...
     ];
 }

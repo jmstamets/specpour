@@ -114,6 +114,11 @@ Class | Method | HTTP request | Description
 [*IngredientsApi*](doc/IngredientsApi.md) | [**getIngredientRecipes**](doc/IngredientsApi.md#getingredientrecipes) | **GET** /ingredients/{id}/recipes | Recipes using this ingredient, hierarchy-aware (T155, FR-014a)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**listIngredients**](doc/IngredientsApi.md#listingredients) | **GET** /ingredients | Browse ingredients (FR-014)
 [*IngredientsApi*](doc/IngredientsApi.md) | [**updateIngredient**](doc/IngredientsApi.md#updateingredient) | **PUT** /ingredients/{id} | Update one of the caller&#39;s own authored ingredients (T059, FR-012/FR-017)
+[*InventoryApi*](doc/InventoryApi.md) | [**createInventoryItem**](doc/InventoryApi.md#createinventoryitem) | **POST** /inventory/items | Add an item to the caller&#39;s personal inventory, or a venue&#39;s inventory the caller owns (T066, FR-029/FR-030)
+[*InventoryApi*](doc/InventoryApi.md) | [**deleteInventoryItem**](doc/InventoryApi.md#deleteinventoryitem) | **DELETE** /inventory/items/{id} | Remove one of the caller&#39;s own inventory items (T066, FR-029)
+[*InventoryApi*](doc/InventoryApi.md) | [**getInventoryItem**](doc/InventoryApi.md#getinventoryitem) | **GET** /inventory/items/{id} | Get one of the caller&#39;s own inventory items by id (T066, FR-029)
+[*InventoryApi*](doc/InventoryApi.md) | [**listInventoryItems**](doc/InventoryApi.md#listinventoryitems) | **GET** /inventory/items | List the caller&#39;s own inventory, or a venue&#39;s inventory the caller owns (T066, FR-029)
+[*InventoryApi*](doc/InventoryApi.md) | [**updateInventoryItem**](doc/InventoryApi.md#updateinventoryitem) | **PUT** /inventory/items/{id} | Update the quantity/bottle size of one of the caller&#39;s own inventory items (T066, FR-029)
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getInbox**](doc/NotificationsApi.md#getinbox) | **GET** /inbox | Get the caller&#39;s inbox messages
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getMyChannelPreferences**](doc/NotificationsApi.md#getmychannelpreferences) | **GET** /me/channels | Get the caller&#39;s notification channel opt-in preferences
 [*NotificationsApi*](doc/NotificationsApi.md) | [**markInboxMessageRead**](doc/NotificationsApi.md#markinboxmessageread) | **POST** /inbox/{id}/read | Mark an inbox message as read
@@ -145,6 +150,7 @@ Class | Method | HTTP request | Description
  - [CreateEquipmentRequest](doc/CreateEquipmentRequest.md)
  - [CreateHouseMadeRequest](doc/CreateHouseMadeRequest.md)
  - [CreateIngredientRequest](doc/CreateIngredientRequest.md)
+ - [CreateInventoryItemRequest](doc/CreateInventoryItemRequest.md)
  - [CreateRecipeRequest](doc/CreateRecipeRequest.md)
  - [CreateVenueRequest](doc/CreateVenueRequest.md)
  - [CursorPage](doc/CursorPage.md)
@@ -171,6 +177,8 @@ Class | Method | HTTP request | Description
  - [IngredientRecipeRef](doc/IngredientRecipeRef.md)
  - [IngredientRecipes](doc/IngredientRecipes.md)
  - [IngredientSummary](doc/IngredientSummary.md)
+ - [InventoryItem](doc/InventoryItem.md)
+ - [InventoryItemPage](doc/InventoryItemPage.md)
  - [LoginMfaRequest](doc/LoginMfaRequest.md)
  - [LoginRequest](doc/LoginRequest.md)
  - [LoginResult](doc/LoginResult.md)
@@ -197,6 +205,7 @@ Class | Method | HTTP request | Description
  - [SupportResourcesResponse](doc/SupportResourcesResponse.md)
  - [UpdateEquipmentRequest](doc/UpdateEquipmentRequest.md)
  - [UpdateIngredientRequest](doc/UpdateIngredientRequest.md)
+ - [UpdateInventoryItemRequest](doc/UpdateInventoryItemRequest.md)
  - [UpdateRecipeRequest](doc/UpdateRecipeRequest.md)
  - [UpdateVenueRequest](doc/UpdateVenueRequest.md)
  - [Venue](doc/Venue.md)
