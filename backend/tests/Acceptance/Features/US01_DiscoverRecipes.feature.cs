@@ -122,7 +122,7 @@ namespace SpecPour.Tests.Acceptance.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US01_DiscoverRecipes.feature.ndjson", 11);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US01_DiscoverRecipes.feature.ndjson", 12);
         }
         
         async global::System.Threading.Tasks.Task global::Xunit.IAsyncLifetime.InitializeAsync()
@@ -487,6 +487,50 @@ namespace SpecPour.Tests.Acceptance.Features
 #line hidden
 #line 55
     await testRunner.ThenAsync("the support resources response includes at least one resource", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="11 - A concept page\'s Approved variant to a private recipe is never listed (T199," +
+            " T196 standing-rule completion)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "US1 - Discover and follow curated recipes")]
+        [global::Xunit.TraitAttribute("Description", "11 - A concept page\'s Approved variant to a private recipe is never listed (T199," +
+            " T196 standing-rule completion)")]
+        public async global::System.Threading.Tasks.Task _11_AConceptPagesApprovedVariantToAPrivateRecipeIsNeverListedT199T196Standing_RuleCompletion()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "9";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("11 - A concept page\'s Approved variant to a private recipe is never listed (T199," +
+                    " T196 standing-rule completion)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 57
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 11
+  await this.FeatureBackgroundAsync();
+#line hidden
+#line 58
+    await testRunner.GivenAsync("a concept page with an Approved variant to a public recipe and an Approved varian" +
+                        "t to a private recipe", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 59
+    await testRunner.WhenAsync("I request that concept page", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 60
+    await testRunner.ThenAsync("the public variant is listed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 61
+    await testRunner.AndAsync("the private variant is not listed", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

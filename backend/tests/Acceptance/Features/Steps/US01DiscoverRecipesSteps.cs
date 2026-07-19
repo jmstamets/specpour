@@ -344,6 +344,108 @@ public sealed class US01DiscoverRecipesSteps
         Assert.True(_lastJson!.RootElement.GetProperty("items").GetArrayLength() > 0);
     }
 
+    // T199: own fresh fixture (Guid.NewGuid(), not SeedIds) since this scenario
+    // doesn't share the Background — no idempotency concern the way the shared
+    // Background seed above has.
+    private Guid _t199ConceptId;
+    private Guid _t199PublicRecipeId;
+    private Guid _t199PrivateRecipeId;
+
+    [Given(@"a concept page with an Approved variant to a public recipe and an Approved variant to a private recipe")]
+    public async Task GivenAConceptPageWithApprovedVariantsToAPublicAndAPrivateRecipe()
+    {
+        using var scope = AcceptanceHooks.Factory.Services.CreateScope();
+        var catalogDb = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+
+        var now = DateTimeOffset.UtcNow;
+        _t199ConceptId = Guid.NewGuid();
+        _t199PublicRecipeId = Guid.NewGuid();
+        _t199PrivateRecipeId = Guid.NewGuid();
+
+        catalogDb.Recipes.AddRange(
+            new Recipe
+            {
+                Id = _t199PublicRecipeId,
+                OwnerType = OwnerType.System,
+                LibraryScope = LibraryScope.Core,
+                PrimaryName = $"T199 Public Variant {Guid.NewGuid():N}",
+                Method = MixMethod.Shaken,
+                Instructions = ["Shake with ice", "Strain"],
+                IceSpec = "None (served up)",
+                Visibility = ContentVisibility.Public,
+                CreatedAt = now,
+                UpdatedAt = now,
+            },
+            new Recipe
+            {
+                Id = _t199PrivateRecipeId,
+                OwnerType = OwnerType.User,
+                OwnerId = Guid.NewGuid(),
+                LibraryScope = LibraryScope.Personal,
+                PrimaryName = $"T199 Private Variant {Guid.NewGuid():N}",
+                Method = MixMethod.Shaken,
+                Instructions = ["Shake with ice", "Strain"],
+                IceSpec = "None (served up)",
+                Visibility = ContentVisibility.Private,
+                CreatedAt = now,
+                UpdatedAt = now,
+            });
+
+        catalogDb.ConceptPages.Add(new ConceptPage
+        {
+            Id = _t199ConceptId,
+            Name = $"T199 Concept {Guid.NewGuid():N}",
+            Description = "A concept page with one public and one private Approved variant.",
+        });
+
+        catalogDb.ConceptVariantLinks.AddRange(
+            new ConceptVariantLink
+            {
+                Id = Guid.NewGuid(),
+                ConceptId = _t199ConceptId,
+                RecipeId = _t199PublicRecipeId,
+                DifferentiatorText = "The public variant.",
+                State = ConceptVariantState.Approved,
+            },
+            new ConceptVariantLink
+            {
+                Id = Guid.NewGuid(),
+                ConceptId = _t199ConceptId,
+                RecipeId = _t199PrivateRecipeId,
+                // Approved despite pointing at a private recipe: no attach-variant
+                // endpoint enforces the "must be public or core" rule yet (FR-021),
+                // so this state is only reachable via direct seeding today — exactly
+                // the gap T196 defensively guarded and this test verifies.
+                DifferentiatorText = "The private variant — must never be listed.",
+                State = ConceptVariantState.Approved,
+            });
+
+        await catalogDb.SaveChangesAsync();
+    }
+
+    [When(@"I request that concept page")]
+    public async Task WhenIRequestThatConceptPage()
+    {
+        using var client = AcceptanceHooks.Factory.CreateClient();
+        _lastResponse = await client.GetAsync(new Uri($"/api/v1/concepts/{_t199ConceptId}", UriKind.Relative));
+        await CaptureJsonAsync();
+    }
+
+    [Then(@"the public variant is listed")]
+    public void ThenThePublicVariantIsListed()
+    {
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        var variants = _lastJson!.RootElement.GetProperty("variants").EnumerateArray();
+        Assert.Contains(variants, v => v.GetProperty("recipeId").GetGuid() == _t199PublicRecipeId);
+    }
+
+    [Then(@"the private variant is not listed")]
+    public void ThenThePrivateVariantIsNotListed()
+    {
+        var variants = _lastJson!.RootElement.GetProperty("variants").EnumerateArray();
+        Assert.DoesNotContain(variants, v => v.GetProperty("recipeId").GetGuid() == _t199PrivateRecipeId);
+    }
+
     private async Task RequestRecipeAsync(Guid id)
     {
         using var client = AcceptanceHooks.Factory.CreateClient();
