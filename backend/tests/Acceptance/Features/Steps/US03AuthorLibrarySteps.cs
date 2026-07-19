@@ -235,9 +235,13 @@ public sealed class US03AuthorLibrarySteps
 
     [Then(@"the private recipe is not accessible to the second user")]
     public void ThenThePrivateRecipeIsNotAccessibleToTheSecondUser() =>
-        Assert.True(
-            _secondUserResponse.StatusCode is System.Net.HttpStatusCode.NotFound or System.Net.HttpStatusCode.Forbidden,
-            $"Expected 404 or 403 for a private recipe accessed by a non-owner; got {(int)_secondUserResponse.StatusCode}.");
+        // T196 review round: strictly 404, never 403 — a 403 would confirm the
+        // recipe exists (an information leak for private content in its own
+        // right), same no-enumeration reasoning as recovery/login elsewhere in
+        // this codebase. Was "404 or 403" until this tightening; the
+        // implementation (RecipeEndpoints.GetAsync) already only ever returns
+        // 404 here, so this closes the assertion gap, not a code gap.
+        Assert.Equal(System.Net.HttpStatusCode.NotFound, _secondUserResponse.StatusCode);
 
     private async Task CreateRecipeAsync(
         HttpClient client, string primaryName, string libraryScope, Guid? venueId, Guid? ingredientIdOverride = null)
