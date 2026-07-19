@@ -1,0 +1,14 @@
+{
+  "_comment": "T190: non-regression coverage ratchet baseline, enforced by scripts/check-coverage-ratchet.sh in CI's coverage-report job. Numbers are LINE coverage percentages from reportgenerator's merged TextSummary (backend: all four coverlet Cobertura reports merged; frontend: flutter test --coverage's lcov.info), unfiltered — no generated-file exclusions, matching exactly what the tools produce so this file is reproducible by re-running the script. Raise these values only via a deliberate, standalone edit once coverage genuinely improves; never lower them.",
+  "_futureOption": "John (2026-07-19, flagged-not-acted): the unfiltered backend baseline includes generated code (EF migrations, generated OpenAPI/client code) that will never be exercised by tests, diluting the number. A filtered view (excluding known-generated paths) would make the ratchet more SENSITIVE to real regressions. The ratchet measures direction (is coverage trending down), not an absolute target, so the unfiltered baseline is fine to start with — this is a considered, deferred improvement, not a gap.",
+  "backend": {
+    "lineCoveragePercent": 19.2,
+    "measuredAt": "2026-07-18",
+    "note": "Phase 4 exit / Phase 5 entry baseline. Measured locally: dotnet test across all four backend/tests/* suites (Acceptance 47, Contract 39, Integration 1, Unit 36) with --collect:\"XPlat Code Coverage\", merged via reportgenerator. 2918/15133 coverable lines covered."
+  },
+  "frontend": {
+    "lineCoveragePercent": 78.9,
+    "measuredAt": "2026-07-18",
+    "note": "Phase 4 exit / Phase 5 entry baseline. Measured locally: flutter test --coverage (full 87-case suite). 1895/2399 coverable lines covered. Includes generated l10n/drift files, unfiltered."
+  }
+}

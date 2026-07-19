@@ -78,6 +78,30 @@ services:
     environment:
       ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=specpour;Username=specpour;Password=specpour_dev_only"
 
+  # T181: one-shot deterministic-content seed — imports the curated launch content
+  # (backend/src/Tools/Seeder/Content/*.json). `profiles: [tools]` deliberately
+  # keeps it OUT of a bare `docker compose up`/`up -d` (which starts every
+  # non-profiled service): api doesn't depend_on it, so an auto-started seeder
+  # would race api's own health check with no ordering guarantee. Compose profiles
+  # don't restrict `docker compose run <service>` (a named run bypasses profile
+  # gating), so this stays reachable via an explicit, deliberately-sequenced
+  # `docker compose run --rm seeder` wherever real catalog data is needed — CI's
+  # frontend-web-browser-tests job does this after the health-check step; a local
+  # walkthrough that wants to click through real recipe/ingredient content should
+  # do the same. Idempotent — safe to run against a stack that already has data.
+  seeder:
+    profiles: ["tools"]
+    build:
+      context: ./backend
+      dockerfile: src/Tools/Seeder/Dockerfile
+    container_name: specpour-seeder
+    restart: "no"
+    depends_on:
+      migration-runner:
+        condition: service_completed_successfully
+    environment:
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=specpour;Username=specpour;Password=specpour_dev_only"
+
   api:
     build:
       context: ./backend

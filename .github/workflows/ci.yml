@@ -60,7 +60,9 @@ jobs:
       - run: dotnet build backend/SpecPour.slnx -c Release
       - name: Run ${{ matrix.suite }} suite
         run: |
-          dotnet test backend/tests/${{ matrix.suite }} -c Release --no-build 2>&1 | tee test-output.log
+          dotnet test backend/tests/${{ matrix.suite }} -c Release --no-build \
+            --collect:"XPlat Code Coverage" --results-directory "TestResults/${{ matrix.suite }}" \
+            2>&1 | tee test-output.log
           # Defense-in-depth (2026-07-16 fail-open audit): no --filter is used
           # here, so the confirmed "0 tests matched a filter -> exit 0" mode
           # isn't reachable today, but a genuinely empty test project is a
@@ -70,6 +72,18 @@ jobs:
             echo "::error::No evidence that any tests actually ran in ${{ matrix.suite }} — treating as inconclusive, not clean."
             exit 1
           fi
+          # T190 (Phase 5 entry): fail closed if coverlet didn't actually
+          # produce a report — an empty artifact here would make the
+          # coverage-report job's ratchet misread "no data" as "0% coverage."
+          if ! find "TestResults/${{ matrix.suite }}" -name "coverage.cobertura.xml" -print -quit | grep -q .; then
+            echo "::error::No coverage.cobertura.xml produced for ${{ matrix.suite }} — coverage collection failed."
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-backend-${{ matrix.suite }}
+          path: TestResults/${{ matrix.suite }}/**/coverage.cobertura.xml
+          retention-days: 14
 
   # --- Frontend: analyzer + formatting gate (mirrors T006's local commands). ---
   frontend-analyze:
@@ -99,7 +113,19 @@ jobs:
       - working-directory: frontend/app
         run: flutter pub get
       - working-directory: frontend/app
-        run: flutter test
+        run: |
+          flutter test --coverage
+          # T190 (Phase 5 entry): fail closed if coverage wasn't produced —
+          # see the matching guard in backend-tests above.
+          if [ ! -s coverage/lcov.info ]; then
+            echo "::error::coverage/lcov.info missing or empty — coverage collection failed."
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-frontend
+          path: frontend/app/coverage/lcov.info
+          retention-days: 14
 
   # --- Frontend: client acceptance flows (quickstart.md: `flutter test
   # integration_test`). The `integration_test` package doesn't support web or
@@ -173,6 +199,8 @@ jobs:
           echo "::error::API never became healthy within 120s."
           docker compose logs
           exit 1
+      - name: Seed deterministic catalog content (T181)
+        run: docker compose run --rm seeder
       - name: Run the browser-context auth smoke set
         run: scripts/run-web-integration-tests.sh
       - name: Run the cross-tab election mechanism test (T177 #100)
@@ -256,3 +284,35 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: "1"
           ignore-unfixed: true
+
+  # --- T190 (Phase 5 entry): merges the coverage collected above (backend
+  # coverlet/Cobertura per suite, frontend flutter/LCov) and enforces the
+  # non-regression ratchet in scripts/check-coverage-ratchet.sh against
+  # coverage-baseline.json. Fail-closed per Principle XVI — an inconclusive
+  # measurement (missing artifact, zero coverable lines, unparseable output)
+  # fails the job exactly like a genuine regression does, never a silent pass.
+  coverage-report:
+    needs: [backend-tests, frontend-unit-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Install reportgenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-backend-*
+          path: coverage-artifacts/backend
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-frontend
+          path: coverage-artifacts/frontend
+      - name: Merge coverage + enforce ratchet
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          scripts/check-coverage-ratchet.sh \
+            coverage-artifacts/backend \
+            coverage-artifacts/frontend/lcov.info \
+            | tee -a "$GITHUB_STEP_SUMMARY"

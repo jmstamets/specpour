@@ -86,5 +86,7 @@ if grep -q "has the following vulnerable packages" /tmp/specpour-vulnerable.log;
   exit 1
 fi
 
-echo "All local CI-gate checks passed. (Not run here — CI-only until real CI exists:"
-echo "  frontend integration_test on Android emulator, Trivy container scan.)"
+echo "All local CI-gate checks passed. (Not run here — CI-only:"
+echo "  frontend integration_test on Android emulator, Trivy container scan,"
+echo "  T190 coverage collection + non-regression ratchet — see"
+echo "  scripts/check-coverage-ratchet.sh to run it manually if needed.)"
