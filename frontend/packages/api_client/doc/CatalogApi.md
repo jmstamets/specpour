@@ -225,11 +225,11 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **listRecipes**
-> RecipePage listRecipes(family, category, tag, flavorProfile, equipment, glassware, ice, uses, allergenExclude, source_, scope, cursor, limit)
+> RecipePage listRecipes(family, category, tag, flavorProfile, equipment, glassware, ice, uses, allergenExclude, makeable, source_, scope, cursor, limit)
 
 Browse/search recipes with content facets (FR-050)
 
-Guest-accessible (FR-004b). Only public/core recipes are returned — private personal-library recipes land with the personal-library story (US3). The rating and makeable-from-inventory facets are staged (T149/T148); ABV-range filtering computes ABV per candidate at request time rather than from a stored column, since ABV is always derived, never persisted (data-model.md).
+Guest-accessible (FR-004b). Only public/core recipes are returned by default — private personal-library recipes land with the personal-library story (US3), or via `scope`/`makeable`. The rating facet is still staged (T149); ABV-range filtering computes ABV per candidate at request time rather than from a stored column, since ABV is always derived, never persisted (data-model.md).
 
 ### Example
 ```dart
@@ -245,13 +245,14 @@ final String glassware = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
 final String ice = ice_example; // String | 
 final String uses = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050) — a class-level ingredient ID matches recipes using it or any descendant.
 final String allergenExclude = allergenExclude_example; // String | Comma-separated allergen keys to exclude.
+final String makeable = makeable_example; // String | Makeable-from-inventory facet (T148, FR-050) — bearer-only (401 if not authenticated). Includes both fully-makeable recipes and near-misses (one-away, naming the missing/substitutable line); the base recipe set for this facet spans public recipes AND the caller's own personal/bar recipes (a caller's own authored recipe can be makeable/near-miss too), composing with `scope` when both are given. Each returned recipe carries a `makeability` object with per-line detail.
 final String source_ = source__example; // String | 
 final String scope = scope_example; // String | T058, FR-050 \"my library\" facet: the caller's own recipes in that library, regardless of visibility. Requires an authenticated caller (401 otherwise).
 final String cursor = cursor_example; // String | Opaque pagination cursor from a previous page's `nextCursor`.
 final int limit = 56; // int | Maximum number of items to return.
 
 try {
-    final response = api.listRecipes(family, category, tag, flavorProfile, equipment, glassware, ice, uses, allergenExclude, source_, scope, cursor, limit);
+    final response = api.listRecipes(family, category, tag, flavorProfile, equipment, glassware, ice, uses, allergenExclude, makeable, source_, scope, cursor, limit);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling CatalogApi->listRecipes: $e\n');
@@ -271,6 +272,7 @@ Name | Type | Description  | Notes
  **ice** | **String**|  | [optional] 
  **uses** | **String**| Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050) — a class-level ingredient ID matches recipes using it or any descendant. | [optional] 
  **allergenExclude** | **String**| Comma-separated allergen keys to exclude. | [optional] 
+ **makeable** | **String**| Makeable-from-inventory facet (T148, FR-050) — bearer-only (401 if not authenticated). Includes both fully-makeable recipes and near-misses (one-away, naming the missing/substitutable line); the base recipe set for this facet spans public recipes AND the caller's own personal/bar recipes (a caller's own authored recipe can be makeable/near-miss too), composing with `scope` when both are given. Each returned recipe carries a `makeability` object with per-line detail. | [optional] 
  **source_** | **String**|  | [optional] 
  **scope** | **String**| T058, FR-050 \"my library\" facet: the caller's own recipes in that library, regardless of visibility. Requires an authenticated caller (401 otherwise). | [optional] 
  **cursor** | **String**| Opaque pagination cursor from a previous page's `nextCursor`. | [optional] 

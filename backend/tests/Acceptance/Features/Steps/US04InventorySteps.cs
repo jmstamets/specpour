@@ -43,6 +43,8 @@ public sealed class US04InventorySteps
     private Guid _secondIngredientId;
     private Guid _inventoryItemId;
     private Guid _recipeId;
+    private Guid _makeableRecipeId;
+    private Guid _nearMissRecipeId;
 
     // Scenario 6 needs two independent signed-in identities live at once.
     private HttpClient? _secondUserSessionClient;
@@ -366,6 +368,55 @@ public sealed class US04InventorySteps
         Assert.Equal(200, (int)_lastResponse.StatusCode);
         var items = _lastJson!.RootElement.GetProperty("items").EnumerateArray();
         Assert.DoesNotContain(items, item => item.GetProperty("entityType").GetString() == "inventory");
+    }
+
+    [Given(@"the user has both a makeable and a near-miss private recipe")]
+    public async Task GivenTheUserHasBothAMakeableAndANearMissPrivateRecipe()
+    {
+        await CreateRecipeWithIngredientLinesAsync(new[] { _londonDryGinId });
+        Assert.Equal(201, (int)_lastResponse.StatusCode);
+        _makeableRecipeId = _lastJson!.RootElement.GetProperty("id").GetGuid();
+
+        await CreateRecipeWithIngredientLinesAsync(new[] { _londonDryGinId, _secondIngredientId });
+        Assert.Equal(201, (int)_lastResponse.StatusCode);
+        _nearMissRecipeId = _lastJson!.RootElement.GetProperty("id").GetGuid();
+    }
+
+    [When(@"the user browses recipes filtered by makeable")]
+    public async Task WhenTheUserBrowsesRecipesFilteredByMakeable()
+    {
+        _lastResponse = await _sessionClient!.GetAsync(new Uri("/api/v1/recipes?makeable=true", UriKind.Relative));
+        await CaptureJsonAsync();
+    }
+
+    [When(@"an anonymous guest browses recipes filtered by makeable")]
+    public async Task WhenAnAnonymousGuestBrowsesRecipesFilteredByMakeable()
+    {
+        using var anonymousClient = AcceptanceHooks.Factory.CreateClient();
+        _lastResponse = await anonymousClient.GetAsync(new Uri("/api/v1/recipes?makeable=true", UriKind.Relative));
+    }
+
+    [Then(@"the makeable-satisfied recipe appears with match quality ""(.*)""")]
+    public void ThenTheMakeableSatisfiedRecipeAppearsWithMatchQuality(string matchQuality)
+    {
+        Assert.Equal(200, (int)_lastResponse.StatusCode);
+        var items = _lastJson!.RootElement.GetProperty("items").EnumerateArray();
+        var item = Assert.Single(items, i => i.GetProperty("id").GetGuid() == _makeableRecipeId);
+        var makeability = item.GetProperty("makeability");
+        Assert.False(makeability.GetProperty("isNearMiss").GetBoolean());
+        Assert.Equal(matchQuality, makeability.GetProperty("matchQuality").GetString());
+    }
+
+    [Then(@"the near-miss recipe appears marked as a near miss naming the missing requirement")]
+    public void ThenTheNearMissRecipeAppearsMarkedAsANearMissNamingTheMissingRequirement()
+    {
+        var items = _lastJson!.RootElement.GetProperty("items").EnumerateArray();
+        var item = Assert.Single(items, i => i.GetProperty("id").GetGuid() == _nearMissRecipeId);
+        var makeability = item.GetProperty("makeability");
+        Assert.True(makeability.GetProperty("isNearMiss").GetBoolean());
+        var lines = makeability.GetProperty("lines").EnumerateArray();
+        var missingLine = Assert.Single(lines, l => l.GetProperty("requirementIngredientId").GetGuid() == _secondIngredientId);
+        Assert.Equal("missing", missingLine.GetProperty("matchQuality").GetString());
     }
 
     private async Task CreateRecipeWithIngredientLinesAsync(IReadOnlyList<Guid> ingredientIds)

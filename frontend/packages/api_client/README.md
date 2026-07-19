@@ -198,6 +198,8 @@ Class | Method | HTTP request | Description
  - [RecipeDetail](doc/RecipeDetail.md)
  - [RecipeIngredientLine](doc/RecipeIngredientLine.md)
  - [RecipeIngredientLineInput](doc/RecipeIngredientLineInput.md)
+ - [RecipeMakeabilityLine](doc/RecipeMakeabilityLine.md)
+ - [RecipeMakeabilitySummary](doc/RecipeMakeabilitySummary.md)
  - [RecipePage](doc/RecipePage.md)
  - [RecipeSummary](doc/RecipeSummary.md)
  - [RecognitionResponse](doc/RecognitionResponse.md)

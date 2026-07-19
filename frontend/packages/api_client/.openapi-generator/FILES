@@ -74,6 +74,8 @@ doc/RecipeAuthor.md
 doc/RecipeDetail.md
 doc/RecipeIngredientLine.md
 doc/RecipeIngredientLineInput.md
+doc/RecipeMakeabilityLine.md
+doc/RecipeMakeabilitySummary.md
 doc/RecipePage.md
 doc/RecipeSummary.md
 doc/RecognitionResponse.md
@@ -184,6 +186,8 @@ lib/src/model/recipe_author.dart
 lib/src/model/recipe_detail.dart
 lib/src/model/recipe_ingredient_line.dart
 lib/src/model/recipe_ingredient_line_input.dart
+lib/src/model/recipe_makeability_line.dart
+lib/src/model/recipe_makeability_summary.dart
 lib/src/model/recipe_page.dart
 lib/src/model/recipe_summary.dart
 lib/src/model/recognition_response.dart
@@ -282,6 +286,8 @@ test/recipe_author_test.dart
 test/recipe_detail_test.dart
 test/recipe_ingredient_line_input_test.dart
 test/recipe_ingredient_line_test.dart
+test/recipe_makeability_line_test.dart
+test/recipe_makeability_summary_test.dart
 test/recipe_page_test.dart
 test/recipe_summary_test.dart
 test/recognition_response_test.dart

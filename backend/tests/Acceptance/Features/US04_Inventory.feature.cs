@@ -127,7 +127,7 @@ namespace SpecPour.Tests.Acceptance.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US04_Inventory.feature.ndjson", 10);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/US04_Inventory.feature.ndjson", 12);
         }
         
         async global::System.Threading.Tasks.Task global::Xunit.IAsyncLifetime.InitializeAsync()
@@ -527,6 +527,88 @@ namespace SpecPour.Tests.Acceptance.Features
 #line hidden
 #line 95
     await testRunner.ThenAsync("the search results do not include an inventory entity type", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="9 - The makeable-from-inventory facet on GET /recipes surfaces fully-makeable and" +
+            " near-miss recipes with per-line detail (T148, FR-050)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Track Inventory and Ask \"What Can I Make?\"")]
+        [global::Xunit.TraitAttribute("Description", "9 - The makeable-from-inventory facet on GET /recipes surfaces fully-makeable and" +
+            " near-miss recipes with per-line detail (T148, FR-050)")]
+        public async global::System.Threading.Tasks.Task _9_TheMakeable_From_InventoryFacetOnGETRecipesSurfacesFully_MakeableAndNear_MissRecipesWithPer_LineDetailT148FR_050()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "8";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("9 - The makeable-from-inventory facet on GET /recipes surfaces fully-makeable and" +
+                    " near-miss recipes with per-line detail (T148, FR-050)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 97
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 98
+    await testRunner.GivenAsync("an inventory-tracking signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 99
+    await testRunner.AndAsync("a curated ingredient hierarchy of \"Beefeater\" (product) under \"London Dry Gin\" (c" +
+                        "lass)", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 100
+    await testRunner.AndAsync("the user has \"Beefeater\" in inventory", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 101
+    await testRunner.AndAsync("the user has both a makeable and a near-miss private recipe", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 102
+    await testRunner.WhenAsync("the user browses recipes filtered by makeable", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 103
+    await testRunner.ThenAsync("the makeable-satisfied recipe appears with match quality \"class-satisfied\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 104
+    await testRunner.AndAsync("the near-miss recipe appears marked as a near miss naming the missing requirement" +
+                        "", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="10 - The makeable-from-inventory facet requires authentication (T148)")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Track Inventory and Ask \"What Can I Make?\"")]
+        [global::Xunit.TraitAttribute("Description", "10 - The makeable-from-inventory facet requires authentication (T148)")]
+        public async global::System.Threading.Tasks.Task _10_TheMakeable_From_InventoryFacetRequiresAuthenticationT148()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "9";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("10 - The makeable-from-inventory facet requires authentication (T148)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 106
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 107
+    await testRunner.WhenAsync("an anonymous guest browses recipes filtered by makeable", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 108
+    await testRunner.ThenAsync("the request is rejected as unauthenticated", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

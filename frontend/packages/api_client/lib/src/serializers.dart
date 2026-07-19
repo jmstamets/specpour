@@ -77,6 +77,8 @@ import 'package:api_client/src/model/recipe_author.dart';
 import 'package:api_client/src/model/recipe_detail.dart';
 import 'package:api_client/src/model/recipe_ingredient_line.dart';
 import 'package:api_client/src/model/recipe_ingredient_line_input.dart';
+import 'package:api_client/src/model/recipe_makeability_line.dart';
+import 'package:api_client/src/model/recipe_makeability_summary.dart';
 import 'package:api_client/src/model/recipe_page.dart';
 import 'package:api_client/src/model/recipe_summary.dart';
 import 'package:api_client/src/model/recognition_response.dart';
@@ -168,6 +170,8 @@ part 'serializers.g.dart';
   RecipeDetail,
   RecipeIngredientLine,
   RecipeIngredientLineInput,
+  RecipeMakeabilityLine,
+  RecipeMakeabilitySummary,
   RecipePage,
   RecipeSummary,
   RecognitionResponse,

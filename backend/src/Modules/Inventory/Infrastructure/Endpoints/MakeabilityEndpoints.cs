@@ -3,14 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 using SpecPour.BuildingBlocks.Http;
-using SpecPour.BuildingBlocks.Library;
-using SpecPour.Modules.Catalog.Contracts;
 using SpecPour.Modules.Ingredients.Contracts;
-using SpecPour.Modules.Inventory.Application.Makeability;
+using SpecPour.Modules.Inventory.Contracts;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace SpecPour.Modules.Inventory.Infrastructure.Endpoints;
@@ -18,10 +15,11 @@ namespace SpecPour.Modules.Inventory.Infrastructure.Endpoints;
 /// <summary>
 /// GET /api/v1/inventory/makeable (T067, FR-031). Bearer-only, checked against the
 /// caller's personal inventory only (a venue-inventory variant is not built — no
-/// acceptance scenario or task text calls for it yet). See
-/// <see cref="MakeabilityCalculator"/> for the actual hierarchy/substitution
-/// resolution; this endpoint's own job is fetching the domain data it needs and
-/// resolving ingredient names for the response (name-resolution sweep convention).
+/// acceptance scenario or task text calls for it yet). Delegates the actual
+/// hierarchy/substitution resolution to <see cref="IMakeabilityPort"/> (T148
+/// extraction — the same computation the `/recipes`/`/search` makeable facet now
+/// also consumes); this endpoint's own job is name resolution for the response
+/// (name-resolution sweep convention).
 /// </summary>
 public static class MakeabilityEndpoints
 {
@@ -38,23 +36,12 @@ public static class MakeabilityEndpoints
 
     private static async Task<MakeableResponse> GetAsync(
         ClaimsPrincipal user,
-        InventoryDbContext db,
-        IRecipeLookupPort recipeLookup,
+        IMakeabilityPort makeabilityPort,
         IIngredientLookupPort ingredientLookup,
-        MakeabilityCalculator calculator,
         CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(user.GetClaim(Claims.Subject)!);
-
-        var inventoryItems = await db.InventoryItems
-            .Where(i => i.OwnerType == OwnerType.User && i.OwnerId == userId)
-            .Select(i => new { i.Id, i.IngredientId })
-            .ToListAsync(cancellationToken);
-        var inventoryPairs = inventoryItems.Select(i => (i.Id, i.IngredientId)).ToList();
-
-        var recipes = await recipeLookup.GetRecipesForMakeabilityAsync(userId, cancellationToken);
-
-        var result = await calculator.ComputeAsync(inventoryPairs, recipes, cancellationToken);
+        var result = await makeabilityPort.ComputeAsync(userId, cancellationToken);
 
         var involvedIngredientIds = result.Makeable.SelectMany(r => r.Lines)
             .Concat(result.NearMiss.SelectMany(r => r.Lines))
@@ -70,13 +57,13 @@ public static class MakeabilityEndpoints
             [.. result.NearMiss.Select(r => ToResponse(r, names))]);
     }
 
-    private static MakeableRecipeResponse ToResponse(MakeableRecipe recipe, IReadOnlyDictionary<Guid, IngredientSummary> names) =>
+    private static MakeableRecipeResponse ToResponse(MakeableRecipeInfo recipe, IReadOnlyDictionary<Guid, IngredientSummary> names) =>
         new(recipe.RecipeId, recipe.RecipeName, recipe.MatchQuality, [.. recipe.Lines.Select(l => ToResponse(l, names))]);
 
-    private static NearMissRecipeResponse ToResponse(NearMissRecipe recipe, IReadOnlyDictionary<Guid, IngredientSummary> names) =>
+    private static NearMissRecipeResponse ToResponse(NearMissRecipeInfo recipe, IReadOnlyDictionary<Guid, IngredientSummary> names) =>
         new(recipe.RecipeId, recipe.RecipeName, [.. recipe.Lines.Select(l => ToResponse(l, names))]);
 
-    private static LineResponse ToResponse(RecipeLineMatch line, IReadOnlyDictionary<Guid, IngredientSummary> names)
+    private static LineResponse ToResponse(MakeabilityLineInfo line, IReadOnlyDictionary<Guid, IngredientSummary> names)
     {
         var requirement = new RequirementResponse(
             line.RequirementIngredientId,

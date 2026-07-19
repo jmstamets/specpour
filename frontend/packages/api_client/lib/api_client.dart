@@ -85,6 +85,8 @@ export 'package:api_client/src/model/recipe_author.dart';
 export 'package:api_client/src/model/recipe_detail.dart';
 export 'package:api_client/src/model/recipe_ingredient_line.dart';
 export 'package:api_client/src/model/recipe_ingredient_line_input.dart';
+export 'package:api_client/src/model/recipe_makeability_line.dart';
+export 'package:api_client/src/model/recipe_makeability_summary.dart';
 export 'package:api_client/src/model/recipe_page.dart';
 export 'package:api_client/src/model/recipe_summary.dart';
 export 'package:api_client/src/model/recognition_response.dart';

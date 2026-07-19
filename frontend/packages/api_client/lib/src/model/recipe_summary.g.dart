@@ -13,12 +13,17 @@ class _$RecipeSummary extends RecipeSummary {
   final String primaryName;
   @override
   final String? familyKey;
+  @override
+  final RecipeMakeabilitySummary? makeability;
 
   factory _$RecipeSummary([void Function(RecipeSummaryBuilder)? updates]) =>
       (RecipeSummaryBuilder()..update(updates))._build();
 
   _$RecipeSummary._(
-      {required this.id, required this.primaryName, this.familyKey})
+      {required this.id,
+      required this.primaryName,
+      this.familyKey,
+      this.makeability})
       : super._();
   @override
   RecipeSummary rebuild(void Function(RecipeSummaryBuilder) updates) =>
@@ -33,7 +38,8 @@ class _$RecipeSummary extends RecipeSummary {
     return other is RecipeSummary &&
         id == other.id &&
         primaryName == other.primaryName &&
-        familyKey == other.familyKey;
+        familyKey == other.familyKey &&
+        makeability == other.makeability;
   }
 
   @override
@@ -42,6 +48,7 @@ class _$RecipeSummary extends RecipeSummary {
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, primaryName.hashCode);
     _$hash = $jc(_$hash, familyKey.hashCode);
+    _$hash = $jc(_$hash, makeability.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -51,7 +58,8 @@ class _$RecipeSummary extends RecipeSummary {
     return (newBuiltValueToStringHelper(r'RecipeSummary')
           ..add('id', id)
           ..add('primaryName', primaryName)
-          ..add('familyKey', familyKey))
+          ..add('familyKey', familyKey)
+          ..add('makeability', makeability))
         .toString();
   }
 }
@@ -72,6 +80,12 @@ class RecipeSummaryBuilder
   String? get familyKey => _$this._familyKey;
   set familyKey(String? familyKey) => _$this._familyKey = familyKey;
 
+  RecipeMakeabilitySummaryBuilder? _makeability;
+  RecipeMakeabilitySummaryBuilder get makeability =>
+      _$this._makeability ??= RecipeMakeabilitySummaryBuilder();
+  set makeability(RecipeMakeabilitySummaryBuilder? makeability) =>
+      _$this._makeability = makeability;
+
   RecipeSummaryBuilder() {
     RecipeSummary._defaults(this);
   }
@@ -82,6 +96,7 @@ class RecipeSummaryBuilder
       _id = $v.id;
       _primaryName = $v.primaryName;
       _familyKey = $v.familyKey;
+      _makeability = $v.makeability?.toBuilder();
       _$v = null;
     }
     return this;
@@ -101,13 +116,28 @@ class RecipeSummaryBuilder
   RecipeSummary build() => _build();
 
   _$RecipeSummary _build() {
-    final _$result = _$v ??
-        _$RecipeSummary._(
-          id: BuiltValueNullFieldError.checkNotNull(id, r'RecipeSummary', 'id'),
-          primaryName: BuiltValueNullFieldError.checkNotNull(
-              primaryName, r'RecipeSummary', 'primaryName'),
-          familyKey: familyKey,
-        );
+    _$RecipeSummary _$result;
+    try {
+      _$result = _$v ??
+          _$RecipeSummary._(
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'RecipeSummary', 'id'),
+            primaryName: BuiltValueNullFieldError.checkNotNull(
+                primaryName, r'RecipeSummary', 'primaryName'),
+            familyKey: familyKey,
+            makeability: _makeability?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'makeability';
+        _makeability?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'RecipeSummary', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

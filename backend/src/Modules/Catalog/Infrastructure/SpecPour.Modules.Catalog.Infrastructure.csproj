@@ -17,6 +17,8 @@
     <!-- T058: verifying bar-library recipe authoring is scoped to a venue the
          caller actually owns. -->
     <ProjectReference Include="..\..\Venues\Contracts\SpecPour.Modules.Venues.Contracts.csproj" />
+    <!-- T148: the makeable-from-inventory facet on GET /recipes needs Inventory's makeability port. -->
+    <ProjectReference Include="..\..\Inventory\Contracts\SpecPour.Modules.Inventory.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

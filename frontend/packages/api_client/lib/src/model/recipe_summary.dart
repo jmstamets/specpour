@@ -3,6 +3,7 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:api_client/src/model/recipe_makeability_summary.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -14,6 +15,7 @@ part 'recipe_summary.g.dart';
 /// * [id] 
 /// * [primaryName] 
 /// * [familyKey] 
+/// * [makeability] - Present only when `?makeable=true` was applied.
 @BuiltValue()
 abstract class RecipeSummary implements Built<RecipeSummary, RecipeSummaryBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -24,6 +26,10 @@ abstract class RecipeSummary implements Built<RecipeSummary, RecipeSummaryBuilde
 
   @BuiltValueField(wireName: r'familyKey')
   String? get familyKey;
+
+  /// Present only when `?makeable=true` was applied.
+  @BuiltValueField(wireName: r'makeability')
+  RecipeMakeabilitySummary? get makeability;
 
   RecipeSummary._();
 
@@ -63,6 +69,13 @@ class _$RecipeSummarySerializer implements PrimitiveSerializer<RecipeSummary> {
       yield serializers.serialize(
         object.familyKey,
         specifiedType: const FullType.nullable(String),
+      );
+    }
+    if (object.makeability != null) {
+      yield r'makeability';
+      yield serializers.serialize(
+        object.makeability,
+        specifiedType: const FullType.nullable(RecipeMakeabilitySummary),
       );
     }
   }
@@ -109,6 +122,14 @@ class _$RecipeSummarySerializer implements PrimitiveSerializer<RecipeSummary> {
           ) as String?;
           if (valueDes == null) continue;
           result.familyKey = valueDes;
+          break;
+        case r'makeability':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(RecipeMakeabilitySummary),
+          ) as RecipeMakeabilitySummary?;
+          if (valueDes == null) continue;
+          result.makeability.replace(valueDes);
           break;
         default:
           unhandled.add(key);

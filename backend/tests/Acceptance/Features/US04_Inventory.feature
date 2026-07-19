@@ -93,3 +93,16 @@ Feature: Track Inventory and Ask "What Can I Make?"
     And the user has "Beefeater" in inventory
     When the user searches for "Beefeater"
     Then the search results do not include an inventory entity type
+
+  Scenario: 9 - The makeable-from-inventory facet on GET /recipes surfaces fully-makeable and near-miss recipes with per-line detail (T148, FR-050)
+    Given an inventory-tracking signed-in user
+    And a curated ingredient hierarchy of "Beefeater" (product) under "London Dry Gin" (class)
+    And the user has "Beefeater" in inventory
+    And the user has both a makeable and a near-miss private recipe
+    When the user browses recipes filtered by makeable
+    Then the makeable-satisfied recipe appears with match quality "class-satisfied"
+    And the near-miss recipe appears marked as a near miss naming the missing requirement
+
+  Scenario: 10 - The makeable-from-inventory facet requires authentication (T148)
+    When an anonymous guest browses recipes filtered by makeable
+    Then the request is rejected as unauthenticated

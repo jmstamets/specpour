@@ -90,6 +90,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RecipeIngredientLineInput.serializer)
       ..add(RecipeIngredientLineInputScalingRuleEnum.serializer)
       ..add(RecipeIngredientLineScalingRuleEnum.serializer)
+      ..add(RecipeMakeabilityLine.serializer)
+      ..add(RecipeMakeabilitySummary.serializer)
       ..add(RecipePage.serializer)
       ..add(RecipeSummary.serializer)
       ..add(RecognitionResponse.serializer)
@@ -173,6 +175,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(NearMissRecipe)]),
           () => ListBuilder<NearMissRecipe>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(RecipeMakeabilityLine)]),
+          () => ListBuilder<RecipeMakeabilityLine>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(RecipeSummary)]),
           () => ListBuilder<RecipeSummary>())

@@ -4,10 +4,13 @@ search:
     tags: [search]
     summary: Full-text search across recipes, ingredients, equipment, glossary terms, and articles (FR-049)
     description: >-
-      Guest-accessible (FR-004b). Search itself owns no schema and has no opinion
-      on content facets (T141 ADR) — this endpoint returns entity references only
-      (`entityType`/`entityId`); fetch the full record from that entity's own
-      GET-by-id endpoint. Content-facet filtering composition lands in T148/T149.
+      Guest-accessible (FR-004b) unless `makeable=true` is used. Search itself owns
+      no schema and has no opinion on content facets (T141 ADR) — this endpoint
+      returns entity references only (`entityType`/`entityId`); fetch the full
+      record from that entity's own GET-by-id endpoint. Rating-facet composition
+      lands in T149. `q` returning nothing is a pre-existing adapter limitation, not
+      a facet bug — this endpoint requires non-empty text; browsing (no `q`) is
+      `GET /recipes`'s job, not this one's.
     security:
       - {}
       - bearerAuth: []
@@ -22,8 +25,20 @@ search:
         description: >-
           Hierarchy-aware "uses:<ingredient>" facet (T155/FR-050), narrowing
           results to recipes referencing the ingredient (or any descendant).
-          Applied after ranking/pagination — a page can return fewer than `limit`
-          items when this facet removes matches.
+          Applied INSIDE the search adapter's own query, before pagination (T148 —
+          previously a post-filter that could shrink a page below `limit`).
+      - name: makeable
+        in: query
+        schema: { type: string, enum: ["true"] }
+        description: >-
+          Makeable-from-inventory facet (T148, FR-050) — bearer-only (401 if not
+          authenticated). Narrows recipe-type results to the caller's own
+          fully-makeable and near-miss recipes, applied the same way as `uses`
+          (inside the adapter's query, before pagination). Combining `uses` and
+          `makeable` intersects (both must match). Only public recipes are ever
+          reachable via this endpoint (unlike `GET /recipes`'s `scope`/`makeable`,
+          which also surfaces the caller's own private recipes) — Search's index
+          only ever carries public content.
       - $ref: '../openapi.yaml#/components/parameters/CursorParam'
       - $ref: '../openapi.yaml#/components/parameters/LimitParam'
     responses:
@@ -33,6 +48,8 @@ search:
           application/json:
             schema:
               $ref: '#/components/schemas/SearchResultPage'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
 
 components:
   schemas:

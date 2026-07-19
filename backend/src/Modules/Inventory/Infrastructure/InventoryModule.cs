@@ -6,6 +6,7 @@ using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Inventory.Application.Makeability;
 using SpecPour.Modules.Inventory.Application.Recognition;
+using SpecPour.Modules.Inventory.Contracts;
 using SpecPour.Modules.Inventory.Infrastructure.Recognition;
 
 namespace SpecPour.Modules.Inventory.Infrastructure;
@@ -33,6 +34,7 @@ public sealed class InventoryModule : IModule
         });
         services.AddSpecPourOutboxWriter(Name);
         services.AddScoped<MakeabilityCalculator>();
+        services.AddScoped<IMakeabilityPort, MakeabilityAdapter>();
         services.AddScoped<ILabelRecognitionPort, LabelRecognitionAdapter>();
     }
 
