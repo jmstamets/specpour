@@ -94,6 +94,23 @@ constitution is at `.specify/memory/constitution.md` (v1.6.0).
   sensitivity; the escape valve for a *justified* drop is a documented,
   reviewed baseline update in its own commit — deliberate and visible — never
   a standing fuzz band that lets regressions accumulate silently.
+- **Nondeterministic-coverage flake, pre-armed (recorded 2026-07-19, T200).**
+  The T198 incident's root cause — a single line whose coverage depends on
+  wall-clock timing — is a latent flake that can recur between any two CI
+  runs, not just local-vs-CI. **A ratchet failure within ~1 line of baseline
+  (a fraction-of-a-percent swing on a denominator in the thousands) is
+  investigated as suspected nondeterministic coverage FIRST**, before
+  assuming a real regression or reflexively re-baselining: compare the
+  failing run's artifact against the last-passing run's (same production
+  code, if any) — a same-denominator few-line delta is the signature. If
+  confirmed, the fix is making the line deterministically covered (a test
+  that reliably exercises it) or explicitly excluding it (with a comment
+  explaining why) — never an epsilon on the ratchet, still rejected per the
+  bullet above. Two candidate mechanisms (unconfirmed as of T200, see
+  `scripts/check-coverage-ratchet.sh`'s own header for detail):
+  `OutboxDispatcherBackgroundService` and `AccountLifecycleBackgroundService`
+  — both poll on a wall-clock timer and race their own branch coverage
+  against test-host shutdown.
 - **Escape-hatch disclosure in the commit message itself (recorded
   2026-07-19).** Any use of a gate-bypass or escape hatch — `SKIP_LOCAL_CI_GATE=1`
   is the current example, but this applies to any future one — must be
