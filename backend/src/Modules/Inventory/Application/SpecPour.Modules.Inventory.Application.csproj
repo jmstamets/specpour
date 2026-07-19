@@ -11,6 +11,8 @@
          (a domain-data-in, no-DbContext Application service). -->
     <ProjectReference Include="..\..\Ingredients\Contracts\SpecPour.Modules.Ingredients.Contracts.csproj" />
     <ProjectReference Include="..\..\Catalog\Contracts\SpecPour.Modules.Catalog.Contracts.csproj" />
+    <!-- T069: ILabelRecognitionPort wraps Ai's prompt registry + vision provider ports. -->
+    <ProjectReference Include="..\..\Ai\Contracts\SpecPour.Modules.Ai.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

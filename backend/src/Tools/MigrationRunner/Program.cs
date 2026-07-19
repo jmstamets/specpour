@@ -13,6 +13,7 @@ using SpecPour.Modules.Measurements.Infrastructure;
 using SpecPour.Modules.Notifications.Infrastructure;
 using SpecPour.Modules.Venues.Infrastructure;
 using SpecPour.Modules.Inventory.Infrastructure;
+using SpecPour.Modules.Ai.Infrastructure;
 using SpecPour.Tools.MigrationRunner.Persistence;
 
 // Deploy-time migration job (constitution Principle III / research R3: forward-only,
@@ -61,6 +62,7 @@ IModuleMigrator[] moduleMigrators =
     new GlossaryModuleMigrator(), // T035
     new VenuesModuleMigrator(), // T061
     new InventoryModuleMigrator(), // T066
+    new AiModuleMigrator(), // T068
     // ...
 ];
 

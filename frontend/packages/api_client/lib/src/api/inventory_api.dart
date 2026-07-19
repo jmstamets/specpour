@@ -14,6 +14,8 @@ import 'package:api_client/src/model/inventory_item.dart';
 import 'package:api_client/src/model/inventory_item_page.dart';
 import 'package:api_client/src/model/makeable_response.dart';
 import 'package:api_client/src/model/problem_details.dart';
+import 'package:api_client/src/model/recognition_response.dart';
+import 'package:api_client/src/model/recognize_request.dart';
 import 'package:api_client/src/model/update_inventory_item_request.dart';
 
 class InventoryApi {
@@ -419,6 +421,107 @@ class InventoryApi {
     }
 
     return Response<InventoryItemPage>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// Attempt to identify a bottle from a label photo; degrades to a pre-filled manual entry form rather than failing when recognition is unavailable or inconclusive (T069, FR-030)
+  /// 
+  ///
+  /// Parameters:
+  /// * [recognizeRequest] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [RecognitionResponse] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<RecognitionResponse>> recognizeBottle({ 
+    required RecognizeRequest recognizeRequest,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/inventory/recognize';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(RecognizeRequest);
+      _bodyData = _serializers.serialize(recognizeRequest, specifiedType: _type);
+
+    } catch(error, stackTrace) {
+      throw DioException(
+         requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    RecognitionResponse? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(RecognitionResponse),
+      ) as RecognitionResponse;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<RecognitionResponse>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

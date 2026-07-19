@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**getInventoryItem**](InventoryApi.md#getinventoryitem) | **GET** /inventory/items/{id} | Get one of the caller&#39;s own inventory items by id (T066, FR-029)
 [**getMakeableRecipes**](InventoryApi.md#getmakeablerecipes) | **GET** /inventory/makeable | \&quot;What can I make?\&quot; against the caller&#39;s personal inventory, with near-misses and substitutions (T067, FR-031)
 [**listInventoryItems**](InventoryApi.md#listinventoryitems) | **GET** /inventory/items | List the caller&#39;s own inventory, or a venue&#39;s inventory the caller owns (T066, FR-029)
+[**recognizeBottle**](InventoryApi.md#recognizebottle) | **POST** /inventory/recognize | Attempt to identify a bottle from a label photo; degrades to a pre-filled manual entry form rather than failing when recognition is unavailable or inconclusive (T069, FR-030)
 [**updateInventoryItem**](InventoryApi.md#updateinventoryitem) | **PUT** /inventory/items/{id} | Update the quantity/bottle size of one of the caller&#39;s own inventory items (T066, FR-029)
 
 
@@ -217,6 +218,47 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **recognizeBottle**
+> RecognitionResponse recognizeBottle(recognizeRequest)
+
+Attempt to identify a bottle from a label photo; degrades to a pre-filled manual entry form rather than failing when recognition is unavailable or inconclusive (T069, FR-030)
+
+### Example
+```dart
+import 'package:api_client/api.dart';
+
+final api = ApiClient().getInventoryApi();
+final RecognizeRequest recognizeRequest = ; // RecognizeRequest | 
+
+try {
+    final response = api.recognizeBottle(recognizeRequest);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling InventoryApi->recognizeBottle: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **recognizeRequest** | [**RecognizeRequest**](RecognizeRequest.md)|  | 
+
+### Return type
+
+[**RecognitionResponse**](RecognitionResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json, application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

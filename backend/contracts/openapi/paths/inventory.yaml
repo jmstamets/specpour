@@ -120,6 +120,35 @@ inventoryItemById:
       '404':
         $ref: '../openapi.yaml#/components/responses/ProblemResponse'
 
+inventoryRecognize:
+  post:
+    operationId: recognizeBottle
+    tags: [inventory]
+    summary: >-
+      Attempt to identify a bottle from a label photo; degrades to a pre-filled
+      manual entry form rather than failing when recognition is unavailable or
+      inconclusive (T069, FR-030)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecognizeRequest'
+    responses:
+      '200':
+        description: >-
+          Always 200 — recognition failure/unavailability is a normal, expected
+          outcome (recognized:false with a pre-filled manual entry form), never an
+          error response.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecognitionResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
 inventoryMakeable:
   get:
     operationId: getMakeableRecipes
@@ -251,3 +280,20 @@ components:
           type: array
           items: { $ref: '#/components/schemas/NearMissRecipe' }
       required: [makeable, nearMiss]
+    RecognizeRequest:
+      type: object
+      properties:
+        photoUrl: { type: [string, "null"] }
+    ManualEntryForm:
+      type: object
+      description: Pre-filled with the recognized candidate when recognized is true; both fields null otherwise.
+      properties:
+        prefilledIngredientId: { type: [string, "null"], format: uuid }
+        prefilledIngredientName: { type: [string, "null"] }
+    RecognitionResponse:
+      type: object
+      properties:
+        recognized: { type: boolean }
+        candidateIngredientId: { type: [string, "null"], format: uuid }
+        manualEntryForm: { $ref: '#/components/schemas/ManualEntryForm' }
+      required: [recognized, manualEntryForm]

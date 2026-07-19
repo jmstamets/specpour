@@ -42,6 +42,13 @@ void main() {
       // TODO
     });
 
+    // Attempt to identify a bottle from a label photo; degrades to a pre-filled manual entry form rather than failing when recognition is unavailable or inconclusive (T069, FR-030)
+    //
+    //Future<RecognitionResponse> recognizeBottle(RecognizeRequest recognizeRequest) async
+    test('test recognizeBottle', () async {
+      // TODO
+    });
+
     // Update the quantity/bottle size of one of the caller's own inventory items (T066, FR-029)
     //
     //Future<InventoryItem> updateInventoryItem(String id, UpdateInventoryItemRequest updateInventoryItemRequest) async

@@ -119,6 +119,7 @@ Class | Method | HTTP request | Description
 [*InventoryApi*](doc/InventoryApi.md) | [**getInventoryItem**](doc/InventoryApi.md#getinventoryitem) | **GET** /inventory/items/{id} | Get one of the caller&#39;s own inventory items by id (T066, FR-029)
 [*InventoryApi*](doc/InventoryApi.md) | [**getMakeableRecipes**](doc/InventoryApi.md#getmakeablerecipes) | **GET** /inventory/makeable | \&quot;What can I make?\&quot; against the caller&#39;s personal inventory, with near-misses and substitutions (T067, FR-031)
 [*InventoryApi*](doc/InventoryApi.md) | [**listInventoryItems**](doc/InventoryApi.md#listinventoryitems) | **GET** /inventory/items | List the caller&#39;s own inventory, or a venue&#39;s inventory the caller owns (T066, FR-029)
+[*InventoryApi*](doc/InventoryApi.md) | [**recognizeBottle**](doc/InventoryApi.md#recognizebottle) | **POST** /inventory/recognize | Attempt to identify a bottle from a label photo; degrades to a pre-filled manual entry form rather than failing when recognition is unavailable or inconclusive (T069, FR-030)
 [*InventoryApi*](doc/InventoryApi.md) | [**updateInventoryItem**](doc/InventoryApi.md#updateinventoryitem) | **PUT** /inventory/items/{id} | Update the quantity/bottle size of one of the caller&#39;s own inventory items (T066, FR-029)
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getInbox**](doc/NotificationsApi.md#getinbox) | **GET** /inbox | Get the caller&#39;s inbox messages
 [*NotificationsApi*](doc/NotificationsApi.md) | [**getMyChannelPreferences**](doc/NotificationsApi.md#getmychannelpreferences) | **GET** /me/channels | Get the caller&#39;s notification channel opt-in preferences
@@ -186,6 +187,7 @@ Class | Method | HTTP request | Description
  - [MakeabilityLine](doc/MakeabilityLine.md)
  - [MakeableRecipe](doc/MakeableRecipe.md)
  - [MakeableResponse](doc/MakeableResponse.md)
+ - [ManualEntryForm](doc/ManualEntryForm.md)
  - [MatchQuality](doc/MatchQuality.md)
  - [MeExport](doc/MeExport.md)
  - [MfaEnrollment](doc/MfaEnrollment.md)
@@ -198,6 +200,8 @@ Class | Method | HTTP request | Description
  - [RecipeIngredientLineInput](doc/RecipeIngredientLineInput.md)
  - [RecipePage](doc/RecipePage.md)
  - [RecipeSummary](doc/RecipeSummary.md)
+ - [RecognitionResponse](doc/RecognitionResponse.md)
+ - [RecognizeRequest](doc/RecognizeRequest.md)
  - [RecoveryConfirmRequest](doc/RecoveryConfirmRequest.md)
  - [RecoveryRequest](doc/RecoveryRequest.md)
  - [RegisterRequest](doc/RegisterRequest.md)

@@ -66,6 +66,7 @@ import 'package:api_client/src/model/login_result.dart';
 import 'package:api_client/src/model/makeability_line.dart';
 import 'package:api_client/src/model/makeable_recipe.dart';
 import 'package:api_client/src/model/makeable_response.dart';
+import 'package:api_client/src/model/manual_entry_form.dart';
 import 'package:api_client/src/model/match_quality.dart';
 import 'package:api_client/src/model/me_export.dart';
 import 'package:api_client/src/model/mfa_enrollment.dart';
@@ -78,6 +79,8 @@ import 'package:api_client/src/model/recipe_ingredient_line.dart';
 import 'package:api_client/src/model/recipe_ingredient_line_input.dart';
 import 'package:api_client/src/model/recipe_page.dart';
 import 'package:api_client/src/model/recipe_summary.dart';
+import 'package:api_client/src/model/recognition_response.dart';
+import 'package:api_client/src/model/recognize_request.dart';
 import 'package:api_client/src/model/recovery_confirm_request.dart';
 import 'package:api_client/src/model/recovery_request.dart';
 import 'package:api_client/src/model/register_request.dart';
@@ -154,6 +157,7 @@ part 'serializers.g.dart';
   MakeabilityLine,
   MakeableRecipe,
   MakeableResponse,
+  ManualEntryForm,
   MatchQuality,
   MeExport,
   MfaEnrollment,
@@ -166,6 +170,8 @@ part 'serializers.g.dart';
   RecipeIngredientLineInput,
   RecipePage,
   RecipeSummary,
+  RecognitionResponse,
+  RecognizeRequest,
   RecoveryConfirmRequest,
   RecoveryRequest,
   RegisterRequest,

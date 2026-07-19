@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\SpecPour.Modules.Ai.Application.csproj" />
+    <ProjectReference Include="..\Contracts\SpecPour.Modules.Ai.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -9,5 +10,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>

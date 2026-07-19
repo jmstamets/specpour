@@ -62,6 +62,7 @@ doc/LoginResult.md
 doc/MakeabilityLine.md
 doc/MakeableRecipe.md
 doc/MakeableResponse.md
+doc/ManualEntryForm.md
 doc/MatchQuality.md
 doc/MeExport.md
 doc/MfaEnrollment.md
@@ -75,6 +76,8 @@ doc/RecipeIngredientLine.md
 doc/RecipeIngredientLineInput.md
 doc/RecipePage.md
 doc/RecipeSummary.md
+doc/RecognitionResponse.md
+doc/RecognizeRequest.md
 doc/RecoveryConfirmRequest.md
 doc/RecoveryRequest.md
 doc/RegisterRequest.md
@@ -170,6 +173,7 @@ lib/src/model/login_result.dart
 lib/src/model/makeability_line.dart
 lib/src/model/makeable_recipe.dart
 lib/src/model/makeable_response.dart
+lib/src/model/manual_entry_form.dart
 lib/src/model/match_quality.dart
 lib/src/model/me_export.dart
 lib/src/model/mfa_enrollment.dart
@@ -182,6 +186,8 @@ lib/src/model/recipe_ingredient_line.dart
 lib/src/model/recipe_ingredient_line_input.dart
 lib/src/model/recipe_page.dart
 lib/src/model/recipe_summary.dart
+lib/src/model/recognition_response.dart
+lib/src/model/recognize_request.dart
 lib/src/model/recovery_confirm_request.dart
 lib/src/model/recovery_request.dart
 lib/src/model/register_request.dart
@@ -264,6 +270,7 @@ test/login_result_test.dart
 test/makeability_line_test.dart
 test/makeable_recipe_test.dart
 test/makeable_response_test.dart
+test/manual_entry_form_test.dart
 test/match_quality_test.dart
 test/me_export_test.dart
 test/mfa_enrollment_test.dart
@@ -277,6 +284,8 @@ test/recipe_ingredient_line_input_test.dart
 test/recipe_ingredient_line_test.dart
 test/recipe_page_test.dart
 test/recipe_summary_test.dart
+test/recognition_response_test.dart
+test/recognize_request_test.dart
 test/recovery_confirm_request_test.dart
 test/recovery_request_test.dart
 test/register_request_test.dart

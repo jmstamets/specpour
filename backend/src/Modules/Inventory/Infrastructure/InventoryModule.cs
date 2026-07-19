@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using SpecPour.BuildingBlocks.Events.Outbox;
 using SpecPour.BuildingBlocks.Modules;
 using SpecPour.Modules.Inventory.Application.Makeability;
+using SpecPour.Modules.Inventory.Application.Recognition;
+using SpecPour.Modules.Inventory.Infrastructure.Recognition;
 
 namespace SpecPour.Modules.Inventory.Infrastructure;
 
@@ -31,11 +33,13 @@ public sealed class InventoryModule : IModule
         });
         services.AddSpecPourOutboxWriter(Name);
         services.AddScoped<MakeabilityCalculator>();
+        services.AddScoped<ILabelRecognitionPort, LabelRecognitionAdapter>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
         Endpoints.InventoryItemEndpoints.Map(endpoints);
         Endpoints.MakeabilityEndpoints.Map(endpoints);
+        Endpoints.RecognitionEndpoints.Map(endpoints);
     }
 }
