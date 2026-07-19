@@ -15,6 +15,15 @@ Feature: Track Inventory and Ask "What Can I Make?"
   needed the most help) — an extensible field from day one so T201's facet-partial
   value slots in later without a shape change.
 
+  Ratified (John, 2026-07-19): the recipe-level match quality is a DERIVED SUMMARY,
+  never independent truth — every recipe entry also carries its own per-line "lines"
+  array (requirement as stated, that line's own match quality, and the inventory item
+  or substitution satisfying it, null when missing). T067 computes lines first and
+  folds to the aggregate; every downstream consumer (near-miss surfacing, substitution
+  display naming the held item, shopping's cheapest-completion logic, T201's future
+  facet-partial grade) needs this line-level detail, so it belongs in the shape from
+  day one rather than as a later breaking change.
+
   Every read/write path below also carries its own both-directions privacy proof
   (owner/non-owner/guest) per Phase 6 entry guidance: inventory has no public/curator
   variant at all, ever, unlike recipes/ingredients/equipment/venues.
@@ -34,6 +43,7 @@ Feature: Track Inventory and Ask "What Can I Make?"
     And the user has a private recipe requiring "London Dry Gin" at the class level
     When the user asks what they can make
     Then the recipe is listed as makeable with match quality "class-satisfied"
+    And the recipe's requirement for "London Dry Gin" is satisfied by the held "Beefeater" item
 
   Scenario: 3 - A near-miss recipe names its missing ingredient with a substitution suggestion, and is not also listed as fully makeable (spec.md scenario 3)
     Given an inventory-tracking signed-in user
@@ -43,6 +53,7 @@ Feature: Track Inventory and Ask "What Can I Make?"
     When the user asks what they can make
     Then the recipe is listed as a near-miss naming the missing ingredient
     And the recipe does not also appear in the fully-makeable list
+    And the near-miss recipe's lines show the "London Dry Gin" requirement satisfied by the held "Beefeater" item and the second requirement missing
 
   Scenario: 4 - An inventory item displays its tracked quantity and bottle size (spec.md scenario 4)
     Given an inventory-tracking signed-in user

@@ -24,25 +24,29 @@ namespace SpecPour.Tests.Acceptance.Features
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features", "Track Inventory and Ask \"What Can I Make?\"", @"  As a signed-in user
-  I want to record what I own and see which recipes I can make, including near-misses
-  So that I know what's ready to pour tonight and what to shop for
-
-  T064 (Phase 6 entry, US4, spec.md scenarios 1-4). Failing first per constitution
-  Principle I (ATDD, NON-NEGOTIABLE): none of the inventory endpoints these scenarios
-  call (POST/GET/DELETE /inventory/items, POST /inventory/recognize,
-  GET /inventory/makeable) are mapped yet — T066/T067/T069 build them. Every scenario
-  below is expected RED until then.
-
-  Match-quality ladder (docs/specification-statement.md §2, 2026-07-19 revision):
-  exact-product > class-satisfied > substitution > missing. A recipe's own reported
-  match quality is the LOOSEST quality among its satisfied lines (the one match that
-  needed the most help) — an extensible field from day one so T201's facet-partial
-  value slots in later without a shape change.
-
-  Every read/write path below also carries its own both-directions privacy proof
-  (owner/non-owner/guest) per Phase 6 entry guidance: inventory has no public/curator
-  variant at all, ever, unlike recipes/ingredients/equipment/venues.", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features", "Track Inventory and Ask \"What Can I Make?\"", "  As a signed-in user\n  I want to record what I own and see which recipes I can m" +
+                "ake, including near-misses\n  So that I know what\'s ready to pour tonight and wha" +
+                "t to shop for\n\n  T064 (Phase 6 entry, US4, spec.md scenarios 1-4). Failing first" +
+                " per constitution\n  Principle I (ATDD, NON-NEGOTIABLE): none of the inventory en" +
+                "dpoints these scenarios\n  call (POST/GET/DELETE /inventory/items, POST /inventor" +
+                "y/recognize,\n  GET /inventory/makeable) are mapped yet — T066/T067/T069 build th" +
+                "em. Every scenario\n  below is expected RED until then.\n\n  Match-quality ladder (" +
+                "docs/specification-statement.md §2, 2026-07-19 revision):\n  exact-product > clas" +
+                "s-satisfied > substitution > missing. A recipe\'s own reported\n  match quality is" +
+                " the LOOSEST quality among its satisfied lines (the one match that\n  needed the " +
+                "most help) — an extensible field from day one so T201\'s facet-partial\n  value sl" +
+                "ots in later without a shape change.\n\n  Ratified (John, 2026-07-19): the recipe-" +
+                "level match quality is a DERIVED SUMMARY,\n  never independent truth — every reci" +
+                "pe entry also carries its own per-line \"lines\"\n  array (requirement as stated, t" +
+                "hat line\'s own match quality, and the inventory item\n  or substitution satisfyin" +
+                "g it, null when missing). T067 computes lines first and\n  folds to the aggregate" +
+                "; every downstream consumer (near-miss surfacing, substitution\n  display naming " +
+                "the held item, shopping\'s cheapest-completion logic, T201\'s future\n  facet-parti" +
+                "al grade) needs this line-level detail, so it belongs in the shape from\n  day on" +
+                "e rather than as a later breaking change.\n\n  Every read/write path below also ca" +
+                "rries its own both-directions privacy proof\n  (owner/non-owner/guest) per Phase " +
+                "6 entry guidance: inventory has no public/curator\n  variant at all, ever, unlike" +
+                " recipes/ingredients/equipment/venues.", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
         private global::Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
@@ -165,7 +169,7 @@ namespace SpecPour.Tests.Acceptance.Features
                     "e-filled manual form when it can\'t identify the bottle (spec.md scenario 1)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 22
+#line 31
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -175,23 +179,23 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 23
+#line 32
     await testRunner.GivenAsync("an inventory-tracking signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 24
+#line 33
     await testRunner.AndAsync("a curated ingredient hierarchy of \"Beefeater\" (product) under \"London Dry Gin\" (c" +
                         "lass)", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 25
+#line 34
     await testRunner.WhenAsync("the user adds \"Beefeater\" to inventory by manual entry", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 35
     await testRunner.ThenAsync("the item is saved in the user\'s inventory", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 27
+#line 36
     await testRunner.WhenAsync("the user submits an unrecognizable bottle photo for recognition", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 28
+#line 37
     await testRunner.ThenAsync("the recognition response degrades to a pre-filled manual entry form rather than f" +
                         "ailing", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
@@ -213,7 +217,7 @@ namespace SpecPour.Tests.Acceptance.Features
                     "2)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 30
+#line 39
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -223,24 +227,28 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 31
+#line 40
     await testRunner.GivenAsync("an inventory-tracking signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 32
+#line 41
     await testRunner.AndAsync("a curated ingredient hierarchy of \"Beefeater\" (product) under \"London Dry Gin\" (c" +
                         "lass)", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 33
+#line 42
     await testRunner.AndAsync("the user has \"Beefeater\" in inventory", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 34
+#line 43
     await testRunner.AndAsync("the user has a private recipe requiring \"London Dry Gin\" at the class level", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 35
+#line 44
     await testRunner.WhenAsync("the user asks what they can make", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 36
+#line 45
     await testRunner.ThenAsync("the recipe is listed as makeable with match quality \"class-satisfied\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 46
+    await testRunner.AndAsync("the recipe\'s requirement for \"London Dry Gin\" is satisfied by the held \"Beefeater" +
+                        "\" item", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -260,7 +268,7 @@ namespace SpecPour.Tests.Acceptance.Features
                     "n, and is not also listed as fully makeable (spec.md scenario 3)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 38
+#line 48
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -270,28 +278,32 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 39
+#line 49
     await testRunner.GivenAsync("an inventory-tracking signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 40
+#line 50
     await testRunner.AndAsync("a curated ingredient hierarchy of \"Beefeater\" (product) under \"London Dry Gin\" (c" +
                         "lass)", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 41
+#line 51
     await testRunner.AndAsync("the user has \"Beefeater\" in inventory", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 42
+#line 52
     await testRunner.AndAsync("the user has a private recipe requiring \"London Dry Gin\" and a second ingredient " +
                         "the user does not own", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 43
+#line 53
     await testRunner.WhenAsync("the user asks what they can make", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 44
+#line 54
     await testRunner.ThenAsync("the recipe is listed as a near-miss naming the missing ingredient", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 45
+#line 55
     await testRunner.AndAsync("the recipe does not also appear in the fully-makeable list", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 56
+    await testRunner.AndAsync("the near-miss recipe\'s lines show the \"London Dry Gin\" requirement satisfied by t" +
+                        "he held \"Beefeater\" item and the second requirement missing", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -311,7 +323,7 @@ namespace SpecPour.Tests.Acceptance.Features
                     "ario 4)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 47
+#line 58
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -321,20 +333,20 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 48
+#line 59
     await testRunner.GivenAsync("an inventory-tracking signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 49
+#line 60
     await testRunner.AndAsync("a curated ingredient hierarchy of \"Beefeater\" (product) under \"London Dry Gin\" (c" +
                         "lass)", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 50
+#line 61
     await testRunner.AndAsync("the user has \"Beefeater\" in inventory with quantity 750 and bottle size \"750ml\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 51
+#line 62
     await testRunner.WhenAsync("the user views their inventory", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 52
+#line 63
     await testRunner.ThenAsync("the item displays the tracked quantity and bottle size", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -355,7 +367,7 @@ namespace SpecPour.Tests.Acceptance.Features
                     "e case: near-miss thresholds don\'t list everything)", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 54
+#line 65
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -365,27 +377,27 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 55
+#line 66
     await testRunner.GivenAsync("an inventory-tracking signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 56
+#line 67
     await testRunner.AndAsync("a curated ingredient hierarchy of \"Beefeater\" (product) under \"London Dry Gin\" (c" +
                         "lass)", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 57
+#line 68
     await testRunner.AndAsync("the user has a private recipe requiring \"London Dry Gin\" and a second ingredient " +
                         "the user does not own", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 58
+#line 69
     await testRunner.AndAsync("the user\'s inventory is empty", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 59
+#line 70
     await testRunner.WhenAsync("the user asks what they can make", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 60
+#line 71
     await testRunner.ThenAsync("the recipe does not appear in the fully-makeable list", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 61
+#line 72
     await testRunner.AndAsync("the recipe does not appear in the near-miss list", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
@@ -403,7 +415,7 @@ namespace SpecPour.Tests.Acceptance.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("6 - Inventory is invisible to a second user, both reading and writing", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 63
+#line 74
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -413,29 +425,29 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 64
+#line 75
     await testRunner.GivenAsync("an inventory-tracking signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 65
+#line 76
     await testRunner.AndAsync("a curated ingredient hierarchy of \"Beefeater\" (product) under \"London Dry Gin\" (c" +
                         "lass)", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 66
+#line 77
     await testRunner.AndAsync("the user has \"Beefeater\" in inventory", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 67
+#line 78
     await testRunner.AndAsync("a second, unrelated signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 68
+#line 79
     await testRunner.WhenAsync("the second user requests the first user\'s inventory item directly", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 69
+#line 80
     await testRunner.ThenAsync("the item is not accessible to the second user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 70
+#line 81
     await testRunner.WhenAsync("the second user attempts to delete the first user\'s inventory item", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 71
+#line 82
     await testRunner.ThenAsync("the deletion is not permitted for the second user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -453,7 +465,7 @@ namespace SpecPour.Tests.Acceptance.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("7 - Inventory is invisible to a guest", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 73
+#line 84
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -463,16 +475,16 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 74
+#line 85
     await testRunner.WhenAsync("an anonymous guest requests the inventory list", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 75
+#line 86
     await testRunner.ThenAsync("the request is rejected as unauthenticated", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 76
+#line 87
     await testRunner.WhenAsync("an anonymous guest requests what can be made", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 77
+#line 88
     await testRunner.ThenAsync("the request is rejected as unauthenticated", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -490,7 +502,7 @@ namespace SpecPour.Tests.Acceptance.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("8 - Inventory items never appear in search results", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 79
+#line 90
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -500,20 +512,20 @@ namespace SpecPour.Tests.Acceptance.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 80
+#line 91
     await testRunner.GivenAsync("an inventory-tracking signed-in user", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 81
+#line 92
     await testRunner.AndAsync("a curated ingredient hierarchy of \"Beefeater\" (product) under \"London Dry Gin\" (c" +
                         "lass)", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 82
+#line 93
     await testRunner.AndAsync("the user has \"Beefeater\" in inventory", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 83
+#line 94
     await testRunner.WhenAsync("the user searches for \"Beefeater\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 84
+#line 95
     await testRunner.ThenAsync("the search results do not include an inventory entity type", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

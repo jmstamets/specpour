@@ -234,8 +234,45 @@ public sealed class US04InventorySteps
         Assert.Equal(200, (int)_lastResponse.StatusCode);
         var nearMiss = _lastJson!.RootElement.GetProperty("nearMiss").EnumerateArray();
         var entry = Assert.Single(nearMiss, item => item.GetProperty("recipeId").GetGuid() == _recipeId);
-        var missing = entry.GetProperty("missingIngredients").EnumerateArray();
-        Assert.Contains(missing, m => m.GetProperty("ingredientId").GetGuid() == _secondIngredientId);
+        var lines = entry.GetProperty("lines").EnumerateArray();
+        var missingLine = Assert.Single(lines, l => l.GetProperty("requirement").GetProperty("ingredientId").GetGuid() == _secondIngredientId);
+        Assert.Equal("missing", missingLine.GetProperty("matchQuality").GetString());
+    }
+
+    // Ratified 2026-07-19: recipe-level matchQuality is a derived summary, never
+    // independent truth — every recipe entry (makeable or near-miss) also carries
+    // its own per-line "lines" array: requirement as stated, that line's own match
+    // quality, and the inventory item (or substitution) satisfying it, null when
+    // missing. T067 computes lines first and folds to the aggregate.
+    [Then(@"the recipe's requirement for ""(.*)"" is satisfied by the held ""(.*)"" item")]
+    public void ThenTheRecipesRequirementIsSatisfiedByTheHeldItem(string requirementName, string heldName)
+    {
+        var makeable = _lastJson!.RootElement.GetProperty("makeable").EnumerateArray();
+        var entry = Assert.Single(makeable, item => item.GetProperty("recipeId").GetGuid() == _recipeId);
+        var lines = entry.GetProperty("lines").EnumerateArray();
+        var line = Assert.Single(lines, l => l.GetProperty("requirement").GetProperty("ingredientId").GetGuid() == _londonDryGinId);
+        Assert.NotEqual("missing", line.GetProperty("matchQuality").GetString());
+        var satisfiedBy = line.GetProperty("satisfiedBy");
+        Assert.NotEqual(JsonValueKind.Null, satisfiedBy.ValueKind);
+        Assert.Equal(_inventoryItemId, satisfiedBy.GetProperty("inventoryItemId").GetGuid());
+    }
+
+    [Then(@"the near-miss recipe's lines show the ""(.*)"" requirement satisfied by the held ""(.*)"" item and the second requirement missing")]
+    public void ThenTheNearMissRecipesLinesShowSatisfiedAndMissing(string requirementName, string heldName)
+    {
+        var nearMiss = _lastJson!.RootElement.GetProperty("nearMiss").EnumerateArray();
+        var entry = Assert.Single(nearMiss, item => item.GetProperty("recipeId").GetGuid() == _recipeId);
+        var lines = entry.GetProperty("lines").EnumerateArray().ToList();
+
+        var satisfiedLine = Assert.Single(lines, l => l.GetProperty("requirement").GetProperty("ingredientId").GetGuid() == _londonDryGinId);
+        Assert.NotEqual("missing", satisfiedLine.GetProperty("matchQuality").GetString());
+        var satisfiedBy = satisfiedLine.GetProperty("satisfiedBy");
+        Assert.NotEqual(JsonValueKind.Null, satisfiedBy.ValueKind);
+        Assert.Equal(_inventoryItemId, satisfiedBy.GetProperty("inventoryItemId").GetGuid());
+
+        var missingLine = Assert.Single(lines, l => l.GetProperty("requirement").GetProperty("ingredientId").GetGuid() == _secondIngredientId);
+        Assert.Equal("missing", missingLine.GetProperty("matchQuality").GetString());
+        Assert.Equal(JsonValueKind.Null, missingLine.GetProperty("satisfiedBy").ValueKind);
     }
 
     [Then(@"the recipe does not also appear in the fully-makeable list")]
