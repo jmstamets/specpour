@@ -707,4 +707,100 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get venueMissingFieldsError => 'Enter a venue name.';
+
+  @override
+  String get inventoryTitle => 'My Bar';
+
+  @override
+  String get inventoryItemsTabLabel => 'My Bottles';
+
+  @override
+  String get inventoryMakeableTabLabel => 'What Can I Make?';
+
+  @override
+  String get inventoryEmptyMessage => 'No bottles yet. Add your first one.';
+
+  @override
+  String get inventoryMakeableEmptyMessage =>
+      'Nothing makeable yet — add a few bottles to see what you can pour.';
+
+  @override
+  String get inventoryAddButtonTooltip => 'Add bottle';
+
+  @override
+  String get inventoryDeleteConfirmTitle => 'Remove this bottle?';
+
+  @override
+  String get inventoryDeleteConfirmMessage =>
+      'This removes it from your bar. You can always add it back later.';
+
+  @override
+  String get inventoryCancelButton => 'Cancel';
+
+  @override
+  String get inventoryDeleteButton => 'Remove';
+
+  @override
+  String get inventoryNearMissLabel => 'Near miss';
+
+  @override
+  String get inventoryMatchQualityExactProduct => 'Exact match';
+
+  @override
+  String get inventoryMatchQualityClassSatisfied => 'You have this';
+
+  @override
+  String get inventoryMatchQualitySubstitution => 'Substitution';
+
+  @override
+  String inventoryMissingIngredientLabel(String ingredientName) {
+    return 'Missing: $ingredientName';
+  }
+
+  @override
+  String get addInventoryTitle => 'Add a Bottle';
+
+  @override
+  String get addInventoryPhotoButton => 'Take Photo';
+
+  @override
+  String get addInventoryBarcodeButton => 'Scan Barcode';
+
+  @override
+  String get addInventoryIngredientLabel => 'Bottle';
+
+  @override
+  String get addInventoryIngredientHint => 'Search bottles and classes…';
+
+  @override
+  String get addInventoryQuantityLabel => 'Quantity (optional)';
+
+  @override
+  String get addInventoryBottleSizeLabel => 'Bottle size (optional)';
+
+  @override
+  String get addInventorySubmitButton => 'Add to My Bar';
+
+  @override
+  String get addInventoryMissingIngredientError =>
+      'Choose a bottle before saving.';
+
+  @override
+  String addInventoryRecognizedMessage(String ingredientName) {
+    return 'Recognized: $ingredientName. Confirm below.';
+  }
+
+  @override
+  String get addInventoryNotRecognizedMessage =>
+      'Couldn\'t identify that bottle — choose it below.';
+
+  @override
+  String get addInventoryBarcodeScannedMessage =>
+      'Barcode scanned — choose the matching bottle below.';
+
+  @override
+  String get barcodeScanTitle => 'Scan Barcode';
+
+  @override
+  String get barcodeScanInstructions => 'Point the camera at the barcode.';
 }

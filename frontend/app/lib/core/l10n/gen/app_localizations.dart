@@ -1353,6 +1353,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter a venue name.'**
   String get venueMissingFieldsError;
+
+  /// T070 inventory screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'My Bar'**
+  String get inventoryTitle;
+
+  /// T070 inventory screen: tab showing the raw inventory list.
+  ///
+  /// In en, this message translates to:
+  /// **'My Bottles'**
+  String get inventoryItemsTabLabel;
+
+  /// T070 inventory screen: tab showing makeable + near-miss recipes (T067/T148).
+  ///
+  /// In en, this message translates to:
+  /// **'What Can I Make?'**
+  String get inventoryMakeableTabLabel;
+
+  /// T070 inventory screen: empty state for the bottles tab.
+  ///
+  /// In en, this message translates to:
+  /// **'No bottles yet. Add your first one.'**
+  String get inventoryEmptyMessage;
+
+  /// T070 inventory screen: empty state for the makeable tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing makeable yet — add a few bottles to see what you can pour.'**
+  String get inventoryMakeableEmptyMessage;
+
+  /// T070 inventory screen: FAB tooltip opening the add flow.
+  ///
+  /// In en, this message translates to:
+  /// **'Add bottle'**
+  String get inventoryAddButtonTooltip;
+
+  /// T070 inventory item delete confirmation dialog title.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this bottle?'**
+  String get inventoryDeleteConfirmTitle;
+
+  /// T070 inventory item delete confirmation dialog message.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes it from your bar. You can always add it back later.'**
+  String get inventoryDeleteConfirmMessage;
+
+  /// T070 inventory feature: generic cancel button.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get inventoryCancelButton;
+
+  /// T070 inventory item delete confirmation dialog: confirm button.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get inventoryDeleteButton;
+
+  /// T070/T148: badge on a near-miss recipe in the makeable view.
+  ///
+  /// In en, this message translates to:
+  /// **'Near miss'**
+  String get inventoryNearMissLabel;
+
+  /// T070: friendly label for the exact-product match quality.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact match'**
+  String get inventoryMatchQualityExactProduct;
+
+  /// T070: friendly label for the class-satisfied match quality (a held product satisfies a recipe's class-level requirement).
+  ///
+  /// In en, this message translates to:
+  /// **'You have this'**
+  String get inventoryMatchQualityClassSatisfied;
+
+  /// T070: friendly label for the substitution match quality.
+  ///
+  /// In en, this message translates to:
+  /// **'Substitution'**
+  String get inventoryMatchQualitySubstitution;
+
+  /// T070/T148: names the unsatisfied line on a near-miss recipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing: {ingredientName}'**
+  String inventoryMissingIngredientLabel(String ingredientName);
+
+  /// T070 add-inventory screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a Bottle'**
+  String get addInventoryTitle;
+
+  /// T070 add-inventory screen: photo-recognition entry path button (T069).
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get addInventoryPhotoButton;
+
+  /// T070 add-inventory screen: barcode-scan entry path button (T069's own split).
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Barcode'**
+  String get addInventoryBarcodeButton;
+
+  /// T070 add-inventory screen: ingredient picker field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottle'**
+  String get addInventoryIngredientLabel;
+
+  /// T070 add-inventory screen: ingredient picker field hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search bottles and classes…'**
+  String get addInventoryIngredientHint;
+
+  /// T070 add-inventory screen: quantity field label (spec.md scenario 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity (optional)'**
+  String get addInventoryQuantityLabel;
+
+  /// T070 add-inventory screen: bottle size field label (spec.md scenario 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Bottle size (optional)'**
+  String get addInventoryBottleSizeLabel;
+
+  /// T070 add-inventory screen: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to My Bar'**
+  String get addInventorySubmitButton;
+
+  /// T070 add-inventory screen: local validation error shown before submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a bottle before saving.'**
+  String get addInventoryMissingIngredientError;
+
+  /// T070/T069: shown after a successful photo recognition, prefilling the picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognized: {ingredientName}. Confirm below.'**
+  String addInventoryRecognizedMessage(String ingredientName);
+
+  /// T070/T069: shown when photo recognition degrades to manual entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t identify that bottle — choose it below.'**
+  String get addInventoryNotRecognizedMessage;
+
+  /// T070/T069: shown after a barcode scan (no product database to resolve it against, so this always degrades to manual choice too).
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode scanned — choose the matching bottle below.'**
+  String get addInventoryBarcodeScannedMessage;
+
+  /// T070 barcode scan screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Barcode'**
+  String get barcodeScanTitle;
+
+  /// T070 barcode scan screen: on-screen instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Point the camera at the barcode.'**
+  String get barcodeScanInstructions;
 }
 
 class _AppLocalizationsDelegate

@@ -83,6 +83,14 @@ dependencies:
   # instead of forcing manual secret entry.
   qr_flutter: ^4.1.0
 
+  # T070: inventory's photo-recognition entry path (label photo capture) and
+  # on-device barcode scan path (FR-030). Neither actually resolves anything
+  # server-side yet (no real vision provider configured, T202; no barcode/UPC
+  # database integration — out of scope, never requested) — both degrade to
+  # the same manual-entry form either way, per T069's design.
+  image_picker: ^1.1.2
+  mobile_scanner: ^7.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
