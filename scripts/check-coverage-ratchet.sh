@@ -47,6 +47,23 @@
 # in its own commit (deliberate and visible) — never a standing tolerance,
 # which would let small regressions accumulate silently over time.
 #
+# BROWSER TIER IS NOT COVERAGE-BEARING (recorded 2026-07-19, T203): the
+# frontend coverage number this ratchet enforces comes ONLY from
+# `flutter test --coverage` (widget/unit tests). The browser/device tiers —
+# `flutter drive` web-integration tests (scripts/run-web-integration-tests.sh,
+# CI's frontend-web-browser-tests) and the Android-emulator integration_test
+# job — do NOT contribute to it and cannot: they run dart2js-compiled (web) or
+# release-mode (emulator) builds, which have no line-level Dart coverage that
+# maps back to source. So a story is NOT covered by having a green browser
+# journey test — that journey line stays uncovered in this measurement no
+# matter how thoroughly the browser exercises it. The division of labor:
+# BROWSER TESTS PROVE JOURNEYS (the real stack end-to-end); WIDGET TESTS CARRY
+# THE RATCHET. Any new screen needs its own widget tests to hold coverage,
+# regardless of how well an integration test drives it. Precedent (T203): the
+# PR #11 inventory UI (T070) shipped with a green headless-Chrome integration
+# test (T065) but zero widget tests, and coverage still dropped below baseline
+# — the browser test proved the journey but carried none of the ratchet.
+#
 # NONDETERMINISTIC-COVERAGE FLAKE RULE (T200, pre-armed 2026-07-19): the T198
 # incident's root cause — a single line whose coverage depends on wall-clock
 # timing, not on what tests exist — is a LATENT FLAKE, not a one-off. It can
