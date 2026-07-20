@@ -44,6 +44,93 @@ if [[ "$dotnet_major" -lt 10 ]]; then
   exit 1
 fi
 
+# --- T204: frontend coverage, ADVISORY ONLY ---------------------------------
+# Why this exists: T070 (the whole inventory UI) shipped with zero widget tests
+# and dropped frontend line coverage from ~80% to 72.86%. This gate ran plain
+# `flutter test`, which was green, so the regression only surfaced on CI's
+# coverage-report — one push-and-wait later, on an already-ready PR whose
+# handoff it retroactively voided (T203). An advisory warning here would have
+# flagged that one deafeningly (72.86% vs an 80.0 baseline).
+#
+# Why ADVISORY and never a hard fail (John's explicit ruling, 2026-07-19):
+# local frontend coverage reads roughly 1.1 POINTS BELOW CI on identical code
+# (T198: local 78.9 vs CI 80.0), because the two environments genuinely measure
+# differently. A hard fail against the CI baseline would therefore false-fail
+# legitimate near-boundary pushes — blocking real work over a measurement
+# artifact. **The CI ratchet remains the sole enforcement point**; this is a
+# fast local heads-up, deliberately non-blocking. It must NEVER exit non-zero:
+# every failure path below degrades to a printed note and returns 0, because a
+# broken advisory check blocking a push would be strictly worse than no check.
+#
+# Frontend only, on purpose: backend coverage collection is coverlet across 37
+# assemblies (expensive), and the T198 CI-sourcing rule means the backend
+# baseline must come from CI regardless — so there is nothing a local backend
+# number could legitimately be compared against.
+FRONTEND_COVERAGE_LOCAL_SKEW="1.5"   # points below the CI baseline before we shout; covers T198's measured ~1.1
+
+frontend_coverage_advisory() {
+  local lcov="$ROOT/frontend/app/coverage/lcov.info"
+  local baseline pct work
+
+  if [[ ! -s "$lcov" ]]; then
+    echo "NOTE: no frontend lcov.info produced — skipping advisory coverage check (not a failure)." >&2
+    return 0
+  fi
+  if ! command -v jq > /dev/null 2>&1 || [[ ! -f "$ROOT/coverage-baseline.json" ]]; then
+    echo "NOTE: jq or coverage-baseline.json unavailable — skipping advisory coverage check (not a failure)." >&2
+    return 0
+  fi
+
+  baseline="$(jq -r '.frontend.lineCoveragePercent' "$ROOT/coverage-baseline.json" 2>/dev/null || true)"
+  if [[ -z "$baseline" || "$baseline" == "null" ]]; then
+    echo "NOTE: could not read the frontend baseline — skipping advisory coverage check (not a failure)." >&2
+    return 0
+  fi
+
+  # Prefer reportgenerator: it is the exact tool the CI ratchet uses, so the
+  # number printed here is methodologically comparable to the one that will
+  # actually gate. Fall back to summing lcov's own LF/LH records when it isn't
+  # installed (it is a dotnet global tool, not guaranteed on every machine) —
+  # verified to agree with reportgenerator on this repo's lcov.
+  if command -v reportgenerator > /dev/null 2>&1; then
+    work="$(mktemp -d)"
+    if reportgenerator -reports:"$lcov" -targetdir:"$work" -reporttypes:TextSummary > /dev/null 2>&1 \
+       && [[ -f "$work/Summary.txt" ]]; then
+      pct="$(grep -oE '^  Line coverage: [0-9.]+' "$work/Summary.txt" | grep -oE '[0-9.]+$' || true)"
+    fi
+    rm -rf "$work"
+  fi
+  if [[ -z "${pct:-}" ]]; then
+    pct="$(awk -F: '/^LF:/ {lf += $2} /^LH:/ {lh += $2} END { if (lf > 0) printf "%.1f", (lh * 100.0) / lf }' "$lcov" || true)"
+  fi
+  if [[ -z "$pct" ]]; then
+    echo "NOTE: could not compute frontend coverage — skipping advisory check (not a failure)." >&2
+    return 0
+  fi
+
+  local floor
+  floor="$(awk -v b="$baseline" -v s="$FRONTEND_COVERAGE_LOCAL_SKEW" 'BEGIN { printf "%.1f", b - s }')"
+  if [[ "$(awk -v p="$pct" -v f="$floor" 'BEGIN { print (p + 0.0 < f + 0.0) ? 1 : 0 }')" == "1" ]]; then
+    echo "" >&2
+    echo "  ############################################################" >&2
+    echo "  # ADVISORY: frontend line coverage looks like a REGRESSION  #" >&2
+    echo "  ############################################################" >&2
+    echo "  Local:    ${pct}%" >&2
+    echo "  CI base:  ${baseline}%  (local-adjusted floor ${floor}%, allowing ${FRONTEND_COVERAGE_LOCAL_SKEW}pt local-vs-CI skew)" >&2
+    echo "" >&2
+    echo "  CI's coverage-report job will very likely go RED on this push." >&2
+    echo "  Most likely cause: a new screen/provider shipped without widget tests." >&2
+    echo "  Note browser/integration tests do NOT carry coverage (see" >&2
+    echo "  scripts/check-coverage-ratchet.sh) — only widget/unit tests do." >&2
+    echo "" >&2
+    echo "  NOT BLOCKING — the push proceeds. CI remains the enforcement point." >&2
+    echo "" >&2
+  else
+    echo "     frontend coverage ${pct}% (CI baseline ${baseline}%, local floor ${floor}%) — advisory OK"
+  fi
+  return 0
+}
+
 echo "==> [1/4] Backend: build + all four test suites"
 dotnet build backend/SpecPour.slnx -c Release
 for suite in Acceptance Contract Integration Unit; do
@@ -60,10 +147,14 @@ for suite in Acceptance Contract Integration Unit; do
   fi
 done
 
-echo "==> [2/4] Frontend: analyze, format check, unit/widget tests"
+echo "==> [2/4] Frontend: analyze, format check, unit/widget tests (+ advisory coverage)"
 (cd frontend/app && flutter pub get && flutter analyze)
 (cd frontend/app && dart format --output=none --set-exit-if-changed .)
-(cd frontend/app && flutter test)
+# T204: --coverage instead of a plain run. Same tests, same wall-clock cost to
+# a first approximation — the VM just also emits hit data — so this buys the
+# advisory check below for essentially free.
+(cd frontend/app && flutter test --coverage)
+frontend_coverage_advisory
 
 echo "==> [3/4] Generated Dart client must not have drifted from openapi.yaml"
 scripts/check-client-drift.sh
@@ -88,5 +179,7 @@ fi
 
 echo "All local CI-gate checks passed. (Not run here — CI-only:"
 echo "  frontend integration_test on Android emulator, Trivy container scan,"
-echo "  T190 coverage collection + non-regression ratchet — see"
-echo "  scripts/check-coverage-ratchet.sh to run it manually if needed.)"
+echo "  BACKEND coverage collection + the enforcing non-regression ratchet — see"
+echo "  scripts/check-coverage-ratchet.sh to run it manually if needed."
+echo "  T204: frontend coverage IS measured above, but only ADVISORY — a"
+echo "  warning there means CI will likely go red; CI still enforces.)"
