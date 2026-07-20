@@ -26,7 +26,22 @@ public interface IIngredientLookupPort
     /// facet and the ingredient-&gt;recipes bidirectional surface.
     /// </summary>
     Task<IReadOnlyList<Guid>> GetDescendantIdsAsync(Guid ingredientId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// T067: curated substitution candidates for <paramref name="requiredIngredientId"/>
+    /// (FR-013) — <c>SubstitutionRule.FromIngredientId</c> is the originally-specified/
+    /// required ingredient, <c>ToIngredientId</c> is what a curator says may stand in
+    /// for it (this method is the first real consumer, so this direction convention is
+    /// established here). Sideways/upward substitution only, distinct from the
+    /// hierarchy-implied class-satisfied matching <see cref="GetDescendantIdsAsync"/>
+    /// drives — statement §2's match-quality ladder keeps these two mechanisms
+    /// separate even though both can land on "substitution-grade" in the makeability
+    /// response.
+    /// </summary>
+    Task<IReadOnlyList<SubstitutionCandidate>> GetSubstitutesForAsync(Guid requiredIngredientId, CancellationToken cancellationToken);
 }
+
+public sealed record SubstitutionCandidate(Guid IngredientId, string SuitabilityNote);
 
 /// <summary>
 /// The subset of an ingredient's data other modules need. <see cref="AbvPercent"/>

@@ -20,6 +20,8 @@
     <ProjectReference Include="..\..\Modules\Equipment\Infrastructure\SpecPour.Modules.Equipment.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Glossary\Infrastructure\SpecPour.Modules.Glossary.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Venues\Infrastructure\SpecPour.Modules.Venues.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Inventory\Infrastructure\SpecPour.Modules.Inventory.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Ai\Infrastructure\SpecPour.Modules.Ai.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

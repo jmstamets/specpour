@@ -135,6 +135,14 @@ paths:
     $ref: './paths/venues.yaml#/venues'
   /venues/{id}:
     $ref: './paths/venues.yaml#/venuesById'
+  /inventory/items:
+    $ref: './paths/inventory.yaml#/inventoryItems'
+  /inventory/items/{id}:
+    $ref: './paths/inventory.yaml#/inventoryItemById'
+  /inventory/makeable:
+    $ref: './paths/inventory.yaml#/inventoryMakeable'
+  /inventory/recognize:
+    $ref: './paths/inventory.yaml#/inventoryRecognize'
 # Populated incrementally by per-story tasks via $ref — see tasks.md for the
 # per-module path authoring schedule.
 

@@ -22,5 +22,11 @@ void main() {
       // TODO
     });
 
+    // Present only when `?makeable=true` was applied.
+    // RecipeMakeabilitySummary makeability
+    test('to test the property `makeability`', () async {
+      // TODO
+    });
+
   });
 }

@@ -70,4 +70,10 @@ public sealed class IngredientLookupAdapter(IngredientsDbContext db) : IIngredie
 
         return result;
     }
+
+    public async Task<IReadOnlyList<SubstitutionCandidate>> GetSubstitutesForAsync(Guid requiredIngredientId, CancellationToken cancellationToken) =>
+        await db.SubstitutionRules
+            .Where(s => s.FromIngredientId == requiredIngredientId)
+            .Select(s => new SubstitutionCandidate(s.ToIngredientId, s.SuitabilityNote))
+            .ToListAsync(cancellationToken);
 }

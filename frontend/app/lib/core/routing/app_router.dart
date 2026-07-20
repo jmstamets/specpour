@@ -24,6 +24,8 @@ import '../../features/identity/recovery_request_screen.dart';
 import '../../features/identity/register_screen.dart';
 import '../../features/identity/sessions_screen.dart';
 import '../../features/identity/sign_in_screen.dart';
+import '../../features/inventory/add_inventory_screen.dart';
+import '../../features/inventory/inventory_screen.dart';
 import '../../features/library/house_made_ingredient_editor_screen.dart';
 import '../../features/library/library_screen.dart';
 import '../../features/library/recipe_editor_screen.dart';
@@ -152,6 +154,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/library/venues',
         name: 'venues',
         builder: (context, state) => const VenuesScreen(),
+      ),
+      GoRoute(
+        path: '/inventory',
+        name: 'inventory',
+        builder: (context, state) => const InventoryScreen(),
+      ),
+      GoRoute(
+        path: '/inventory/add',
+        name: 'addInventory',
+        builder: (context, state) => const AddInventoryScreen(),
       ),
     ],
   );

@@ -4,9 +4,9 @@ recipes:
     tags: [catalog]
     summary: Browse/search recipes with content facets (FR-050)
     description: >-
-      Guest-accessible (FR-004b). Only public/core recipes are returned — private
-      personal-library recipes land with the personal-library story (US3). The
-      rating and makeable-from-inventory facets are staged (T149/T148); ABV-range
+      Guest-accessible (FR-004b). Only public/core recipes are returned by default —
+      private personal-library recipes land with the personal-library story (US3),
+      or via `scope`/`makeable`. The rating facet is still staged (T149); ABV-range
       filtering computes ABV per candidate at request time rather than from a
       stored column, since ABV is always derived, never persisted (data-model.md).
     security:
@@ -45,6 +45,17 @@ recipes:
         in: query
         schema: { type: string }
         description: Comma-separated allergen keys to exclude.
+      - name: makeable
+        in: query
+        schema: { type: string, enum: ["true"] }
+        description: >-
+          Makeable-from-inventory facet (T148, FR-050) — bearer-only (401 if not
+          authenticated). Includes both fully-makeable recipes and near-misses
+          (one-away, naming the missing/substitutable line); the base recipe set for
+          this facet spans public recipes AND the caller's own personal/bar recipes
+          (a caller's own authored recipe can be makeable/near-miss too), composing
+          with `scope` when both are given. Each returned recipe carries a
+          `makeability` object with per-line detail.
       - name: source
         in: query
         schema: { type: string, enum: [core, personal, public] }
@@ -212,7 +223,37 @@ components:
         id: { type: string, format: uuid }
         primaryName: { type: string }
         familyKey: { type: [string, "null"] }
+        makeability:
+          description: Present only when `?makeable=true` was applied.
+          oneOf:
+            - { $ref: '#/components/schemas/RecipeMakeabilitySummary' }
+            - type: "null"
       required: [id, primaryName]
+    RecipeMakeabilitySummary:
+      type: object
+      description: >-
+        matchQuality is a derived summary of lines (the loosest satisfied-line
+        quality) — never independent truth. Null for near-miss entries (a near-miss
+        has no single aggregate quality).
+      properties:
+        isNearMiss: { type: boolean }
+        matchQuality:
+          oneOf:
+            - { $ref: './inventory.yaml#/components/schemas/MatchQuality' }
+            - type: "null"
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/RecipeMakeabilityLine' }
+      required: [isNearMiss, matchQuality, lines]
+    RecipeMakeabilityLine:
+      type: object
+      properties:
+        requirementIngredientId: { type: string, format: uuid }
+        requirementIngredientName: { type: [string, "null"] }
+        matchQuality: { $ref: './inventory.yaml#/components/schemas/MatchQuality' }
+        satisfiedByIngredientId: { type: [string, "null"], format: uuid }
+        satisfiedByIngredientName: { type: [string, "null"] }
+      required: [requirementIngredientId, matchQuality]
     RecipePage:
       type: object
       properties:

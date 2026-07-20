@@ -11,9 +11,10 @@ namespace SpecPour.Modules.Search.Infrastructure;
 /// (<c>websearch_to_tsquery</c> against each registered entity's generated tsvector
 /// column) unioned with trigram similarity (<c>pg_trgm</c>) for name-fuzziness
 /// matching, ranked and paginated. Facet filtering composition is completed by
-/// T038/T148/T149 once content modules exist to filter on — this adapter accepts
-/// <see cref="SearchQuery.Facets"/> in its contract today (so the port shape doesn't
-/// need to change later) but does not yet apply them.
+/// T038/T148/T149 once content modules exist to filter on. <see cref="SearchQuery.EntityIdFilter"/>
+/// (T148) is applied INSIDE this adapter's own SQL, per matching entity-type branch,
+/// before the OFFSET/LIMIT — fixing the previous post-filter-after-pagination
+/// limitation without this adapter needing any opinion on what a facet means.
 /// </summary>
 public sealed class PostgresFullTextSearchAdapter(NpgsqlDataSource dataSource, ISearchableEntityRegistry registry) : ISearchPort
 {
@@ -28,13 +29,21 @@ public sealed class PostgresFullTextSearchAdapter(NpgsqlDataSource dataSource, I
         }
 
         var offset = DecodeCursor(query.Cursor);
-        var sql = BuildUnionQuery(descriptors);
+        var entityIdFilter = query.EntityIdFilter ?? new Dictionary<string, IReadOnlyList<Guid>>();
+        var sql = BuildUnionQuery(descriptors, entityIdFilter);
 
         await using var command = dataSource.CreateCommand(sql);
         command.Parameters.AddWithValue("query", query.Text);
         command.Parameters.AddWithValue("threshold", TrigramSimilarityThreshold);
         command.Parameters.AddWithValue("limit", query.Limit + 1);
         command.Parameters.AddWithValue("offset", offset);
+        foreach (var descriptor in descriptors)
+        {
+            if (entityIdFilter.TryGetValue(descriptor.EntityType, out var allowedIds))
+            {
+                command.Parameters.AddWithValue(FilterParameterName(descriptor.EntityType), allowedIds.ToArray());
+            }
+        }
 
         var items = new List<SearchResultItem>();
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
@@ -55,7 +64,7 @@ public sealed class PostgresFullTextSearchAdapter(NpgsqlDataSource dataSource, I
         return new SearchPage(page, nextCursor);
     }
 
-    private static string BuildUnionQuery(IReadOnlyList<SearchableEntityDescriptor> descriptors)
+    private static string BuildUnionQuery(IReadOnlyList<SearchableEntityDescriptor> descriptors, IReadOnlyDictionary<string, IReadOnlyList<Guid>> entityIdFilter)
     {
         var branches = descriptors.Select(d =>
         {
@@ -69,6 +78,15 @@ public sealed class PostgresFullTextSearchAdapter(NpgsqlDataSource dataSource, I
                 ? $"""AND "{d.VisibilityColumn}" = {d.PublicVisibilityValue.Value}"""
                 : string.Empty;
 
+            // T148: an entity-type-scoped ID allowlist (e.g. a "makeable"/"uses"
+            // facet already resolved elsewhere, since Search stays entity-agnostic
+            // and has no idea what those mean) — applied here, inside the branch,
+            // before this whole query's OFFSET/LIMIT, so pagination reflects the
+            // filtered count rather than needing a post-filter after the fact.
+            var idFilterClause = entityIdFilter.ContainsKey(d.EntityType)
+                ? $"""AND "{d.IdColumn}" = ANY(@{FilterParameterName(d.EntityType)})"""
+                : string.Empty;
+
             return $"""
                 SELECT
                     '{EscapeLiteral(d.EntityType)}' AS entity_type,
@@ -79,6 +97,7 @@ public sealed class PostgresFullTextSearchAdapter(NpgsqlDataSource dataSource, I
                 WHERE ("{d.TsVectorColumn}" @@ websearch_to_tsquery('english', @query)
                    OR similarity("{d.TitleColumn}", @query) > @threshold)
                 {visibilityClause}
+                {idFilterClause}
                 """;
         });
 
@@ -98,6 +117,12 @@ public sealed class PostgresFullTextSearchAdapter(NpgsqlDataSource dataSource, I
     // request input, but this still guards against a typo introducing a broken query
     // (an unescaped quote) rather than a silent wrong answer.
     private static string EscapeLiteral(string value) => value.Replace("'", "''", StringComparison.Ordinal);
+
+    // Entity types are trusted, simple strings from module registration (e.g.
+    // "recipe") — sanitized defensively so a future entity-type naming choice can't
+    // accidentally produce an invalid Npgsql parameter name.
+    private static string FilterParameterName(string entityType) =>
+        "filter_" + new string([.. entityType.Where(char.IsLetterOrDigit)]);
 
     private static int DecodeCursor(string? cursor)
     {

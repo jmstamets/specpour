@@ -838,5 +838,131 @@
   "venueMissingFieldsError": "Enter a venue name.",
   "@venueMissingFieldsError": {
     "description": "T063 venue form: local validation error shown before submitting."
+  },
+  "inventoryTitle": "My Bar",
+  "@inventoryTitle": {
+    "description": "T070 inventory screen title."
+  },
+  "inventoryItemsTabLabel": "My Bottles",
+  "@inventoryItemsTabLabel": {
+    "description": "T070 inventory screen: tab showing the raw inventory list."
+  },
+  "inventoryMakeableTabLabel": "What Can I Make?",
+  "@inventoryMakeableTabLabel": {
+    "description": "T070 inventory screen: tab showing makeable + near-miss recipes (T067/T148)."
+  },
+  "inventoryEmptyMessage": "No bottles yet. Add your first one.",
+  "@inventoryEmptyMessage": {
+    "description": "T070 inventory screen: empty state for the bottles tab."
+  },
+  "inventoryMakeableEmptyMessage": "Nothing makeable yet — add a few bottles to see what you can pour.",
+  "@inventoryMakeableEmptyMessage": {
+    "description": "T070 inventory screen: empty state for the makeable tab."
+  },
+  "inventoryAddButtonTooltip": "Add bottle",
+  "@inventoryAddButtonTooltip": {
+    "description": "T070 inventory screen: FAB tooltip opening the add flow."
+  },
+  "inventoryDeleteConfirmTitle": "Remove this bottle?",
+  "@inventoryDeleteConfirmTitle": {
+    "description": "T070 inventory item delete confirmation dialog title."
+  },
+  "inventoryDeleteConfirmMessage": "This removes it from your bar. You can always add it back later.",
+  "@inventoryDeleteConfirmMessage": {
+    "description": "T070 inventory item delete confirmation dialog message."
+  },
+  "inventoryCancelButton": "Cancel",
+  "@inventoryCancelButton": {
+    "description": "T070 inventory feature: generic cancel button."
+  },
+  "inventoryDeleteButton": "Remove",
+  "@inventoryDeleteButton": {
+    "description": "T070 inventory item delete confirmation dialog: confirm button."
+  },
+  "inventoryNearMissLabel": "Near miss",
+  "@inventoryNearMissLabel": {
+    "description": "T070/T148: badge on a near-miss recipe in the makeable view."
+  },
+  "inventoryMatchQualityExactProduct": "Exact match",
+  "@inventoryMatchQualityExactProduct": {
+    "description": "T070: friendly label for the exact-product match quality."
+  },
+  "inventoryMatchQualityClassSatisfied": "You have this",
+  "@inventoryMatchQualityClassSatisfied": {
+    "description": "T070: friendly label for the class-satisfied match quality (a held product satisfies a recipe's class-level requirement)."
+  },
+  "inventoryMatchQualitySubstitution": "Substitution",
+  "@inventoryMatchQualitySubstitution": {
+    "description": "T070: friendly label for the substitution match quality."
+  },
+  "inventoryMissingIngredientLabel": "Missing: {ingredientName}",
+  "@inventoryMissingIngredientLabel": {
+    "description": "T070/T148: names the unsatisfied line on a near-miss recipe.",
+    "placeholders": {
+      "ingredientName": {
+        "type": "String"
+      }
+    }
+  },
+  "addInventoryTitle": "Add a Bottle",
+  "@addInventoryTitle": {
+    "description": "T070 add-inventory screen title."
+  },
+  "addInventoryPhotoButton": "Take Photo",
+  "@addInventoryPhotoButton": {
+    "description": "T070 add-inventory screen: photo-recognition entry path button (T069)."
+  },
+  "addInventoryBarcodeButton": "Scan Barcode",
+  "@addInventoryBarcodeButton": {
+    "description": "T070 add-inventory screen: barcode-scan entry path button (T069's own split)."
+  },
+  "addInventoryIngredientLabel": "Bottle",
+  "@addInventoryIngredientLabel": {
+    "description": "T070 add-inventory screen: ingredient picker field label."
+  },
+  "addInventoryIngredientHint": "Search bottles and classes…",
+  "@addInventoryIngredientHint": {
+    "description": "T070 add-inventory screen: ingredient picker field hint."
+  },
+  "addInventoryQuantityLabel": "Quantity (optional)",
+  "@addInventoryQuantityLabel": {
+    "description": "T070 add-inventory screen: quantity field label (spec.md scenario 4)."
+  },
+  "addInventoryBottleSizeLabel": "Bottle size (optional)",
+  "@addInventoryBottleSizeLabel": {
+    "description": "T070 add-inventory screen: bottle size field label (spec.md scenario 4)."
+  },
+  "addInventorySubmitButton": "Add to My Bar",
+  "@addInventorySubmitButton": {
+    "description": "T070 add-inventory screen: submit button."
+  },
+  "addInventoryMissingIngredientError": "Choose a bottle before saving.",
+  "@addInventoryMissingIngredientError": {
+    "description": "T070 add-inventory screen: local validation error shown before submitting."
+  },
+  "addInventoryRecognizedMessage": "Recognized: {ingredientName}. Confirm below.",
+  "@addInventoryRecognizedMessage": {
+    "description": "T070/T069: shown after a successful photo recognition, prefilling the picker.",
+    "placeholders": {
+      "ingredientName": {
+        "type": "String"
+      }
+    }
+  },
+  "addInventoryNotRecognizedMessage": "Couldn't identify that bottle — choose it below.",
+  "@addInventoryNotRecognizedMessage": {
+    "description": "T070/T069: shown when photo recognition degrades to manual entry."
+  },
+  "addInventoryBarcodeScannedMessage": "Barcode scanned — choose the matching bottle below.",
+  "@addInventoryBarcodeScannedMessage": {
+    "description": "T070/T069: shown after a barcode scan (no product database to resolve it against, so this always degrades to manual choice too)."
+  },
+  "barcodeScanTitle": "Scan Barcode",
+  "@barcodeScanTitle": {
+    "description": "T070 barcode scan screen title."
+  },
+  "barcodeScanInstructions": "Point the camera at the barcode.",
+  "@barcodeScanInstructions": {
+    "description": "T070 barcode scan screen: on-screen instructions."
   }
 }

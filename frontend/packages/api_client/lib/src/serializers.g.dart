@@ -30,6 +30,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(CreateHouseMadeRequest.serializer)
       ..add(CreateIngredientRequest.serializer)
       ..add(CreateIngredientRequestLibraryScopeEnum.serializer)
+      ..add(CreateInventoryItemRequest.serializer)
+      ..add(CreateInventoryItemRequestSource_Enum.serializer)
       ..add(CreateRecipeRequest.serializer)
       ..add(CreateRecipeRequestLibraryScopeEnum.serializer)
       ..add(CreateVenueRequest.serializer)
@@ -62,14 +64,23 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(IngredientRecipeRef.serializer)
       ..add(IngredientRecipes.serializer)
       ..add(IngredientSummary.serializer)
+      ..add(InventoryItem.serializer)
+      ..add(InventoryItemPage.serializer)
+      ..add(InventoryItemSource_Enum.serializer)
       ..add(LoginMfaRequest.serializer)
       ..add(LoginRequest.serializer)
       ..add(LoginResult.serializer)
+      ..add(MakeabilityLine.serializer)
+      ..add(MakeableRecipe.serializer)
+      ..add(MakeableResponse.serializer)
+      ..add(ManualEntryForm.serializer)
+      ..add(MatchQuality.serializer)
       ..add(MeExport.serializer)
       ..add(MeExportUnitPreferenceEnum.serializer)
       ..add(MfaEnrollment.serializer)
       ..add(MfaStatus.serializer)
       ..add(MfaStatusMethodEnum.serializer)
+      ..add(NearMissRecipe.serializer)
       ..add(ProblemDetails.serializer)
       ..add(RecipeAuthor.serializer)
       ..add(RecipeAuthorLibraryScopeEnum.serializer)
@@ -79,15 +90,21 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RecipeIngredientLineInput.serializer)
       ..add(RecipeIngredientLineInputScalingRuleEnum.serializer)
       ..add(RecipeIngredientLineScalingRuleEnum.serializer)
+      ..add(RecipeMakeabilityLine.serializer)
+      ..add(RecipeMakeabilitySummary.serializer)
       ..add(RecipePage.serializer)
       ..add(RecipeSummary.serializer)
+      ..add(RecognitionResponse.serializer)
+      ..add(RecognizeRequest.serializer)
       ..add(RecoveryConfirmRequest.serializer)
       ..add(RecoveryRequest.serializer)
       ..add(RegisterRequest.serializer)
       ..add(RegisterRequestUnitPreferenceEnum.serializer)
+      ..add(Requirement.serializer)
       ..add(ResponsibleConsumptionMessageResponse.serializer)
       ..add(RoleGrantSummary.serializer)
       ..add(RoleGrantSummaryScopeTypeEnum.serializer)
+      ..add(SatisfiedBy.serializer)
       ..add(SearchResult.serializer)
       ..add(SearchResultEntityTypeEnum.serializer)
       ..add(SearchResultPage.serializer)
@@ -97,6 +114,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(SupportResourcesResponse.serializer)
       ..add(UpdateEquipmentRequest.serializer)
       ..add(UpdateIngredientRequest.serializer)
+      ..add(UpdateInventoryItemRequest.serializer)
       ..add(UpdateRecipeRequest.serializer)
       ..add(UpdateVenueRequest.serializer)
       ..add(Venue.serializer)
@@ -142,6 +160,25 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(IngredientSummary)]),
           () => ListBuilder<IngredientSummary>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(InventoryItem)]),
+          () => ListBuilder<InventoryItem>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(MakeabilityLine)]),
+          () => ListBuilder<MakeabilityLine>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(MakeabilityLine)]),
+          () => ListBuilder<MakeabilityLine>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(MakeableRecipe)]),
+          () => ListBuilder<MakeableRecipe>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(NearMissRecipe)]),
+          () => ListBuilder<NearMissRecipe>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(RecipeMakeabilityLine)]),
+          () => ListBuilder<RecipeMakeabilityLine>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(RecipeSummary)]),
           () => ListBuilder<RecipeSummary>())

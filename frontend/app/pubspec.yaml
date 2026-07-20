@@ -83,6 +83,14 @@ dependencies:
   # instead of forcing manual secret entry.
   qr_flutter: ^4.1.0
 
+  # T070: inventory's photo-recognition entry path (label photo capture) and
+  # on-device barcode scan path (FR-030). Neither actually resolves anything
+  # server-side yet (no real vision provider configured, T202; no barcode/UPC
+  # database integration — out of scope, never requested) — both degrade to
+  # the same manual-entry form either way, per T069's design.
+  image_picker: ^1.1.2
+  mobile_scanner: ^7.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -97,6 +105,14 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   drift_dev: ^2.34.0
   build_runner: ^2.15.1
+
+  # T203: the add-inventory widget test fakes the image_picker platform channel
+  # (ImagePickerPlatform + MockPlatformInterfaceMixin) to exercise the photo-
+  # recognition branch without a real device camera. Both are transitive via
+  # image_picker already; declared here as direct dev deps so the
+  # depend_on_referenced_packages lint is satisfied.
+  image_picker_platform_interface: ^2.11.1
+  plugin_platform_interface: ^2.1.8
 flutter:
 
   # Regenerates lib/core/l10n/gen/ from lib/core/l10n/arb/ (see l10n.yaml) on every

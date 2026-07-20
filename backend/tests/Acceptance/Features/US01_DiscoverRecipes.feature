@@ -53,3 +53,9 @@ Feature: US1 - Discover and follow curated recipes
     Then the messaging response includes a message content key
     When I request the support resources
     Then the support resources response includes at least one resource
+
+  Scenario: 11 - A concept page's Approved variant to a private recipe is never listed (T199, T196 standing-rule completion)
+    Given a concept page with an Approved variant to a public recipe and an Approved variant to a private recipe
+    When I request that concept page
+    Then the public variant is listed
+    And the private variant is not listed

@@ -1,0 +1,60 @@
+import 'package:test/test.dart';
+import 'package:api_client/api_client.dart';
+
+
+/// tests for InventoryApi
+void main() {
+  final instance = ApiClient().getInventoryApi();
+
+  group(InventoryApi, () {
+    // Add an item to the caller's personal inventory, or a venue's inventory the caller owns (T066, FR-029/FR-030)
+    //
+    //Future<InventoryItem> createInventoryItem(CreateInventoryItemRequest createInventoryItemRequest) async
+    test('test createInventoryItem', () async {
+      // TODO
+    });
+
+    // Remove one of the caller's own inventory items (T066, FR-029)
+    //
+    //Future deleteInventoryItem(String id) async
+    test('test deleteInventoryItem', () async {
+      // TODO
+    });
+
+    // Get one of the caller's own inventory items by id (T066, FR-029)
+    //
+    //Future<InventoryItem> getInventoryItem(String id) async
+    test('test getInventoryItem', () async {
+      // TODO
+    });
+
+    // \"What can I make?\" against the caller's personal inventory, with near-misses and substitutions (T067, FR-031)
+    //
+    //Future<MakeableResponse> getMakeableRecipes() async
+    test('test getMakeableRecipes', () async {
+      // TODO
+    });
+
+    // List the caller's own inventory, or a venue's inventory the caller owns (T066, FR-029)
+    //
+    //Future<InventoryItemPage> listInventoryItems({ String venueId, String cursor, int limit }) async
+    test('test listInventoryItems', () async {
+      // TODO
+    });
+
+    // Attempt to identify a bottle from a label photo; degrades to a pre-filled manual entry form rather than failing when recognition is unavailable or inconclusive (T069, FR-030)
+    //
+    //Future<RecognitionResponse> recognizeBottle(RecognizeRequest recognizeRequest) async
+    test('test recognizeBottle', () async {
+      // TODO
+    });
+
+    // Update the quantity/bottle size of one of the caller's own inventory items (T066, FR-029)
+    //
+    //Future<InventoryItem> updateInventoryItem(String id, UpdateInventoryItemRequest updateInventoryItemRequest) async
+    test('test updateInventoryItem', () async {
+      // TODO
+    });
+
+  });
+}

@@ -1,0 +1,299 @@
+inventoryItems:
+  get:
+    operationId: listInventoryItems
+    tags: [inventory]
+    summary: List the caller's own inventory, or a venue's inventory the caller owns (T066, FR-029)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: venueId
+        in: query
+        description: When present, lists that venue's inventory instead of the caller's personal inventory (403 if the caller doesn't own it).
+        schema: { type: string, format: uuid }
+      - $ref: '../openapi.yaml#/components/parameters/CursorParam'
+      - $ref: '../openapi.yaml#/components/parameters/LimitParam'
+    responses:
+      '200':
+        description: A page of inventory items.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItemPage'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '403':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  post:
+    operationId: createInventoryItem
+    tags: [inventory]
+    summary: Add an item to the caller's personal inventory, or a venue's inventory the caller owns (T066, FR-029/FR-030)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateInventoryItemRequest'
+    responses:
+      '201':
+        description: The created inventory item.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '403':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+inventoryItemById:
+  get:
+    operationId: getInventoryItem
+    tags: [inventory]
+    summary: Get one of the caller's own inventory items by id (T066, FR-029)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '200':
+        description: The inventory item.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        # Always 404, never 403, for another caller's item (no existence disclosure).
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  put:
+    operationId: updateInventoryItem
+    tags: [inventory]
+    summary: Update the quantity/bottle size of one of the caller's own inventory items (T066, FR-029)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateInventoryItemRequest'
+    responses:
+      '200':
+        description: The updated inventory item.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+  delete:
+    operationId: deleteInventoryItem
+    tags: [inventory]
+    summary: Remove one of the caller's own inventory items (T066, FR-029)
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    responses:
+      '204':
+        description: The item was deleted.
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/ProblemResponse'
+
+inventoryRecognize:
+  post:
+    operationId: recognizeBottle
+    tags: [inventory]
+    summary: >-
+      Attempt to identify a bottle from a label photo; degrades to a pre-filled
+      manual entry form rather than failing when recognition is unavailable or
+      inconclusive (T069, FR-030)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecognizeRequest'
+    responses:
+      '200':
+        description: >-
+          Always 200 — recognition failure/unavailability is a normal, expected
+          outcome (recognized:false with a pre-filled manual entry form), never an
+          error response.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecognitionResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+inventoryMakeable:
+  get:
+    operationId: getMakeableRecipes
+    tags: [inventory]
+    summary: >-
+      "What can I make?" against the caller's personal inventory, with near-misses
+      and substitutions (T067, FR-031)
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: >-
+          Fully-makeable recipes and near-misses. Every recipe entry carries a
+          per-line "lines" array — the recipe-level matchQuality (makeable entries
+          only) is a DERIVED SUMMARY of the lines (the loosest quality among them),
+          never independent truth (ratified 2026-07-19).
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MakeableResponse'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/UnauthorizedResponse'
+
+components:
+  schemas:
+    InventoryItem:
+      type: object
+      description: >-
+        Owner-only from birth (FR-029) — no visibility/public variant exists for
+        this type at all, unlike Recipe/Ingredient/Equipment.
+      properties:
+        id: { type: string, format: uuid }
+        ingredientId: { type: string, format: uuid }
+        ingredientName: { type: [string, "null"] }
+        quantity: { type: [number, "null"] }
+        bottleSize: { type: [string, "null"] }
+        source:
+          type: string
+          enum: [photo-recognition, barcode, manual, prep]
+        addedAt: { type: string, format: date-time }
+      required: [id, ingredientId, source, addedAt]
+    InventoryItemPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/InventoryItem' }
+        nextCursor: { type: [string, "null"] }
+      required: [items]
+    CreateInventoryItemRequest:
+      type: object
+      properties:
+        ingredientId: { type: string, format: uuid }
+        venueId:
+          type: [string, "null"]
+          format: uuid
+          description: Omit for the caller's personal inventory; provide to add to a venue's inventory the caller owns.
+        quantity: { type: [number, "null"] }
+        bottleSize: { type: [string, "null"] }
+        source:
+          type: string
+          enum: [photo-recognition, barcode, manual, prep]
+      required: [ingredientId, source]
+    UpdateInventoryItemRequest:
+      type: object
+      properties:
+        quantity: { type: [number, "null"] }
+        bottleSize: { type: [string, "null"] }
+    MatchQuality:
+      type: string
+      description: >-
+        statement §2's ladder, tightest to loosest. Extensible from day one — T201's
+        facet-partial slots in later as a new value, never a shape change.
+      enum: [exact-product, class-satisfied, substitution, missing]
+    Requirement:
+      type: object
+      description: A recipe line's requirement as stated, name-resolved.
+      properties:
+        ingredientId: { type: string, format: uuid }
+        ingredientName: { type: [string, "null"] }
+        quantity: { type: number }
+        unit: { type: string }
+      required: [ingredientId, quantity, unit]
+    SatisfiedBy:
+      type: object
+      description: The caller's inventory item (or substitution) satisfying a line. Absent (null) exactly when the line's matchQuality is "missing".
+      properties:
+        inventoryItemId: { type: string, format: uuid }
+        ingredientId: { type: string, format: uuid }
+        ingredientName: { type: [string, "null"] }
+      required: [inventoryItemId, ingredientId]
+    MakeabilityLine:
+      type: object
+      properties:
+        requirement: { $ref: '#/components/schemas/Requirement' }
+        matchQuality: { $ref: '#/components/schemas/MatchQuality' }
+        satisfiedBy:
+          oneOf:
+            - { $ref: '#/components/schemas/SatisfiedBy' }
+            - type: "null"
+      required: [requirement, matchQuality, satisfiedBy]
+    MakeableRecipe:
+      type: object
+      description: matchQuality here is a derived summary of lines (the loosest satisfied-line quality) — never independent truth.
+      properties:
+        recipeId: { type: string, format: uuid }
+        recipeName: { type: string }
+        matchQuality: { $ref: '#/components/schemas/MatchQuality' }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/MakeabilityLine' }
+      required: [recipeId, recipeName, matchQuality, lines]
+    NearMissRecipe:
+      type: object
+      properties:
+        recipeId: { type: string, format: uuid }
+        recipeName: { type: string }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/MakeabilityLine' }
+      required: [recipeId, recipeName, lines]
+    MakeableResponse:
+      type: object
+      properties:
+        makeable:
+          type: array
+          items: { $ref: '#/components/schemas/MakeableRecipe' }
+        nearMiss:
+          type: array
+          items: { $ref: '#/components/schemas/NearMissRecipe' }
+      required: [makeable, nearMiss]
+    RecognizeRequest:
+      type: object
+      properties:
+        photoUrl: { type: [string, "null"] }
+    ManualEntryForm:
+      type: object
+      description: Pre-filled with the recognized candidate when recognized is true; both fields null otherwise.
+      properties:
+        prefilledIngredientId: { type: [string, "null"], format: uuid }
+        prefilledIngredientName: { type: [string, "null"] }
+    RecognitionResponse:
+      type: object
+      properties:
+        recognized: { type: boolean }
+        candidateIngredientId: { type: [string, "null"], format: uuid }
+        manualEntryForm: { $ref: '#/components/schemas/ManualEntryForm' }
+      required: [recognized, manualEntryForm]

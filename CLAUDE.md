@@ -78,6 +78,31 @@ constitution is at `.specify/memory/constitution.md` (v1.6.0).
   If a story's checkpoint proves too large for one sitting, the draft PR —
   at any red-but-committed point — is the safe parking state; stop there and
   report, rather than rushing or silently narrowing scope.
+- **Ready-for-review requires all REQUIRED checks green on the branch tip
+  (recorded 2026-07-19, PR #11 coverage-ratchet incident).** Marking a PR
+  ready is the handoff; a handoff with a required check pending or red is
+  VOID — do not `gh pr ready` until every required status check has actually
+  reported success on the current tip, not merely "backend suites green
+  locally." Local green is necessary but not sufficient: the coverage-report
+  ratchet (and any CI-only gate) can be red even when every local suite
+  passes, because CI measures things the local gate deliberately doesn't
+  (see the coverage-baseline / browser-tier bullets). **"Required" is the
+  operative word** — check the actual branch-protection required-checks list
+  (`gh api repos/<o>/<r>/branches/main/protection/required_status_checks`),
+  not every check that ran: a non-required, known-fragile job (e.g. the
+  Android-emulator `frontend-integration-tests`, KVM-starved on GitHub
+  runners — `frontend-web-browser-tests` is the required browser tier, not
+  it) being red does NOT block a ready handoff, and must not be conflated
+  with a real gate. **The recovery when a required check is red on an
+  already-ready PR is the T198 draft-fix-ready maneuver**: `gh pr ready
+  --undo`, land the fix on the same branch (this is in-cycle, not a
+  review-freeze violation — the freeze triggers on the READY state, which
+  you've just left), then `gh pr ready` again once CI re-runs green. This is
+  the standard, blessed path, not an exception. Precedent (PR #11): marked
+  ready with all local suites green, but CI's coverage-report was red — the
+  whole inventory UI (T070) shipped with zero widget tests, dropping frontend
+  line coverage below baseline; the handoff was void and recovered via
+  draft-fix-ready with T203's widget tests.
 - **Coverage baselines come from CI, never local computation (recorded
   2026-07-19, T198).** Every number in `coverage-baseline.json` must be
   sourced from CI's own coverage artifact — download the coverage-report

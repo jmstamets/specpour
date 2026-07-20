@@ -44,9 +44,9 @@ void main() {
 
     // Browse/search recipes with content facets (FR-050)
     //
-    // Guest-accessible (FR-004b). Only public/core recipes are returned — private personal-library recipes land with the personal-library story (US3). The rating and makeable-from-inventory facets are staged (T149/T148); ABV-range filtering computes ABV per candidate at request time rather than from a stored column, since ABV is always derived, never persisted (data-model.md).
+    // Guest-accessible (FR-004b). Only public/core recipes are returned by default — private personal-library recipes land with the personal-library story (US3), or via `scope`/`makeable`. The rating facet is still staged (T149); ABV-range filtering computes ABV per candidate at request time rather than from a stored column, since ABV is always derived, never persisted (data-model.md).
     //
-    //Future<RecipePage> listRecipes({ String family, String category, String tag, String flavorProfile, String equipment, String glassware, String ice, String uses, String allergenExclude, String source_, String scope, String cursor, int limit }) async
+    //Future<RecipePage> listRecipes({ String family, String category, String tag, String flavorProfile, String equipment, String glassware, String ice, String uses, String allergenExclude, String makeable, String source_, String scope, String cursor, int limit }) async
     test('test listRecipes', () async {
       // TODO
     });

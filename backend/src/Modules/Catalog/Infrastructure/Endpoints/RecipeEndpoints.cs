@@ -61,6 +61,7 @@ public static class RecipeEndpoints
         string? ice,
         string? uses,
         string? allergenExclude,
+        string? makeable,
         string? source,
         string? scope,
         string? cursor,
@@ -70,10 +71,37 @@ public static class RecipeEndpoints
         Ingredients.Contracts.IIngredientLookupPort ingredientLookup,
         Contracts.IRecipeLookupPort recipeLookup,
         IVenueOwnershipPort venueOwnership,
+        Inventory.Contracts.IMakeabilityPort makeabilityPort,
         CancellationToken cancellationToken)
     {
         var pageSize = Math.Clamp(limit ?? DefaultLimit, 1, 100);
         var offset = CursorPagination.Decode(cursor);
+
+        // T148/FR-050: makeable-from-inventory facet — bearer-only (needs the
+        // caller's own inventory). Computed BEFORE the base query is chosen (not as
+        // a post-filter like equipment/glassware/uses below) because
+        // IMakeabilityPort's own visible-recipe set already spans public ∪ the
+        // caller's own personal/bar recipes — a caller's own authored recipe can be
+        // makeable/near-miss too, and the default (no `scope`) base query below is
+        // public-only, which would silently exclude it if this ran as a pure
+        // post-filter. Includes near-misses (one-away, naming the missing/
+        // substitutable line) alongside fully-makeable recipes — both count as
+        // "matching" for this facet, distinguished per-item by IsNearMiss.
+        Dictionary<Guid, Inventory.Contracts.MakeableRecipeInfo>? makeableById = null;
+        Dictionary<Guid, Inventory.Contracts.NearMissRecipeInfo>? nearMissById = null;
+        HashSet<Guid>? makeableMatchedIds = null;
+        if (string.Equals(makeable, "true", StringComparison.OrdinalIgnoreCase))
+        {
+            if (user.Identity?.IsAuthenticated != true)
+            {
+                return TypedResults.Problem(title: "Sign-in required", statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            var makeability = await makeabilityPort.ComputeAsync(CurrentUserId(user), cancellationToken);
+            makeableById = makeability.Makeable.ToDictionary(m => m.RecipeId);
+            nearMissById = makeability.NearMiss.ToDictionary(m => m.RecipeId);
+            makeableMatchedIds = [.. makeableById.Keys.Concat(nearMissById.Keys)];
+        }
 
         IQueryable<Recipe> query;
         if (scope is not null)
@@ -111,9 +139,25 @@ public static class RecipeEndpoints
             // matches nothing rather than silently ignoring the filter.
             return TypedResults.Ok(new RecipePageResponse([], null));
         }
+        else if (makeableMatchedIds is not null)
+        {
+            // No explicit scope/source: use the makeable facet's own visible-recipe
+            // set (public ∪ the caller's own personal/bar recipes) as the base,
+            // rather than the public-only default, so the caller's own authored
+            // recipes can appear here too.
+            query = db.Recipes.Where(r => makeableMatchedIds.Contains(r.Id));
+        }
         else
         {
             query = db.Recipes.Where(r => r.Visibility == ContentVisibility.Public);
+        }
+
+        // Composes with any of the branches above (e.g. `scope=personal&makeable=true`
+        // narrows to the caller's own makeable/near-miss personal recipes); a no-op
+        // when the branch above already used makeableMatchedIds as its own base.
+        if (makeableMatchedIds is not null)
+        {
+            query = query.Where(r => makeableMatchedIds.Contains(r.Id));
         }
 
         if (family is not null)
@@ -196,14 +240,55 @@ public static class RecipeEndpoints
 
         var familyKeysById = await db.Families.ToDictionaryAsync(f => f.Id, f => f.NameKey, cancellationToken);
 
+        IReadOnlyDictionary<Guid, Ingredients.Contracts.IngredientSummary> makeabilityIngredientNames = new Dictionary<Guid, Ingredients.Contracts.IngredientSummary>();
+        if (makeableById is not null && nearMissById is not null)
+        {
+            var involvedIds = page
+                .SelectMany(r => (makeableById.TryGetValue(r.Id, out var m) ? m.Lines : nearMissById.TryGetValue(r.Id, out var n) ? n.Lines : [])
+                    .SelectMany(l => new[] { l.RequirementIngredientId, l.SatisfiedByIngredientId })
+                    .Where(id => id.HasValue)
+                    .Select(id => id!.Value))
+                .Distinct()
+                .ToList();
+            makeabilityIngredientNames = await ingredientLookup.GetSummariesAsync(involvedIds, cancellationToken);
+        }
+
         var items = page.Select(r => new RecipeSummaryResponse(
             r.Id,
             r.PrimaryName,
-            r.FamilyId is { } familyId && familyKeysById.TryGetValue(familyId, out var familyKey) ? familyKey : null))
+            r.FamilyId is { } familyId && familyKeysById.TryGetValue(familyId, out var familyKey) ? familyKey : null,
+            ToMakeabilitySummary(r.Id, makeableById, nearMissById, makeabilityIngredientNames)))
             .ToList();
 
         return TypedResults.Ok(new RecipePageResponse(items, nextCursor));
     }
+
+    private static MakeabilitySummaryResponse? ToMakeabilitySummary(
+        Guid recipeId,
+        Dictionary<Guid, Inventory.Contracts.MakeableRecipeInfo>? makeableById,
+        Dictionary<Guid, Inventory.Contracts.NearMissRecipeInfo>? nearMissById,
+        IReadOnlyDictionary<Guid, Ingredients.Contracts.IngredientSummary> names)
+    {
+        if (makeableById is null || nearMissById is null)
+        {
+            return null;
+        }
+
+        if (makeableById.TryGetValue(recipeId, out var makeableRecipe))
+        {
+            return new MakeabilitySummaryResponse(false, makeableRecipe.MatchQuality, [.. makeableRecipe.Lines.Select(l => ToLineSummary(l, names))]);
+        }
+
+        var nearMissRecipe = nearMissById[recipeId];
+        return new MakeabilitySummaryResponse(true, null, [.. nearMissRecipe.Lines.Select(l => ToLineSummary(l, names))]);
+    }
+
+    private static MakeabilityLineSummaryResponse ToLineSummary(Inventory.Contracts.MakeabilityLineInfo line, IReadOnlyDictionary<Guid, Ingredients.Contracts.IngredientSummary> names) => new(
+        line.RequirementIngredientId,
+        names.TryGetValue(line.RequirementIngredientId, out var reqSummary) ? reqSummary.Name : null,
+        line.MatchQuality,
+        line.SatisfiedByIngredientId,
+        line.SatisfiedByIngredientId is { } id && names.TryGetValue(id, out var heldSummary) ? heldSummary.Name : null);
 
     private static async Task<Results<Ok<RecipeDetailResponse>, NotFound>> GetAsync(
         Guid id,
@@ -621,7 +706,12 @@ public static class RecipeEndpoints
 
 public sealed record RecipePageResponse(IReadOnlyList<RecipeSummaryResponse> Items, string? NextCursor);
 
-public sealed record RecipeSummaryResponse(Guid Id, string PrimaryName, string? FamilyKey);
+public sealed record RecipeSummaryResponse(Guid Id, string PrimaryName, string? FamilyKey, MakeabilitySummaryResponse? Makeability = null);
+
+/// <summary>T148: present exactly when `?makeable=true` was applied. <see cref="MatchQuality"/> is a derived summary of <see cref="Lines"/> (null for near-miss entries — a near-miss has no single aggregate quality, per the same ratification GET /inventory/makeable follows).</summary>
+public sealed record MakeabilitySummaryResponse(bool IsNearMiss, string? MatchQuality, IReadOnlyList<MakeabilityLineSummaryResponse> Lines);
+
+public sealed record MakeabilityLineSummaryResponse(Guid RequirementIngredientId, string? RequirementIngredientName, string MatchQuality, Guid? SatisfiedByIngredientId, string? SatisfiedByIngredientName);
 
 public sealed record RecipeIngredientLineResponse(int Position, Guid IngredientId, string? IngredientName, decimal Quantity, string Unit, string? Purpose, string ScalingRule);
 

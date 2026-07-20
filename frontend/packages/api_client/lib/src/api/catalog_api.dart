@@ -432,7 +432,7 @@ class CatalogApi {
   }
 
   /// Browse/search recipes with content facets (FR-050)
-  /// Guest-accessible (FR-004b). Only public/core recipes are returned — private personal-library recipes land with the personal-library story (US3). The rating and makeable-from-inventory facets are staged (T149/T148); ABV-range filtering computes ABV per candidate at request time rather than from a stored column, since ABV is always derived, never persisted (data-model.md).
+  /// Guest-accessible (FR-004b). Only public/core recipes are returned by default — private personal-library recipes land with the personal-library story (US3), or via &#x60;scope&#x60;/&#x60;makeable&#x60;. The rating facet is still staged (T149); ABV-range filtering computes ABV per candidate at request time rather than from a stored column, since ABV is always derived, never persisted (data-model.md).
   ///
   /// Parameters:
   /// * [family] - Family taxonomy key (e.g. \"family.sour\").
@@ -444,6 +444,7 @@ class CatalogApi {
   /// * [ice] 
   /// * [uses] - Hierarchy-aware \"uses:<ingredient>\" facet (T155/FR-050) — a class-level ingredient ID matches recipes using it or any descendant.
   /// * [allergenExclude] - Comma-separated allergen keys to exclude.
+  /// * [makeable] - Makeable-from-inventory facet (T148, FR-050) — bearer-only (401 if not authenticated). Includes both fully-makeable recipes and near-misses (one-away, naming the missing/substitutable line); the base recipe set for this facet spans public recipes AND the caller's own personal/bar recipes (a caller's own authored recipe can be makeable/near-miss too), composing with `scope` when both are given. Each returned recipe carries a `makeability` object with per-line detail.
   /// * [source_] 
   /// * [scope] - T058, FR-050 \"my library\" facet: the caller's own recipes in that library, regardless of visibility. Requires an authenticated caller (401 otherwise).
   /// * [cursor] - Opaque pagination cursor from a previous page's `nextCursor`.
@@ -467,6 +468,7 @@ class CatalogApi {
     String? ice,
     String? uses,
     String? allergenExclude,
+    String? makeable,
     String? source_,
     String? scope,
     String? cursor,
@@ -507,6 +509,7 @@ class CatalogApi {
       if (ice != null) r'ice': encodeQueryParameter(_serializers, ice, const FullType(String)),
       if (uses != null) r'uses': encodeQueryParameter(_serializers, uses, const FullType(String)),
       if (allergenExclude != null) r'allergenExclude': encodeQueryParameter(_serializers, allergenExclude, const FullType(String)),
+      if (makeable != null) r'makeable': encodeQueryParameter(_serializers, makeable, const FullType(String)),
       if (source_ != null) r'source': encodeQueryParameter(_serializers, source_, const FullType(String)),
       if (scope != null) r'scope': encodeQueryParameter(_serializers, scope, const FullType(String)),
       if (cursor != null) r'cursor': encodeQueryParameter(_serializers, cursor, const FullType(String)),

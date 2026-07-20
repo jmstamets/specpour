@@ -31,6 +31,7 @@ import 'package:api_client/src/model/concept_variant.dart';
 import 'package:api_client/src/model/create_equipment_request.dart';
 import 'package:api_client/src/model/create_house_made_request.dart';
 import 'package:api_client/src/model/create_ingredient_request.dart';
+import 'package:api_client/src/model/create_inventory_item_request.dart';
 import 'package:api_client/src/model/create_recipe_request.dart';
 import 'package:api_client/src/model/create_venue_request.dart';
 import 'package:api_client/src/model/cursor_page.dart';
@@ -57,24 +58,38 @@ import 'package:api_client/src/model/ingredient_page.dart';
 import 'package:api_client/src/model/ingredient_recipe_ref.dart';
 import 'package:api_client/src/model/ingredient_recipes.dart';
 import 'package:api_client/src/model/ingredient_summary.dart';
+import 'package:api_client/src/model/inventory_item.dart';
+import 'package:api_client/src/model/inventory_item_page.dart';
 import 'package:api_client/src/model/login_mfa_request.dart';
 import 'package:api_client/src/model/login_request.dart';
 import 'package:api_client/src/model/login_result.dart';
+import 'package:api_client/src/model/makeability_line.dart';
+import 'package:api_client/src/model/makeable_recipe.dart';
+import 'package:api_client/src/model/makeable_response.dart';
+import 'package:api_client/src/model/manual_entry_form.dart';
+import 'package:api_client/src/model/match_quality.dart';
 import 'package:api_client/src/model/me_export.dart';
 import 'package:api_client/src/model/mfa_enrollment.dart';
 import 'package:api_client/src/model/mfa_status.dart';
+import 'package:api_client/src/model/near_miss_recipe.dart';
 import 'package:api_client/src/model/problem_details.dart';
 import 'package:api_client/src/model/recipe_author.dart';
 import 'package:api_client/src/model/recipe_detail.dart';
 import 'package:api_client/src/model/recipe_ingredient_line.dart';
 import 'package:api_client/src/model/recipe_ingredient_line_input.dart';
+import 'package:api_client/src/model/recipe_makeability_line.dart';
+import 'package:api_client/src/model/recipe_makeability_summary.dart';
 import 'package:api_client/src/model/recipe_page.dart';
 import 'package:api_client/src/model/recipe_summary.dart';
+import 'package:api_client/src/model/recognition_response.dart';
+import 'package:api_client/src/model/recognize_request.dart';
 import 'package:api_client/src/model/recovery_confirm_request.dart';
 import 'package:api_client/src/model/recovery_request.dart';
 import 'package:api_client/src/model/register_request.dart';
+import 'package:api_client/src/model/requirement.dart';
 import 'package:api_client/src/model/responsible_consumption_message_response.dart';
 import 'package:api_client/src/model/role_grant_summary.dart';
+import 'package:api_client/src/model/satisfied_by.dart';
 import 'package:api_client/src/model/search_result.dart';
 import 'package:api_client/src/model/search_result_page.dart';
 import 'package:api_client/src/model/session.dart';
@@ -83,6 +98,7 @@ import 'package:api_client/src/model/support_resource_response.dart';
 import 'package:api_client/src/model/support_resources_response.dart';
 import 'package:api_client/src/model/update_equipment_request.dart';
 import 'package:api_client/src/model/update_ingredient_request.dart';
+import 'package:api_client/src/model/update_inventory_item_request.dart';
 import 'package:api_client/src/model/update_recipe_request.dart';
 import 'package:api_client/src/model/update_venue_request.dart';
 import 'package:api_client/src/model/venue.dart';
@@ -108,6 +124,7 @@ part 'serializers.g.dart';
   CreateEquipmentRequest,
   CreateHouseMadeRequest,
   CreateIngredientRequest,
+  CreateInventoryItemRequest,
   CreateRecipeRequest,
   CreateVenueRequest,
   CursorPage,
@@ -134,24 +151,38 @@ part 'serializers.g.dart';
   IngredientRecipeRef,
   IngredientRecipes,
   IngredientSummary,
+  InventoryItem,
+  InventoryItemPage,
   LoginMfaRequest,
   LoginRequest,
   LoginResult,
+  MakeabilityLine,
+  MakeableRecipe,
+  MakeableResponse,
+  ManualEntryForm,
+  MatchQuality,
   MeExport,
   MfaEnrollment,
   MfaStatus,
+  NearMissRecipe,
   ProblemDetails,
   RecipeAuthor,
   RecipeDetail,
   RecipeIngredientLine,
   RecipeIngredientLineInput,
+  RecipeMakeabilityLine,
+  RecipeMakeabilitySummary,
   RecipePage,
   RecipeSummary,
+  RecognitionResponse,
+  RecognizeRequest,
   RecoveryConfirmRequest,
   RecoveryRequest,
   RegisterRequest,
+  Requirement,
   ResponsibleConsumptionMessageResponse,
   RoleGrantSummary,
+  SatisfiedBy,
   SearchResult,
   SearchResultPage,
   Session,
@@ -160,6 +191,7 @@ part 'serializers.g.dart';
   SupportResourcesResponse,
   UpdateEquipmentRequest,
   UpdateIngredientRequest,
+  UpdateInventoryItemRequest,
   UpdateRecipeRequest,
   UpdateVenueRequest,
   Venue,
